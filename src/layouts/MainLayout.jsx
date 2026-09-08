@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from '../components/common/Navbar';
 import { Footer } from '../components/common/Footer';
+import { BackToTopButton } from '../components/common/BackToTopButton';
 
 export const MainLayout = () => {
   return (
@@ -11,6 +12,7 @@ export const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <BackToTopButton />
     </div>
   );
 };
