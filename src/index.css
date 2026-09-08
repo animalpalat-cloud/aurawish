@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 217 70 239;
+  }
+  
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+/* Custom luxury scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090b10;
+}
+::-webkit-scrollbar-thumb {
+  background: #23293a;
+  border-radius: 9999px;
+  border: 2px solid #090b10;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b4562;
+}
+
+/* Glassmorphic utilities */
+.glass-panel {
+  background: rgba(18, 22, 33, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(18, 22, 33, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-input {
+  background: rgba(12, 15, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+.glass-input:focus {
+  border-color: rgba(217, 70, 239, 0.7);
+  box-shadow: 0 0 0 2px rgba(217, 70, 239, 0.2);
+}
+
+/* Metallic & Foil Text Effects */
+.text-gold-foil {
+  background: linear-gradient(135deg, #FDE68A 0%, #D97706 50%, #FDE68A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 4s linear infinite;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #fdf4ff 0%, #f0abfc 40%, #c026d3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #a5f3fc 0%, #22d3ee 50%, #0891b2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-rose {
+  background: linear-gradient(135deg, #ffe4e6 0%, #fb7185 50%, #e11d48 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-glow {
+  border: 1px solid rgba(229, 192, 123, 0.3);
+  box-shadow: 0 0 20px rgba(229, 192, 123, 0.15), inset 0 0 15px rgba(229, 192, 123, 0.05);
+}
+
+/* Foil Shine Animation */
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Envelope 3D unboxing perspectives */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Noise overlay */
+.bg-noise {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* 
+ * Robust Urdu & Card Typography Pipeline
+ * When a custom font (especially Urdu Nastaliq/Naskh) is active on [data-card-export],
+ * ensure child text elements (h1, h2, p, span, div) inherit the chosen font-family
+ * instead of being blocked by static utility classes like font-serif, font-display, font-outfit.
+ */
+[data-card-export] {
+  /* Set CSS custom variable for dynamic card typography */
+  --card-font: inherit;
+}
+
+[data-card-export] h1,
+[data-card-export] h2,
+[data-card-export] p,
+[data-card-export] .card-text {
+  font-family: var(--card-font) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * RTL (Urdu / Arabic / Persian) Script-Aware Typography
+ * ═══════════════════════════════════════════════════════════════════════
+ * Key principles:
+ *  1. Headings and body text need DIFFERENT line-height values.
+ *  2. Nastaliq fonts (Noto Nastaliq Urdu, Gulzar, Mirza) have extreme
+ *     vertical extents — glyphs descend far below the baseline and
+ *     extend above the ascent line. They need more generous spacing.
+ *  3. Naskh/Modern Arabic fonts (Amiri, Noto Naskh Arabic, Cairo, etc.)
+ *     have more conventional vertical metrics closer to Latin fonts.
+ *  4. letter-spacing MUST be 0 or normal for connected Arabic scripts.
+ *  5. overflow:hidden on parent containers can clip Nastaliq descenders.
+ *  6. The `lang` attribute enables proper OpenType shaping in browsers.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* Base RTL container: direction + bidi isolation */
+[data-card-export][dir="rtl"],
+[dir="rtl"] [data-card-export],
+.urdu-text {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+/* Connected Arabic script: never use negative/positive letter-spacing.
+   Also normalize word-spacing for consistent glyph positioning. */
+[data-card-export][dir="rtl"] p,
+[data-card-export][dir="rtl"] h1,
+[data-card-export][dir="rtl"] h2,
+[data-card-export][dir="rtl"] span,
+[data-card-export][dir="rtl"] div,
+.urdu-text p,
+.urdu-text h1,
+.urdu-text h2,
+.urdu-text span,
+.urdu-text div {
+  letter-spacing: 0 !important;
+  word-spacing: normal !important;
+}
+
+/* ── HEADINGS (h1, h2) — RTL ────────────────────────────────────────
+ * Large Urdu headings need a line-height that accommodates diacritics
+ * and Nastaliq diagonal flow without being so large that it creates
+ * a vast gap. 1.5 works well for display sizes (text-3xl to text-6xl).
+ * Small padding prevents glyph clipping at container edges. */
+[data-card-export][dir="rtl"] h1,
+[data-card-export][dir="rtl"] h2,
+.urdu-text h1,
+.urdu-text h2 {
+  line-height: 1.5 !important;
+  padding-top: 0.15em;
+  padding-bottom: 0.2em;
+  overflow: visible !important;
+}
+
+/* ── BODY TEXT (p, .card-text) — RTL ────────────────────────────────
+ * Body text at text-base/text-lg needs generous line-height for
+ * multi-line readability. Nastaliq especially needs this because
+ * descenders from one line can visually overlap the line below. */
+[data-card-export][dir="rtl"] p,
+.urdu-text p,
+[data-card-export][dir="rtl"] .card-text,
+.urdu-text .card-text {
+  line-height: 2.0 !important;
+  padding-top: 0.1em;
+  padding-bottom: 0.15em;
+  overflow: visible !important;
+}
+
+/* ── SMALL/DECORATIVE TEXT (text-xs, text-sm) — RTL ─────────────────
+ * Small text like subtitles, sender names, tracking labels. These
+ * need a balanced but not excessive line-height. */
+[data-card-export][dir="rtl"] .text-xs,
+[data-card-export][dir="rtl"] .text-sm,
+[data-card-export][dir="rtl"] .text-\[11px\],
+[data-card-export][dir="rtl"] .text-\[10px\],
+.urdu-text .text-xs,
+.urdu-text .text-sm {
+  line-height: 1.7 !important;
+  overflow: visible !important;
+}
+
+/* ── NASTALIQ-SPECIFIC OVERRIDES ─────────────────────────────────────
+ * When data-font-category="nastaliq" is set, apply even more generous
+ * vertical space. Nastaliq fonts have ~2× the vertical extent of Naskh. */
+[data-card-export][data-font-category="nastaliq"] h1,
+[data-card-export][data-font-category="nastaliq"] h2 {
+  line-height: 1.65 !important;
+  padding-top: 0.2em;
+  padding-bottom: 0.3em;
+}
+
+[data-card-export][data-font-category="nastaliq"] p {
+  line-height: 2.2 !important;
+  padding-top: 0.15em;
+  padding-bottom: 0.25em;
+}
+
+/* ── PREVENT GLYPH CLIPPING ──────────────────────────────────────────
+ * Ensure the template's rounded/bordered wrapper doesn't clip tall
+ * Urdu/Nastaliq glyphs. We target the direct child content area only,
+ * NOT the outer card container (which needs overflow:hidden for its
+ * decorative corners). */
+[data-card-export][dir="rtl"] > div {
+  overflow: visible;
+}
+
+/* ── MIXED BIDI CONTENT ──────────────────────────────────────────────
+ * When Urdu text contains embedded English words/names, use isolate
+ * so the directional run doesn't disrupt surrounding RTL flow. */
+[data-card-export][dir="rtl"] bdi,
+.urdu-text bdi {
+  unicode-bidi: isolate;
+}
+

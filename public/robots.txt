@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /create/
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+
+Sitemap: https://aurawish.com/sitemap.xml
