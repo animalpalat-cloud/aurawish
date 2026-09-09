@@ -29,8 +29,8 @@ export const ContactPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="Contact AuraWish - Support & Inquiries"
-        description="Have questions about AuraWish card maker, template suggestions, or feedback? Get in touch with our team."
+        title="Contact Birthday Wishes - Support & Inquiries"
+        description="Have questions about Birthday Wishes card maker, template suggestions, or feedback? Get in touch with our team."
         canonicalUrl="/contact"
       />
 

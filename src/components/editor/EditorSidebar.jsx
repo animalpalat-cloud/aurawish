@@ -31,7 +31,7 @@ export const EditorSidebar = ({
           </div>
           <div>
             <span className="text-sm font-bold font-display text-white tracking-wide flex items-center gap-1.5">
-              AuraWish
+              Birthday Wishes
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400/15 text-amber-300 border border-amber-400/25 font-sans font-medium">STUDIO</span>
             </span>
           </div>

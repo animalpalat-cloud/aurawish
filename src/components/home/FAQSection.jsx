@@ -3,11 +3,11 @@ import { HelpCircle, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 export const FAQS = [
   {
-    q: 'What is AuraWish?',
-    a: 'AuraWish is a digital birthday card and greeting platform that lets you create, personalize, and share interactive birthday cards online. Instead of sending a static image or a plain text message, AuraWish delivers an interactive celebration with custom photos, ambient music, particle animations, and a 3D digital envelope unboxing experience.'
+    q: 'What is Birthday Wishes?',
+    a: 'Birthday Wishes is a digital birthday card and greeting platform that lets you create, personalize, and share interactive birthday cards online. Instead of sending a static image or a plain text message, Birthday Wishes delivers an interactive celebration with custom photos, ambient music, particle animations, and a 3D digital envelope unboxing experience.'
   },
   {
-    q: 'How do I create a birthday card online with AuraWish?',
+    q: 'How do I create a birthday card online with Birthday Wishes?',
     a: 'Creating a birthday card takes less than two minutes: choose an artist-designed template from our catalog, customize the recipient name, age, and personal birthday message, upload a favorite photo, and select background music. You can preview changes live in real-time before generating your card.'
   },
   {
@@ -20,15 +20,15 @@ export const FAQS = [
   },
   {
     q: 'How do I share the birthday card with the recipient?',
-    a: 'Once you finalize your design, AuraWish generates a unique, private shareable link (e.g. aurawish.com/card/abc123). You can send this link directly via WhatsApp, SMS, iMessage, Email, or social media. When the recipient opens the link, they experience a 3D envelope unboxing with background music and your personalized card.'
+    a: 'Once you finalize your design, Birthday Wishes generates a unique, private shareable link (e.g. birthdaywishes.com/card/abc123). You can send this link directly via WhatsApp, SMS, iMessage, Email, or social media. When the recipient opens the link, they experience a 3D envelope unboxing with background music and your personalized card.'
   },
   {
     q: 'Can I download the birthday card as an image or video?',
     a: 'Yes. In addition to online link sharing, you can download your birthday card as an ultra-sharp 1080×1080 PNG image for print and messaging, or export an animated MP4 video with synchronized celebration music.'
   },
   {
-    q: 'Does AuraWish support multiple languages such as Urdu, Arabic, Hindi, or Spanish?',
-    a: 'Yes. AuraWish features a real multi-language rendering engine supporting 25 major world languages, complete with native scripts (Arabic, Perso-Arabic, Devanagari, CJK, Cyrillic, Greek, Latin) and automatic RTL/LTR text direction. You can select your language and pair it with authentic script-compatible fonts without broken characters.'
+    q: 'Does Birthday Wishes support multiple languages such as Urdu, Arabic, Hindi, or Spanish?',
+    a: 'Yes. Birthday Wishes features a real multi-language rendering engine supporting 25 major world languages, complete with native scripts (Arabic, Perso-Arabic, Devanagari, CJK, Cyrillic, Greek, Latin) and automatic RTL/LTR text direction. You can select your language and pair it with authentic script-compatible fonts without broken characters.'
   },
   {
     q: 'Do recipients need to install an app or register an account to view their card?',
@@ -57,7 +57,7 @@ export const FAQSection = () => {
             Frequently Asked Questions
           </h2>
           <p className="text-sm sm:text-base text-slate-400 mt-2">
-            Everything you need to know about creating, customizing, and sharing digital birthday cards on AuraWish.
+            Everything you need to know about creating, customizing, and sharing digital birthday cards on Birthday Wishes.
           </p>
         </div>
 

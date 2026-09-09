@@ -10,7 +10,7 @@ export const BirthdayIdeasHubPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="Birthday Ideas - Message Inspiration, Surprises & Guides | AuraWish"
+        title="Birthday Ideas - Message Inspiration, Surprises & Guides | Birthday Wishes"
         description="Explore curated editorial guides on how to write meaningful birthday cards, creative surprise ideas, digital card tips, and etiquette."
         canonicalUrl="/birthday-ideas"
       />

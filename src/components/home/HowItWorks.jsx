@@ -33,7 +33,7 @@ export const HowItWorks = () => {
             Simple 3-Step Journey
           </div>
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight">
-            How AuraWish Works
+            How Birthday Wishes Works
           </h2>
           <p className="text-sm sm:text-base text-slate-400 mt-3">
             Create and send a personalized digital birthday greeting in under 2 minutes.

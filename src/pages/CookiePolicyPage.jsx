@@ -6,8 +6,8 @@ export const CookiePolicyPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="Cookie Policy - AuraWish"
-        description="Learn how AuraWish uses essential cookies and browser storage to power digital card customization and studio sessions."
+        title="Cookie Policy - Birthday Wishes"
+        description="Learn how Birthday Wishes uses essential cookies and browser storage to power digital card customization and studio sessions."
         canonicalUrl="/cookie-policy"
       />
 
@@ -29,9 +29,9 @@ export const CookiePolicyPage = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-bold text-white">How AuraWish Uses Storage</h2>
+          <h2 className="text-xl font-bold text-white">How Birthday Wishes Uses Storage</h2>
           <p>
-            AuraWish prioritizes a seamless creator experience. We use storage for:
+            Birthday Wishes prioritizes a seamless creator experience. We use storage for:
           </p>
           <ul className="list-disc pl-5 space-y-2 text-slate-400 text-sm">
             <li>

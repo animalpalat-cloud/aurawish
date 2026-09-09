@@ -105,7 +105,7 @@ export const Navbar = () => {
             <Link 
               to="/" 
               className="flex items-center gap-2.5 sm:gap-3 group py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10] rounded-xl transition-all"
-              aria-label="AuraWish Homepage"
+              aria-label="Birthday Wishes Homepage"
             >
               {/* Logo Emblem */}
               <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-500 to-amber-400 p-[1px] shadow-md shadow-brand-500/20 group-hover:shadow-brand-500/35 transition-all duration-300">
@@ -117,7 +117,7 @@ export const Navbar = () => {
               {/* Brand Wordmark & Tag */}
               <div className="flex items-baseline gap-1.5 sm:gap-2">
                 <span className="text-lg sm:text-xl font-bold tracking-tight text-white font-display">
-                  AuraWish
+                  Birthday Wishes
                 </span>
                 <span className="inline-flex items-center px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase rounded-md bg-amber-400/10 text-amber-300 border border-amber-400/25 select-none">
                   Studio

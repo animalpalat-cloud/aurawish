@@ -6,8 +6,8 @@ export const DisclaimerPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="Disclaimer - AuraWish"
-        description="Legal and informational disclaimer regarding AuraWish digital greeting cards, user content, audio, and web links."
+        title="Disclaimer - Birthday Wishes"
+        description="Legal and informational disclaimer regarding Birthday Wishes digital greeting cards, user content, audio, and web links."
         canonicalUrl="/disclaimer"
       />
 
@@ -24,14 +24,14 @@ export const DisclaimerPage = () => {
         <section className="space-y-3">
           <h2 className="text-xl font-bold text-white">General Information</h2>
           <p>
-            The content, greeting card ideas, birthday messages, and editorial guides published on AuraWish are intended for personal entertainment and celebration purposes.
+            The content, greeting card ideas, birthday messages, and editorial guides published on Birthday Wishes are intended for personal entertainment and celebration purposes.
           </p>
         </section>
 
         <section className="space-y-3">
           <h2 className="text-xl font-bold text-white">User-Generated Content</h2>
           <p>
-            AuraWish allows creators to compose personal text messages and upload photographs to generate shareable digital cards. AuraWish does not endorse, verify, or assume liability for opinions, claims, or media uploaded by individual users.
+            Birthday Wishes allows creators to compose personal text messages and upload photographs to generate shareable digital cards. Birthday Wishes does not endorse, verify, or assume liability for opinions, claims, or media uploaded by individual users.
           </p>
         </section>
 

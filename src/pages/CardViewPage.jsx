@@ -64,7 +64,7 @@ export const CardViewPage = () => {
 
           // Dynamic document title for recipient
           if (foundCard.recipientName) {
-            document.title = `Happy Birthday ${foundCard.recipientName}! 🎂 | AuraWish`;
+            document.title = `Happy Birthday ${foundCard.recipientName}! 🎂 | Birthday Wishes`;
           }
 
           setLoading(false);

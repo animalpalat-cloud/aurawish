@@ -1,4 +1,4 @@
-// AuraWish Product Feature Deep-Dive Landing Pages Data
+// Birthday Wishes Product Feature Deep-Dive Landing Pages Data
 // Honest, factual breakdowns of real platform capabilities.
 
 export const PRODUCT_FEATURE_PAGES = [
@@ -6,8 +6,8 @@ export const PRODUCT_FEATURE_PAGES = [
     slug: 'birthday-card-maker',
     title: 'Online Birthday Card Maker',
     h1: 'Create Custom Digital Birthday Cards Online',
-    intro: 'AuraWish is an online digital greeting studio where anyone can craft luxury birthday cards with customized messages, photos, celebratory music, and animated effects—no graphic design skills required.',
-    seoTitle: 'Free Online Birthday Card Maker - Custom Cards with Music | AuraWish',
+    intro: 'Birthday Wishes is an online digital greeting studio where anyone can craft luxury birthday cards with customized messages, photos, celebratory music, and animated effects—no graphic design skills required.',
+    seoTitle: 'Free Online Birthday Card Maker - Custom Cards with Music | Birthday Wishes',
     seoDescription: 'Design bespoke digital birthday cards online. Personalize text, choose celebration music, add photos, and share interactive cards instantly.',
     features: [
       {
@@ -36,8 +36,8 @@ export const PRODUCT_FEATURE_PAGES = [
     slug: 'digital-birthday-cards',
     title: 'Digital Birthday Cards',
     h1: 'Interactive Digital Birthday Cards for Modern Celebrations',
-    intro: 'Say goodbye to boring static e-cards. AuraWish digital cards deliver an interactive 3D unboxing experience right inside the recipient’s mobile or desktop browser.',
-    seoTitle: 'Interactive Digital Birthday Cards - 3D Envelope Unboxing | AuraWish',
+    intro: 'Say goodbye to boring static e-cards. Birthday Wishes digital cards deliver an interactive 3D unboxing experience right inside the recipient’s mobile or desktop browser.',
+    seoTitle: 'Interactive Digital Birthday Cards - 3D Envelope Unboxing | Birthday Wishes',
     seoDescription: 'Send extraordinary digital birthday cards. Recipients tap to unbox an animated envelope accompanied by celebration music and effects.',
     features: [
       {
@@ -55,7 +55,7 @@ export const PRODUCT_FEATURE_PAGES = [
     title: 'Animated Birthday Cards',
     h1: 'Animated Birthday Cards with Real-Time Effects',
     intro: 'Add festive flair to your wishes with animated sparkles, fluttering confetti, floating hearts, and fireworks.',
-    seoTitle: 'Animated Birthday Cards with Music & Effects | AuraWish',
+    seoTitle: 'Animated Birthday Cards with Music & Effects | Birthday Wishes',
     seoDescription: 'Create animated birthday cards with confetti, sparkling lights, and background music. Delight friends and family with motion.',
     features: [
       {
@@ -69,7 +69,7 @@ export const PRODUCT_FEATURE_PAGES = [
     title: 'Birthday Cards with Photos',
     h1: 'Personalized Birthday Cards Featuring Your Favorite Photos',
     intro: 'A picture is worth a thousand words. Upload a treasured photo of the celebrator and frame it inside our luxury design templates.',
-    seoTitle: 'Personalized Birthday Cards with Photos - Photo Cards | AuraWish',
+    seoTitle: 'Personalized Birthday Cards with Photos - Photo Cards | Birthday Wishes',
     seoDescription: 'Upload photos to create customized birthday cards. Add portraits, memories, and personal wishes with music in seconds.',
     features: [
       {
@@ -83,7 +83,7 @@ export const PRODUCT_FEATURE_PAGES = [
     title: 'Birthday Cards with Music',
     h1: 'Digital Birthday Cards with Celebration Music & Audio',
     intro: 'Music creates an emotional atmosphere. Add curated background songs and sound effects that trigger when your recipient unboxes the card.',
-    seoTitle: 'Birthday Cards with Music - Audio Digital Greeting Cards | AuraWish',
+    seoTitle: 'Birthday Cards with Music - Audio Digital Greeting Cards | Birthday Wishes',
     seoDescription: 'Send interactive birthday cards with background music. Choose from lofi, acoustic, and festive celebration soundtracks.',
     features: [
       {
@@ -97,7 +97,7 @@ export const PRODUCT_FEATURE_PAGES = [
     title: 'Shareable Birthday Cards',
     h1: 'Instant Shareable Birthday Card Links for WhatsApp & Socials',
     intro: 'No postal delays. Generate a clean, private share link and send it via WhatsApp, SMS, Messenger, or email in one click.',
-    seoTitle: 'Shareable Birthday Cards - One-Click Share Links | AuraWish',
+    seoTitle: 'Shareable Birthday Cards - One-Click Share Links | Birthday Wishes',
     seoDescription: 'Create shareable birthday cards and send instant celebration links via WhatsApp, SMS, or email. Works on all devices.',
     features: [
       {

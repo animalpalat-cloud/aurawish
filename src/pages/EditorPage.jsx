@@ -126,7 +126,7 @@ export const EditorPage = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-display font-bold text-white">
-                AuraWish Studio: {template.name}
+                Birthday Wishes Studio: {template.name}
               </h1>
               {existingCard && (
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">

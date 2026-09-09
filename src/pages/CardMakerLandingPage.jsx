@@ -30,7 +30,7 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
       <div className="my-8 sm:my-12 text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-          <span>AuraWish Online Studio</span>
+          <span>Birthday Wishes Online Studio</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
@@ -62,7 +62,7 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
             Engineered for Magical Celebration Moments
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Real interactive capabilities built directly into every AuraWish card.
+            Real interactive capabilities built directly into every Birthday Wishes card.
           </p>
         </div>
 

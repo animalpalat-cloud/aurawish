@@ -18,7 +18,7 @@ export const Footer = () => {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold tracking-tight text-white font-display">
-                AuraWish
+                Birthday Wishes
               </span>
             </Link>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-sm">
@@ -37,7 +37,7 @@ export const Footer = () => {
           {/* Column 2: Core Platform Hubs */}
           <div>
             <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
-              Explore AuraWish
+              Explore Birthday Wishes
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li><Link to="/birthday-wishes" className="hover:text-white transition-colors">Birthday Wishes Hub</Link></li>
@@ -84,7 +84,7 @@ export const Footer = () => {
 
         {/* Bottom Copyright Bar */}
         <div className="pt-8 mt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} AuraWish Studio. All rights reserved. Crafted for unforgettable celebrations.</p>
+          <p>© {new Date().getFullYear()} Birthday Wishes Studio. All rights reserved. Crafted for unforgettable celebrations.</p>
           <div className="flex items-center gap-4 text-[11px]">
             <Link to="/privacy-policy" className="hover:text-slate-400 transition-colors">Privacy</Link>
             <span>•</span>

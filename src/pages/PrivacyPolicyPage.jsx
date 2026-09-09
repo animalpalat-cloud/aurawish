@@ -6,8 +6,8 @@ export const PrivacyPolicyPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="Privacy Policy - AuraWish"
-        description="Review AuraWish's privacy policy, including how we handle card information, photos, session data, and user accounts."
+        title="Privacy Policy - Birthday Wishes"
+        description="Review Birthday Wishes's privacy policy, including how we handle card information, photos, session data, and user accounts."
         canonicalUrl="/privacy-policy"
       />
 
@@ -24,7 +24,7 @@ export const PrivacyPolicyPage = () => {
         <section className="space-y-3">
           <h2 className="text-xl font-bold text-white">1. Information We Collect</h2>
           <p>
-            AuraWish respects your privacy. When you create digital greeting cards, we collect only the necessary information to render and deliver your card:
+            Birthday Wishes respects your privacy. When you create digital greeting cards, we collect only the necessary information to render and deliver your card:
           </p>
           <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
             <li>Card content: recipient name, sender name, custom birthday messages, age, and template preferences.</li>
@@ -53,7 +53,7 @@ export const PrivacyPolicyPage = () => {
         <section className="space-y-3">
           <h2 className="text-xl font-bold text-white">4. Cookies & Local Storage</h2>
           <p>
-            AuraWish uses browser local storage and essential session cookies to remember your drafted cards, theme customizations, and active login sessions. These do not track you across unrelated third-party websites.
+            Birthday Wishes uses browser local storage and essential session cookies to remember your drafted cards, theme customizations, and active login sessions. These do not track you across unrelated third-party websites.
           </p>
         </section>
 

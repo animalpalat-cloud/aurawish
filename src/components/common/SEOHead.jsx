@@ -11,7 +11,7 @@ export const SEOHead = ({
 }) => {
   useEffect(() => {
     // 1. Title Tag
-    const formattedTitle = title.includes('AuraWish') ? title : `${title} | AuraWish`;
+    const formattedTitle = title.includes('Birthday Wishes') ? title : `${title} | Birthday Wishes`;
     document.title = formattedTitle;
 
     // Helper to upsert meta tag
@@ -41,7 +41,7 @@ export const SEOHead = ({
     if (ogImage) setMeta('property', 'og:image', ogImage);
     const fullCanonical = canonicalUrl ? `https://aurawish.com${canonicalUrl}` : window.location.href;
     setMeta('property', 'og:url', fullCanonical);
-    setMeta('property', 'og:site_name', 'AuraWish');
+    setMeta('property', 'og:site_name', 'Birthday Wishes');
 
     // 4. Twitter Cards
     setMeta('name', 'twitter:card', 'summary_large_image');

@@ -1,4 +1,4 @@
-// AuraWish Birthday Ideas & Editorial Guides Master Data
+// Birthday Wishes Birthday Ideas & Editorial Guides Master Data
 // Deep, practical, actionable advice for digital greetings, surprise planning, and messaging.
 
 export const BIRTHDAY_IDEAS = [
@@ -25,7 +25,7 @@ export const BIRTHDAY_IDEAS = [
       }
     ],
     relatedSlugs: ['what-to-write-in-a-birthday-card', 'personalized-birthday-card-ideas'],
-    seoTitle: 'How to Write a Meaningful Birthday Message (Step-by-Step Guide) | AuraWish',
+    seoTitle: 'How to Write a Meaningful Birthday Message (Step-by-Step Guide) | Birthday Wishes',
     seoDescription: 'Master the art of writing memorable birthday wishes. Practical frameworks, etiquette tips, and real message examples for friends and family.'
   },
   {
@@ -51,7 +51,7 @@ export const BIRTHDAY_IDEAS = [
       }
     ],
     relatedSlugs: ['how-to-write-a-birthday-message', 'birthday-surprise-ideas'],
-    seoTitle: 'What to Write in a Birthday Card: Versatile Examples & Templates | AuraWish',
+    seoTitle: 'What to Write in a Birthday Card: Versatile Examples & Templates | Birthday Wishes',
     seoDescription: 'Never get stuck writing a birthday card again. Browse adaptable formulas and message examples for every relationship and celebration tone.'
   },
   {
@@ -61,7 +61,7 @@ export const BIRTHDAY_IDEAS = [
     category: 'Creative Ideas',
     readTime: '6 min read',
     h1: '7 Creative Ideas to Personalize a Digital Birthday Card',
-    intro: 'Digital birthday cards have evolved far beyond static email attachments. Today’s web technologies enable rich, cinematic unboxing rituals. Here are seven ways to make an AuraWish digital card truly unforgettable.',
+    intro: 'Digital birthday cards have evolved far beyond static email attachments. Today’s web technologies enable rich, cinematic unboxing rituals. Here are seven ways to make a Birthday Wishes digital card truly unforgettable.',
     sections: [
       {
         h2: '1. Pair Nostalgic Background Audio With the Reading Pace',
@@ -77,7 +77,7 @@ export const BIRTHDAY_IDEAS = [
       }
     ],
     relatedSlugs: ['how-to-make-a-digital-birthday-card', 'birthday-surprise-ideas'],
-    seoTitle: '7 Creative Ideas to Personalize Digital Birthday Cards | AuraWish',
+    seoTitle: '7 Creative Ideas to Personalize Digital Birthday Cards | Birthday Wishes',
     seoDescription: 'Transform digital cards into cinematic unboxings. Ideas for music selection, photo integration, animated confetti, and custom typography.'
   },
   {
@@ -91,7 +91,7 @@ export const BIRTHDAY_IDEAS = [
     sections: [
       {
         h2: '1. Midnight Digital Envelope Unboxing',
-        body: 'Send an AuraWish shareable card link timed precisely to hit their inbox at midnight in their local timezone. The interactive envelope unboxing and background music make for an instant morning surprise.'
+        body: 'Send an Birthday Wishes shareable card link timed precisely to hit their inbox at midnight in their local timezone. The interactive envelope unboxing and background music make for an instant morning surprise.'
       },
       {
         h2: '2. Virtual Breakfast or Coffee Delivery',
@@ -103,7 +103,7 @@ export const BIRTHDAY_IDEAS = [
       }
     ],
     relatedSlugs: ['personalized-birthday-card-ideas', 'how-to-make-a-digital-birthday-card'],
-    seoTitle: 'Long-Distance Birthday Surprise Ideas (Warm & Creative) | AuraWish',
+    seoTitle: 'Long-Distance Birthday Surprise Ideas (Warm & Creative) | Birthday Wishes',
     seoDescription: 'Creative ways to celebrate loved ones across the miles with digital birthday surprises, timed cards, and thoughtful moments.'
   },
   {
@@ -113,7 +113,7 @@ export const BIRTHDAY_IDEAS = [
     category: 'Tutorials',
     readTime: '3 min read',
     h1: 'How to Make a Digital Birthday Card in 3 Simple Steps',
-    intro: 'Creating a luxurious digital birthday greeting on AuraWish takes less than two minutes. Here is how the studio works from start to share.',
+    intro: 'Creating a luxurious digital birthday greeting on Birthday Wishes takes less than two minutes. Here is how the studio works from start to share.',
     sections: [
       {
         h2: 'Step 1: Select a Luxury Design Template',
@@ -129,8 +129,8 @@ export const BIRTHDAY_IDEAS = [
       }
     ],
     relatedSlugs: ['personalized-birthday-card-ideas', 'how-to-write-a-birthday-message'],
-    seoTitle: 'How to Make a Digital Birthday Card in 3 Steps | AuraWish',
-    seoDescription: 'Step-by-step guide to creating personalized digital birthday cards with photos, music, and interactive unboxings on AuraWish.'
+    seoTitle: 'How to Make a Digital Birthday Card in 3 Steps | Birthday Wishes',
+    seoDescription: 'Step-by-step guide to creating personalized digital birthday cards with photos, music, and interactive unboxings on Birthday Wishes.'
   }
 ];
 

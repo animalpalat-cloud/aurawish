@@ -25,14 +25,14 @@ export const BirthdayArticlePage = () => {
     "description": article.seoDescription,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://aurawish.com/birthday-ideas/${article.slug}`
+      "@id": `https://Birthday Wishes.com/birthday-ideas/${article.slug}`
     },
     "publisher": {
       "@type": "Organization",
-      "name": "AuraWish",
+      "name": "Birthday Wishes",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://aurawish.com/logo.png"
+        "url": "https://Birthday Wishes.com/logo.png"
       }
     }
   };

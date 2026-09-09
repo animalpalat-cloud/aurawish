@@ -61,7 +61,7 @@ export const CardRecipientView = ({ cardData, template }) => {
       <header className="max-w-4xl mx-auto w-full flex items-center justify-between mb-8 z-10">
         <Link to="/" className="flex items-center gap-2 text-white font-display font-bold text-lg hover:opacity-80 transition-opacity">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          AuraWish
+          Birthday Wishes
         </Link>
 
         <div className="flex items-center gap-2">

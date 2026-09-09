@@ -38,7 +38,7 @@ export const SignupPage = () => {
     setLoading(true);
     try {
       await registerWithEmail(name || 'Celebrator', email, password);
-      addToast('Account created successfully! Welcome to AuraWish.', 'success');
+      addToast('Account created successfully! Welcome to Birthday Wishes.', 'success');
       navigate(returnTo);
     } catch (err) {
       const msg = err.message || 'Failed to create account. Please try again.';
@@ -85,7 +85,7 @@ export const SignupPage = () => {
             Create Your Account
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Join AuraWish to save custom cards, track live views, and access luxury templates.
+            Join Birthday Wishes to save custom cards, track live views, and access luxury templates.
           </p>
         </div>
 

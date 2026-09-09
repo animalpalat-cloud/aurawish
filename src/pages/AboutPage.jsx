@@ -9,8 +9,8 @@ export const AboutPage = () => {
   return (
     <div className="py-10 sm:py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
-        title="About AuraWish - Beautiful Birthday Wishes & Digital Cards"
-        description="Learn about AuraWish's mission to transform birthdays into cinematic celebration moments through handcrafted digital cards, heartfelt wishes, and music."
+        title="About Birthday Wishes - Beautiful Birthday Wishes & Digital Cards"
+        description="Learn about Birthday Wishes's mission to transform birthdays into cinematic celebration moments through handcrafted digital cards, heartfelt wishes, and music."
         canonicalUrl="/about"
       />
 
@@ -26,7 +26,7 @@ export const AboutPage = () => {
           Making Everyday Birthdays Feel <span className="text-gold-foil">Unforgettable</span>
         </h1>
         <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-          AuraWish was built on a simple premise: physical greeting cards often get lost, while generic text messages lack emotional weight. We set out to build an interactive digital celebration studio that combines tactile elegance with modern web technology.
+          Birthday Wishes was built on a simple premise: physical greeting cards often get lost, while generic text messages lack emotional weight. We set out to build an interactive digital celebration studio that combines tactile elegance with modern web technology.
         </p>
       </div>
 
@@ -67,16 +67,16 @@ export const AboutPage = () => {
       <div className="space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed my-12 border-t border-slate-800 pt-10">
         <h2 className="text-2xl font-display font-bold text-white">Why Digital Greetings Matter</h2>
         <p>
-          In a world where families and friends often live in different cities, countries, and time zones, physical mail can be slow or unreliable. AuraWish bridges miles in seconds without sacrificing the ceremony of opening a personal greeting card.
+          In a world where families and friends often live in different cities, countries, and time zones, physical mail can be slow or unreliable. Birthday Wishes bridges miles in seconds without sacrificing the ceremony of opening a personal greeting card.
         </p>
         <p>
-          We also believe in global linguistic celebration. AuraWish provides full support for over 25 languages, featuring genuine Urdu Nastaliq and Arabic Naskh typography with proper right-to-left layout direction. Everyone deserves to be celebrated in their mother tongue.
+          We also believe in global linguistic celebration. Birthday Wishes provides full support for over 25 languages, featuring genuine Urdu Nastaliq and Arabic Naskh typography with proper right-to-left layout direction. Everyone deserves to be celebrated in their mother tongue.
         </p>
       </div>
 
       {/* CTA Section */}
       <div className="mt-12 p-8 rounded-3xl bg-gradient-to-r from-brand-900/30 via-[#151128] to-amber-900/20 border border-brand-500/20 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-white">Experience AuraWish Studio</h2>
+        <h2 className="text-2xl font-bold text-white">Experience Birthday Wishes Studio</h2>
         <p className="text-sm text-slate-300 max-w-xl mx-auto">
           Explore our hand-crafted card templates or find the perfect birthday wish for someone special today.
         </p>

@@ -26,13 +26,13 @@ export class CardExportEngine {
    * Sanitizes names for safe file downloading across operating systems
    */
   static sanitizeFilename(title, ext = 'png') {
-    const cleaned = (title || 'AuraWish-Birthday-Card')
+    const cleaned = (title || 'Birthday-Wishes-Card')
       .replace(/[\/\\:*?"<>|]/g, '-')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
       .slice(0, 60);
-    return `${cleaned || 'AuraWish-Birthday-Card'}.${ext}`;
+    return `${cleaned || 'Birthday-Wishes-Card'}.${ext}`;
   }
 
   /**

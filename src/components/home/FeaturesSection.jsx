@@ -52,10 +52,10 @@ export const FeaturesSection = () => {
             <span>Built For Meaningful Connections</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-bold text-white tracking-tight">
-            Why People Love Sending AuraWish Birthday Cards
+            Why People Love Sending Birthday Wishes Birthday Cards
           </h2>
           <p className="text-sm sm:text-base text-slate-400 mt-4 leading-relaxed">
-            Standard text messages get buried, and generic store-bought cards get tossed aside. AuraWish blends personalized sentiments with digital craftsmanship to create keepsakes people truly remember.
+            Standard text messages get buried, and generic store-bought cards get tossed aside. Birthday Wishes blends personalized sentiments with digital craftsmanship to create keepsakes people truly remember.
           </p>
         </div>
 

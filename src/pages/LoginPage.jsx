@@ -26,7 +26,7 @@ export const LoginPage = () => {
 
     try {
       await loginWithEmail(email, password);
-      addToast('Welcome back to AuraWish Studio!', 'success');
+      addToast('Welcome back to Birthday Wishes Studio!', 'success');
       navigate(returnTo);
     } catch (err) {
       const msg = err.message || 'Failed to sign in. Please check your credentials.';
