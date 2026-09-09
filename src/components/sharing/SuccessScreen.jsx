@@ -19,6 +19,8 @@ export const SuccessScreen = ({ card, onShareAgain }) => {
   const shareUrl = `${window.location.origin}/card/${card.shareId}`;
 
   useEffect(() => {
+    // Ensure any lingering editor music is fully stopped before playing the success chime
+    soundService.stopMusic();
     soundService.playFx('chime');
     try {
       confetti({

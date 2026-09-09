@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { ParticleOverlay } from './ParticleOverlay';
 import { InteractiveWishes } from './InteractiveWishes';
@@ -24,7 +24,7 @@ import { cn } from '../../utils/cn';
 import { getFontFamily, loadFont, isUrduFont, containsUrduText } from '../../data/fontsData';
 import { getLanguage, detectScriptAndDirection } from '../../data/languagesData';
 
-export const UniversalCardRenderer = ({
+const UniversalCardRendererBase = ({
   cardData = {},
   template = {},
   showInteractiveWish = true,
@@ -175,3 +175,6 @@ export const UniversalCardRenderer = ({
   );
 };
 
+// Memoize to prevent re-rendering when only the editor sidebar tab changes
+// (e.g. switching from Message to Photo tab should not re-render the live preview)
+export const UniversalCardRenderer = memo(UniversalCardRendererBase);

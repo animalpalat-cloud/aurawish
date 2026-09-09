@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Sparkles, Share2, Bookmark, Eye } from 'lucide-react';
 import { templateService } from '../services/templateService';
 import { cardService } from '../services/cardService';
+import { soundService } from '../services/soundService';
 import { useCardEditor } from '../hooks/useCardEditor';
 import { EditorSidebar } from '../components/editor/EditorSidebar';
 import { LivePreviewPane } from '../components/editor/LivePreviewPane';
@@ -39,6 +40,13 @@ export const EditorPage = () => {
   const [createdCard, setCreatedCard] = useState(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
+  // Stop all editor audio when the user leaves the editor (navigate away, back button, etc.)
+  useEffect(() => {
+    return () => {
+      soundService.stopMusic();
+    };
+  }, []);
+
   // Handle generating the card & saving
   const handleGenerateCard = async () => {
     if (!cardData.recipientName?.trim()) {
@@ -55,6 +63,8 @@ export const EditorPage = () => {
       };
 
       const saved = await cardService.saveCard(payload);
+      // Stop all editor audio immediately upon successful card generation
+      soundService.stopMusic();
       setCreatedCard(saved);
       addToast('Card generated successfully!', 'success');
     } catch (e) {

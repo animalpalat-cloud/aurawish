@@ -116,10 +116,17 @@
     }
     </script>
     
-    <!-- Google Fonts Preconnect & Stylesheets -->
+    <!-- Google Fonts Preconnect & Non-Blocking Font Loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Dancing+Script:wght@400;600;700&family=Great+Vibes&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Non-blocking: only critical UI fonts (Outfit) and one display font (Playfair Display) load first.
+         Dancing Script, Cinzel, Great Vibes, Plus Jakarta Sans are loaded on-demand via fontsData.js loadFont() -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
+    </noscript>
   </head>
   <body class="bg-[#090B10] text-slate-100 antialiased selection:bg-brand-500 selection:text-white min-h-screen overflow-x-hidden">
     <div id="root"></div>
