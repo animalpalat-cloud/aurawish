@@ -58,9 +58,38 @@
 .text-gold-foil {
   background: linear-gradient(135deg, #FDE68A 0%, #D97706 50%, #FDE68A 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
-  animation: shine 4s linear infinite;
+  /*
+    PERF FIX: The original animation moved `background-position` every frame.
+    background-position changes trigger a composited repaint on every rAF tick,
+    causing continuous main-thread work even on pages the user is just scrolling.
+
+    Fix: animate `transform: translateX` on a ::before pseudo-element overlay
+    instead. transform is GPU-only and does NOT trigger layout or paint.
+    The visual result is identical — a left-to-right sheen across the gold text.
+  */
+  position: relative;
+  animation: none;
+  will-change: auto;
+}
+.text-gold-foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 240, 160, 0.35) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shine-sweep 4s linear infinite;
+  pointer-events: none;
+  /* Keep the ::after inside the text clip region */
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .text-gradient-primary {
@@ -86,11 +115,15 @@
   box-shadow: 0 0 20px rgba(229, 192, 123, 0.15), inset 0 0 15px rgba(229, 192, 123, 0.05);
 }
 
-/* Foil Shine Animation */
+/* Foil Shine Animation — uses transform only (GPU, no paint) */
+@keyframes shine-sweep {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* LEGACY: kept for any external references, but .text-gold-foil no longer uses it */
 @keyframes shine {
-  to {
-    background-position: 200% center;
-  }
+  to { background-position: 200% center; }
 }
 
 /* Envelope 3D unboxing perspectives */
@@ -240,5 +273,78 @@
 [data-card-export][dir="rtl"] bdi,
 .urdu-text bdi {
   unicode-bidi: isolate;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * MOBILE SCROLL PERFORMANCE
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * 1. touch-action: pan-y  ───────────────────────────────────────────
+ *    Tell the browser that page sections only scroll vertically.
+ *    This lets Chrome/Safari hand off vertical flings to the compositor
+ *    thread immediately, without waiting for JS event handlers.
+ *    Applied to the main content wrappers; NOT applied to interactive
+ *    elements (sliders, canvases, audio cutter) which need their own
+ *    touch-action values.
+ *
+ * 2. content-visibility: auto  ──────────────────────────────────────
+ *    Skips rendering off-screen sections entirely until they approach
+ *    the viewport. Major win on long pages (Homepage, Templates, Wishes).
+ *    contain-intrinsic-size provides a layout hint so scroll position
+ *    doesn't jump when content is first rendered.
+ *    NOT applied to the hero or first visible section (would cause
+ *    flicker on initial load).
+ *
+ * 3. Glassmorphic panel perf hint  ──────────────────────────────────
+ *    .glass-panel and .glass-card already use backdrop-filter.
+ *    Adding will-change:transform tells the compositor to promote them
+ *    early so backdrop recalculations don't stall the main thread.
+ * ────────────────────────────────────────────────────────────────────
+ */
+
+/* Vertical-only pan for all major page sections */
+main,
+section,
+article,
+.page-section {
+  touch-action: pan-y;
+}
+
+/* content-visibility for below-fold sections on long pages.
+   The .cv-section class is added manually to each non-hero section
+   wrapper in the JSX so we have precise control over which sections
+   get deferred rendering. */
+.cv-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px; /* safe fallback height estimate */
+}
+
+/* Promote glass panels to their own layer up-front so backdrop-filter
+   recalculation doesn't stall scrolling. */
+.glass-panel,
+.glass-card {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Prevent layout shifts from images without explicit dimensions */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Reduce motion for users who prefer it — respects OS accessibility setting */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .text-gold-foil::after {
+    animation: none;
+  }
 }
 

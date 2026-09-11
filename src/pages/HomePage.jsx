@@ -13,28 +13,21 @@ import { motion } from 'framer-motion';
 export const HomePage = () => {
   return (
     <div className="relative overflow-hidden">
-      {/* 1. Hero Section (H1: Create Beautiful Birthday Wishes & Digital Birthday Cards) */}
+      {/* 1. Hero — above-fold, NOT deferred */}
       <HeroSection />
 
-      {/* 2. Featured Birthday Card Templates Showcase */}
-      <FeaturedTemplates />
+      {/* 2–8. Below-fold sections — cv-section enables content-visibility:auto
+              so the browser skips rendering until they approach the viewport */}
+      <div className="cv-section"><FeaturedTemplates /></div>
+      <div className="cv-section"><BirthdayWishesDiscovery /></div>
+      <div className="cv-section"><HowItWorks /></div>
+      <div className="cv-section"><FeaturesSection /></div>
+      <div className="cv-section"><FAQSection /></div>
 
-      {/* 3. Birthday Wishes by Relationship & Style (Intent-Satisfying Content & Internal Linking) */}
-      <BirthdayWishesDiscovery />
-
-      {/* 4. How It Works (3-step visual guide) */}
-      <HowItWorks />
-
-      {/* 5. Features Showcase: Personalization, Audio, Effects & Formats */}
-      <FeaturesSection />
-
-      {/* 6. Comprehensive FAQ Section (Structured Data Aligned) */}
-      <FAQSection />
-
-      {/* 8. Call to Action Pre-Footer Banner */}
-      <section className="py-20 relative overflow-hidden bg-gradient-to-b from-[#090b10] via-[#151128] to-[#090b10] border-t border-white/[0.06]">
+      {/* CTA Banner */}
+      <section className="cv-section py-20 relative overflow-hidden bg-gradient-to-b from-[#090b10] via-[#151128] to-[#090b10] border-t border-white/[0.06]">
         <div className="absolute inset-0 bg-radial-gradient from-brand-500/10 via-transparent to-transparent pointer-events-none" />
-        
+
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -68,7 +61,7 @@ export const HomePage = () => {
                   Create Free Birthday Card Now
                 </Button>
               </Link>
-              
+
               <Link to="/dashboard">
                 <Button
                   variant="secondary"

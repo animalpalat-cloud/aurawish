@@ -4,9 +4,13 @@ import { Sparkles, Heart, Shield, Zap } from 'lucide-react';
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#07080c] relative overflow-hidden text-slate-400">
-      {/* Background soft glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-brand-500/5 blur-3xl pointer-events-none" />
+    <footer
+      className="border-t border-white/[0.06] bg-[#07080c] relative overflow-hidden text-slate-400"
+      style={{
+        backgroundImage:
+          'radial-gradient(ellipse 70% 120px at 50% 0%, rgba(139,92,246,0.06) 0%, transparent 100%)',
+      }}
+    >
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">

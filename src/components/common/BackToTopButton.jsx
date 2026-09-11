@@ -9,24 +9,18 @@ export const BackToTopButton = () => {
     let ticking = false;
 
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          // Show after scrolling 350px
-          const scrolled = window.scrollY > 350;
-          setIsVisible(scrolled);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setIsVisible(window.scrollY > 350);
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Check initial scroll position on mount
-    handleScroll();
+    handleScroll(); // check initial position
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToTop = () => {
@@ -48,7 +42,7 @@ export const BackToTopButton = () => {
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           aria-label="Back to top"
           title="Back to top"
-          className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 hover:border-brand-500/50 shadow-xl shadow-black/40 backdrop-blur-md transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/60 focus:ring-offset-2 focus:ring-offset-[#090b10] group"
+          className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-slate-900/95 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 hover:border-brand-500/50 shadow-xl shadow-black/40 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/60 focus:ring-offset-2 focus:ring-offset-[#090b10] group"
         >
           <ArrowUp
             className="w-5 h-5 transition-transform duration-200 group-hover:-translate-y-0.5 text-brand-400 group-hover:text-brand-300"

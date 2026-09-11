@@ -4,6 +4,15 @@ import { UniversalCardRenderer } from '../card-renderer/UniversalCardRenderer';
 import { Button } from '../common/Button';
 import { DownloadModal } from '../sharing/DownloadModal';
 
+/** Tiny debounce helper — avoids importing a whole library */
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
 export const LivePreviewPane = ({
   cardData,
   template,
@@ -23,8 +32,13 @@ export const LivePreviewPane = ({
   // Base card width for each mode
   const targetWidth = previewMode === 'mobile' ? 376 : 580; // 360 + 16 border for mobile shell
 
-  // Measure the card's actual rendered height at full size so we can scale it correctly.
-  // We use a ResizeObserver on the card element itself rather than guessing a fixed height.
+  // Measure the card's actual rendered height.
+  // PERF FIX: The previous measureCard was passed directly to ResizeObserver,
+  // meaning every sub-pixel resize observation (e.g. from scrollbar appearing,
+  // text reflow, image loading) fired a synchronous setState that triggered a
+  // full re-render.  Debouncing at 80 ms batches rapid resize events into a
+  // single state update, eliminating the setState cascade during scrolling or
+  // typing in the sidebar.
   const measureCard = useCallback(() => {
     const cardEl = cardRef.current;
     if (!cardEl) return;
@@ -34,63 +48,62 @@ export const LivePreviewPane = ({
     }
   }, [cardNaturalHeight]);
 
-  // Observe the card for size changes (content, images loading, etc.)
+  // Debounced version used by the ResizeObserver
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const measureCardDebounced = useCallback(debounce(measureCard, 80), [measureCard]);
+
+  // Observe the card for size changes
   useEffect(() => {
     const cardEl = cardRef.current;
     if (!cardEl) return;
-
-    // Initial measurement
-    measureCard();
-
+    measureCard(); // initial — immediate, not debounced
     let ro;
     if (window.ResizeObserver) {
-      ro = new ResizeObserver(measureCard);
+      ro = new ResizeObserver(measureCardDebounced);
       ro.observe(cardEl);
     }
-
     return () => { if (ro) ro.disconnect(); };
-  }, [measureCard, previewMode, cardData, template]);
+  }, [measureCard, measureCardDebounced, previewMode, cardData, template]);
 
-  // Auto-fit calculation: uses the measured card height instead of a hardcoded estimate
+  // Auto-fit calculation.
+  // PERF FIX: Same debounce treatment — the container ResizeObserver was firing
+  // calculateScale (setState) on every pixel of window resize or sidebar drag,
+  // which re-rendered the entire LivePreviewPane each time.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const calculateScale = () => {
-      const containerWidth = container.clientWidth;
+      const containerWidth  = container.clientWidth;
       const containerHeight = container.clientHeight;
       if (!containerWidth || !containerHeight) return;
 
-      // Use measured card height, falling back to a reasonable default
       const effectiveHeight = cardNaturalHeight > 0
         ? cardNaturalHeight
         : (previewMode === 'mobile' ? 720 : 800);
 
-      // Padding to keep card from touching edges
-      const pad = 32;
-      const availW = Math.max(100, containerWidth - pad);
+      const pad    = 32;
+      const availW = Math.max(100, containerWidth  - pad);
       const availH = Math.max(100, containerHeight - pad);
 
-      const scaleW = availW / targetWidth;
-      const scaleH = availH / effectiveHeight;
-
-      const computed = Math.min(scaleW, scaleH);
-      // Cap at 1.0 so we never upscale
+      const computed = Math.min(availW / targetWidth, availH / effectiveHeight);
       setAutoScale(Math.min(computed, 1.0));
     };
 
-    calculateScale();
+    const calculateScaleDebounced = debounce(calculateScale, 80);
+
+    calculateScale(); // initial — immediate
 
     let ro;
     if (window.ResizeObserver) {
-      ro = new ResizeObserver(calculateScale);
+      ro = new ResizeObserver(calculateScaleDebounced);
       ro.observe(container);
     } else {
-      window.addEventListener('resize', calculateScale);
+      window.addEventListener('resize', calculateScaleDebounced);
     }
     return () => {
       if (ro) ro.disconnect();
-      window.removeEventListener('resize', calculateScale);
+      window.removeEventListener('resize', calculateScaleDebounced);
     };
   }, [previewMode, cardNaturalHeight, targetWidth, cardData, template]);
 

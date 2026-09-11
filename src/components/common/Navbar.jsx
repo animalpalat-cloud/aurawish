@@ -96,7 +96,7 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#090b10]/90 backdrop-blur-xl border-b border-white/[0.07] transition-colors duration-200">
+    <header className="sticky top-0 z-40 w-full bg-[#090b10]/92 backdrop-blur-md border-b border-white/[0.07] transition-colors duration-200" style={{ willChange: 'transform' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[68px]">
           
@@ -109,7 +109,7 @@ export const Navbar = () => {
             >
               {/* Logo Emblem */}
               <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-brand-500 to-amber-400 p-[1px] shadow-md shadow-brand-500/20 group-hover:shadow-brand-500/35 transition-all duration-300">
-                <div className="w-full h-full bg-[#090b10]/80 rounded-[11px] flex items-center justify-center backdrop-blur-sm group-hover:bg-[#090b10]/60 transition-colors">
+                <div className="w-full h-full bg-[#090b10]/80 rounded-[11px] flex items-center justify-center group-hover:bg-[#090b10]/60 transition-colors">
                   <Sparkles className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export const Navbar = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 top-[68px] bg-black/60 backdrop-blur-sm z-30 xl:hidden"
+              className="fixed inset-0 top-[68px] bg-black/60 z-30 xl:hidden"
               aria-hidden="true"
             />
 
@@ -298,7 +298,7 @@ export const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="relative z-40 xl:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-2xl px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3"
+              className="relative z-40 xl:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-md px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3"
             >
               {/* Navigation Links */}
               <nav className="space-y-1">
