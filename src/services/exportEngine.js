@@ -459,30 +459,65 @@ export class CardExportEngine {
 
   /**
    * Export Animated MP4/WebM Video with Synchronized Music
-   * Optimized font loading for faster video generation
+   *
+   * Mobile-first rewrite — fixes the "stuck forever" bug on iOS/Android:
+   *
+   * ROOT CAUSES FIXED:
+   * 1. Frame loop used setTimeout(1000/fps) per frame = 180 sequential 33ms
+   *    delays on mobile. This starved the MediaRecorder of data, and on iOS
+   *    the AudioContext.createMediaStreamDestination() silently produced a
+   *    0-track stream, causing recorder.onstop to never fire.
+   *    FIX: Render all frames synchronously in a tight loop, then let
+   *    MediaRecorder flush in a single timed window.
+   *
+   * 2. videoBitsPerSecond: 5_000_000 exceeds mobile hardware encoder limits
+   *    (Android Chrome caps at ~2.5 Mbps; iOS Safari rejects high bitrates).
+   *    FIX: Detect mobile and cap bitrate accordingly.
+   *
+   * 3. No global timeout — if recorder.onstop never fires the Promise hangs.
+   *    FIX: 60 s hard timeout rejects with a clear error.
+   *
+   * 4. iOS Safari does not support createMediaStreamDestination — audio
+   *    path would silently fail and leave the export in an indeterminate
+   *    state.
+   *    FIX: Explicit capability check; graceful silent-video fallback.
+   *
+   * 5. canvas.captureStream() is unavailable on some Android WebViews.
+   *    FIX: Detect and throw early with a clear error instead of hanging.
    */
   async exportVideo(cardData, template, onProgress = () => {}) {
     this.isAborted = false;
-    const width = 1080;
-    const height = 1080;
-    const fps = 30;
-    const durationSeconds = 6;
-    const totalFrames = fps * durationSeconds;
 
-    onProgress(5, 'Preparing studio fonts & artwork...');
+    // ── Capability detection ──────────────────────────────────────────────
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isIOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // Mobile-safe canvas dimensions: 720p on mobile, 1080p on desktop
+    const width  = isMobile ? 720 : 1080;
+    const height = isMobile ? 720 : 1080;
+
+    // Lower FPS on mobile prevents encoder stalls
+    const fps            = isMobile ? 24 : 30;
+    const durationSeconds = 6;
+    const totalFrames    = fps * durationSeconds;
+
+    // Mobile hardware encoders cap around 2.5 Mbps; desktop can handle 5 Mbps
+    const videoBitrate = isMobile ? 2_000_000 : 5_000_000;
+
+    // ── Font loading ──────────────────────────────────────────────────────
+    onProgress(5, 'Preparing artwork & fonts…');
     const currentLang = getLanguage(cardData.language || 'en');
     const selectedFont = cardData.font || template?.fontFamily || currentLang.defaultFont || 'Playfair Display';
     await loadFont(selectedFont);
 
-    // Reduced font wait time for video export
     if (document.fonts && document.fonts.ready) {
       try {
         await Promise.race([
           document.fonts.ready,
-          new Promise(r => setTimeout(r, 200))
+          new Promise(r => setTimeout(r, 200)),
         ]);
       } catch (e) {
-        console.warn('Font load check in exportVideo:', e);
+        console.warn('Font check in exportVideo:', e);
       }
     }
 
@@ -490,52 +525,66 @@ export class CardExportEngine {
 
     const photoImg = await CardExportEngine.loadSafeImage(cardData.photoUrl);
 
-    // Setup Canvas
+    // ── Canvas setup ──────────────────────────────────────────────────────
     const canvas = document.createElement('canvas');
-    canvas.width = width;
+    canvas.width  = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
 
-    // Setup Web Audio Context for video sound sync
-    let audioContext = null;
+    // Verify captureStream is available (absent in some Android WebViews)
+    if (typeof canvas.captureStream !== 'function') {
+      throw new Error(
+        'Video export is not supported on this browser. Please download as a PNG image instead.'
+      );
+    }
+
+    // ── Audio setup (capability-aware) ───────────────────────────────────
+    let audioContext    = null;
     let audioDestination = null;
-    let audioStream = null;
+    let audioStream     = null;
+    let audioSupported  = false;
 
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        audioContext = new AudioCtx();
-        audioDestination = audioContext.createMediaStreamDestination();
-        audioStream = audioDestination.stream;
+    if (!isIOS) {
+      // iOS Safari does not support createMediaStreamDestination —
+      // attempting it causes a NotSupportedError that previously left
+      // the export in a broken state.  Skip audio on iOS entirely.
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          audioContext     = new AudioCtx();
+          audioDestination = audioContext.createMediaStreamDestination();
+          // Verify we actually got audio tracks
+          if (audioDestination.stream.getAudioTracks().length > 0) {
+            audioStream    = audioDestination.stream;
+            audioSupported = true;
+          }
+        }
+      } catch (e) {
+        console.warn('Web Audio MediaStream not supported on this device:', e);
       }
-    } catch (e) {
-      console.warn('Web Audio capture not supported, continuing with silent canvas capture:', e);
     }
 
-    // Connect Canvas MediaStream
-    const canvasStream = canvas.captureStream ? canvas.captureStream(fps) : null;
-    if (!canvasStream) {
-      throw new Error('Browser does not support canvas video capture (captureStream).');
-    }
+    // ── MediaRecorder MIME selection ──────────────────────────────────────
+    // Order matters: prefer webm/vp8 on Android (broadest support),
+    // mp4 only if explicitly supported.
+    const mimeTypeCandidates = isMobile
+      ? [
+          'video/webm;codecs=vp8,opus',
+          'video/webm;codecs=vp8',
+          'video/webm',
+          'video/mp4;codecs=avc1',
+          'video/mp4',
+        ]
+      : [
+          'video/mp4;codecs=avc1',
+          'video/mp4',
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+        ];
 
-    // Combine video tracks + audio tracks
-    const combinedTracks = [...canvasStream.getVideoTracks()];
-    if (audioStream && audioStream.getAudioTracks().length > 0) {
-      combinedTracks.push(audioStream.getAudioTracks()[0]);
-    }
-
-    const combinedStream = new MediaStream(combinedTracks);
-
-    // Determine Supported MIME Type
-    const mimeTypes = [
-      'video/mp4;codecs=avc1',
-      'video/mp4',
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp8,opus',
-      'video/webm'
-    ];
     let selectedMime = '';
-    for (const m of mimeTypes) {
+    for (const m of mimeTypeCandidates) {
       if (MediaRecorder.isTypeSupported(m)) {
         selectedMime = m;
         break;
@@ -543,88 +592,137 @@ export class CardExportEngine {
     }
 
     if (!selectedMime) {
-      throw new Error('MediaRecorder video encoding is not supported on this browser.');
+      throw new Error(
+        'Video recording is not supported on this browser. Please download as a PNG image.'
+      );
     }
 
+    // ── MediaRecorder setup ───────────────────────────────────────────────
+    const canvasStream = canvas.captureStream(fps);
+
+    const combinedTracks = [...canvasStream.getVideoTracks()];
+    if (audioSupported && audioStream) {
+      combinedTracks.push(audioStream.getAudioTracks()[0]);
+    }
+    const combinedStream = new MediaStream(combinedTracks);
+
     const recorder = new MediaRecorder(combinedStream, {
-      mimeType: selectedMime,
-      videoBitsPerSecond: 5000000
+      mimeType:           selectedMime,
+      videoBitsPerSecond: videoBitrate,
     });
 
     const recordedChunks = [];
     recorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) {
-        recordedChunks.push(e.data);
-      }
+      if (e.data && e.data.size > 0) recordedChunks.push(e.data);
     };
 
-    recorder.start();
+    // Request data every second so we get chunks even on slow mobile encoders
+    recorder.start(1000);
 
-    // Route audio into AudioDestination: if custom device audio (trimmed or full), play that clip; otherwise synthesize procedural melody
-    if (audioContext && audioDestination) {
+    // ── Audio routing ─────────────────────────────────────────────────────
+    if (audioSupported && audioContext && audioDestination) {
       try {
-        const customSource = cardData.customAudio?.file || cardData.customAudio?.blobUrl || cardData.customAudioUrl || (
-          typeof cardData.musicTrack === 'string' && (cardData.musicTrack.startsWith('blob:') || cardData.musicTrack.startsWith('http'))
+        const customSource =
+          cardData.customAudio?.file ||
+          cardData.customAudio?.blobUrl ||
+          cardData.customAudioUrl ||
+          (typeof cardData.musicTrack === 'string' &&
+           (cardData.musicTrack.startsWith('blob:') || cardData.musicTrack.startsWith('http'))
             ? cardData.musicTrack
-            : null
-        );
+            : null);
 
         if (customSource) {
-          const playedCustom = await this.playCustomAudioToDestination(
-            audioContext,
-            audioDestination,
-            customSource,
+          const ok = await this.playCustomAudioToDestination(
+            audioContext, audioDestination, customSource,
             cardData.customAudio?.trimRange || cardData.trimRange || null,
-            durationSeconds
+            durationSeconds,
           );
-          if (!playedCustom) {
-            this.synthesizeAudioToDestination(audioContext, audioDestination, durationSeconds);
-          }
+          if (!ok) this.synthesizeAudioToDestination(audioContext, audioDestination, durationSeconds);
         } else {
           this.synthesizeAudioToDestination(audioContext, audioDestination, durationSeconds);
         }
       } catch (err) {
-        console.warn('Audio output to destination error, falling back to synthesis:', err);
+        console.warn('Audio routing failed, falling back to synthesis:', err);
         try {
           this.synthesizeAudioToDestination(audioContext, audioDestination, durationSeconds);
-        } catch (synthErr) {
-          console.warn('Synthesis fallback error:', synthErr);
-        }
+        } catch (_) {}
       }
     }
 
-    onProgress(15, 'Rendering animated frames...');
+    // ── Frame rendering loop ──────────────────────────────────────────────
+    // KEY FIX: Instead of 180 × setTimeout(33ms) which starves the mobile
+    // browser, we render all frames synchronously then wait for the recording
+    // duration to elapse before stopping.
+    onProgress(15, 'Rendering animated frames…');
 
-    // Frame-by-frame deterministic rendering
+    const renderStart = performance.now();
+
     for (let frame = 0; frame < totalFrames; frame++) {
       if (this.isAborted) {
         recorder.stop();
-        if (audioContext) audioContext.close();
+        if (audioContext) audioContext.close().catch(() => {});
         throw new Error('Export cancelled by user.');
       }
 
       const time = frame / fps;
       CardExportEngine.renderFrame(ctx, cardData, template, time, photoImg, width, height);
 
-      const progressPercent = Math.round(15 + (frame / totalFrames) * 70);
-      onProgress(progressPercent, `Rendering frame ${frame + 1} of ${totalFrames}...`);
+      onProgress(
+        Math.round(15 + (frame / totalFrames) * 65),
+        `Rendering frame ${frame + 1} of ${totalFrames}…`,
+      );
 
-      await new Promise((r) => setTimeout(r, 1000 / fps));
+      // Yield to the browser every 8 frames to keep it responsive,
+      // but do not sleep for the full frame duration (that was the mobile hang).
+      if (frame % 8 === 0) {
+        await new Promise(r => setTimeout(r, 0));
+      }
     }
 
-    onProgress(88, 'Finalizing video encoding & audio synchronization...');
+    onProgress(82, 'Waiting for encoder to flush…');
 
+    // Wait for the actual recording wall-clock time to elapse before stopping.
+    // MediaRecorder needs real time to encode; rendering faster than real-time
+    // is fine — we just have to wait for the duration window to close.
+    const elapsed   = performance.now() - renderStart;
+    const remaining = Math.max(0, durationSeconds * 1000 - elapsed);
+    if (remaining > 0) {
+      await new Promise(r => setTimeout(r, remaining + 200)); // +200ms safety margin
+    }
+
+    onProgress(90, 'Finalising video…');
+
+    // ── Stop recorder and collect result ─────────────────────────────────
     return new Promise((resolve, reject) => {
+      // Hard timeout: if onstop never fires within 30 s, reject cleanly
+      const timeoutId = setTimeout(() => {
+        try { recorder.stop(); } catch (_) {}
+        if (audioContext) audioContext.close().catch(() => {});
+        reject(new Error(
+          'Video export timed out. Your device may not support this format. ' +
+          'Please try downloading as a PNG image.'
+        ));
+      }, 30_000);
+
       recorder.onstop = () => {
+        clearTimeout(timeoutId);
         try {
           if (audioContext) audioContext.close().catch(() => {});
+
+          if (recordedChunks.length === 0) {
+            reject(new Error(
+              'No video data was captured. Please try PNG export instead.'
+            ));
+            return;
+          }
+
           const isMp4 = selectedMime.includes('mp4');
-          const ext = isMp4 ? 'mp4' : 'webm';
-          const blob = new Blob(recordedChunks, { type: selectedMime });
-          const url = URL.createObjectURL(blob);
+          const ext   = isMp4 ? 'mp4' : 'webm';
+          const blob  = new Blob(recordedChunks, { type: selectedMime });
+          const url   = URL.createObjectURL(blob);
           const filename = CardExportEngine.sanitizeFilename(
             `Happy-Birthday-${cardData.recipientName || 'Card'}`,
-            ext
+            ext,
           );
           onProgress(100, 'Your birthday card video is ready!');
           resolve({ blob, url, filename, isMp4 });
@@ -634,6 +732,7 @@ export class CardExportEngine {
       };
 
       recorder.onerror = (e) => {
+        clearTimeout(timeoutId);
         if (audioContext) audioContext.close().catch(() => {});
         reject(e.error || new Error('Video recording failed.'));
       };

@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/common/Toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -38,6 +38,28 @@ const BirthdayIdeasHubPage     = lazy(() => import('./pages/BirthdayIdeasHubPage
 const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'));
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
 
+// ── Prefetch high-likelihood next routes ───────────────────────────────────
+// When the user lands on the homepage, they almost always navigate to
+// Templates → Create (EditorPage) or directly to a Card.
+// Prefetching those chunks in the background (after the initial render)
+// eliminates the Suspense blank-screen delay when they click.
+//
+// We use dynamic import() without React.lazy here — the modules are just
+// downloaded and cached by the browser; the lazy() wrappers above will
+// resolve instantly from cache when the route is actually navigated to.
+function prefetchLikelyRoutes() {
+  // Idle callback / rAF so we don't block the initial paint
+  const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+  schedule(() => {
+    // Priority 1: Templates page (most common next navigation from Home)
+    import('./pages/TemplatesPage').catch(() => {});
+    // Priority 2: Editor — opened from Templates immediately after
+    import('./pages/EditorPage').catch(() => {});
+    // Priority 3: Card view — shared card link might be opened on the same device
+    import('./pages/CardViewPage').catch(() => {});
+  });
+}
+
 // ── Route Loading Fallback ─────────────────────────────────────────────────
 // Shown while a lazy chunk is being fetched. Matches the app dark theme.
 const PageLoader = () => (
@@ -50,6 +72,12 @@ const PageLoader = () => (
 );
 
 function App() {
+  // Prefetch high-likelihood next routes after the homepage has rendered,
+  // so navigating to Templates / Editor / CardView is instant.
+  useEffect(() => {
+    prefetchLikelyRoutes();
+  }, []);
+
   return (
     <ToastProvider>
       <AuthProvider>
