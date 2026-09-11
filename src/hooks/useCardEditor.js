@@ -39,11 +39,16 @@ export const useCardEditor = (initialTemplateId, initialCardData = null) => {
 
   const [isDirty, setIsDirty] = useState(false);
 
+  // Memoized to prevent re-creating on every render
   const updateField = useCallback((field, value) => {
-    setCardData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setCardData(prev => {
+      // Avoid state update if value hasn't changed
+      if (prev[field] === value) return prev;
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
     setIsDirty(true);
   }, []);
 

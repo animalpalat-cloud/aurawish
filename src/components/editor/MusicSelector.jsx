@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Music,
@@ -34,7 +34,7 @@ import {
 import { validateAudioFile, MAX_DEVICE_MUSIC_SIZE } from '../../services/storageService';
 import { MusicCutterModal } from './MusicCutterModal';
 
-export const MusicSelector = ({ cardData, updateField }) => {
+const MusicSelectorComponent = ({ cardData, updateField }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRelationship, setSelectedRelationship] = useState('all');
@@ -70,7 +70,7 @@ export const MusicSelector = ({ cardData, updateField }) => {
     };
   }, []);
 
-  const handleTogglePreview = (trackId, e) => {
+  const handleTogglePreview = useCallback((trackId, e) => {
     if (e) e.stopPropagation();
     setIsPlayingDeviceAudio(false);
     if (playingTrackId === trackId) {
@@ -80,25 +80,25 @@ export const MusicSelector = ({ cardData, updateField }) => {
       soundService.playMusic(trackId);
       setPlayingTrackId(trackId);
     }
-  };
+  }, [playingTrackId]);
 
-  const handleSelectTrack = (trackId) => {
+  const handleSelectTrack = useCallback((trackId) => {
     setIsPlayingDeviceAudio(false);
     updateField('musicTrack', trackId);
     updateField('musicSource', 'library');
-  };
+  }, [updateField]);
 
-  const handlePlayFx = (fxId) => {
+  const handlePlayFx = useCallback((fxId) => {
     setPlayingFxId(fxId);
     soundService.playFx(fxId);
     setTimeout(() => setPlayingFxId(null), 800);
-  };
+  }, []);
 
-  const handleVolumeChange = (e) => {
+  const handleVolumeChange = useCallback((e) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
     soundService.setVolume(newVol);
-  };
+  }, []);
 
   // Device Music Handlers
   const handleDeviceFileSelect = (e) => {
@@ -585,3 +585,14 @@ export const MusicSelector = ({ cardData, updateField }) => {
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders when parent re-renders
+export const MusicSelector = React.memo(MusicSelectorComponent, (prevProps, nextProps) => {
+  // Only re-render if cardData music fields or updateField changed
+  return (
+    prevProps.cardData.musicTrack === nextProps.cardData.musicTrack &&
+    prevProps.cardData.musicSource === nextProps.cardData.musicSource &&
+    prevProps.cardData.customAudio === nextProps.cardData.customAudio &&
+    prevProps.updateField === nextProps.updateField
+  );
+});

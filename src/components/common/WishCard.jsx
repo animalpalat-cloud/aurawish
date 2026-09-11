@@ -58,4 +58,11 @@ export const WishCard = ({ wish, templateId = 'velvet-luxury' }) => {
   );
 };
 
-export default WishCard;
+// Memoize WishCard to prevent unnecessary re-renders in lists
+const MemoizedWishCard = React.memo(WishCard, (prevProps, nextProps) => {
+  // Only re-render if wish text or templateId changes
+  return prevProps.wish === nextProps.wish && prevProps.templateId === nextProps.templateId;
+});
+
+export { MemoizedWishCard };
+export default MemoizedWishCard;

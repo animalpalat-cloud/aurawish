@@ -69,6 +69,7 @@ export class CardExportEngine {
   /**
    * Export High-Resolution PNG Image using html2canvas
    * Captures the actual DOM card element so it matches the Live Preview exactly.
+   * Now with optimized font loading and reduced wait time.
    */
   async exportPNG(cardData, template, options = {}) {
     const scale = options.scale || 2; // 2x for high-res
@@ -78,24 +79,20 @@ export class CardExportEngine {
     const selectedFont = cardData.font || template?.fontFamily || currentLang.defaultFont || 'Playfair Display';
     await loadFont(selectedFont);
 
-    // 2. Ensure all fonts are ready and verified in the browser document
-    if (document.fonts) {
+    // 2. Reduced font verification wait time (was 400ms, now 200ms)
+    if (document.fonts && document.fonts.ready) {
       try {
-        if (document.fonts.ready) {
-          await document.fonts.ready;
-        }
-        // Explicitly load the font sizes used in rendering
-        const fontFam = selectedFont;
-        await Promise.all([
-          document.fonts.load(`400 32px "${fontFam}"`),
-          document.fonts.load(`700 48px "${fontFam}"`),
+        await Promise.race([
+          document.fonts.ready,
+          new Promise(r => setTimeout(r, 200))
         ]);
       } catch (e) {
         console.warn('Font preload check during export:', e);
       }
+    } else {
+      // Minimal wait if fonts API not available
+      await new Promise(r => setTimeout(r, 150));
     }
-    // Extra wait for layout and Nastaliq shaping to stabilize
-    await new Promise(r => setTimeout(r, 400));
 
     // Find the card element in the DOM using the data attribute or selector
     let cardElement = document.querySelector('[data-card-export="true"]');
@@ -462,6 +459,7 @@ export class CardExportEngine {
 
   /**
    * Export Animated MP4/WebM Video with Synchronized Music
+   * Optimized font loading for faster video generation
    */
   async exportVideo(cardData, template, onProgress = () => {}) {
     this.isAborted = false;
@@ -476,14 +474,12 @@ export class CardExportEngine {
     const selectedFont = cardData.font || template?.fontFamily || currentLang.defaultFont || 'Playfair Display';
     await loadFont(selectedFont);
 
-    if (document.fonts) {
+    // Reduced font wait time for video export
+    if (document.fonts && document.fonts.ready) {
       try {
-        if (document.fonts.ready) {
-          await document.fonts.ready;
-        }
-        await Promise.all([
-          document.fonts.load(`400 30px "${selectedFont}"`),
-          document.fonts.load(`700 56px "${selectedFont}"`)
+        await Promise.race([
+          document.fonts.ready,
+          new Promise(r => setTimeout(r, 200))
         ]);
       } catch (e) {
         console.warn('Font load check in exportVideo:', e);

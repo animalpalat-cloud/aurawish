@@ -5,7 +5,8 @@ import { Sparkles, ArrowRight, Eye, Music, Camera } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 
-export const TemplateCard = ({ template, onQuickPreview }) => {
+// Memoize TemplateCard to prevent unnecessary re-renders
+export const TemplateCard = React.memo(({ template, onQuickPreview }) => {
   const navigate = useNavigate();
 
   if (!template || !template.templateId) {
@@ -115,4 +116,8 @@ export const TemplateCard = ({ template, onQuickPreview }) => {
       </div>
     </motion.div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Only re-render if template ID changes
+  return prevProps.template?.templateId === nextProps.template?.templateId &&
+         prevProps.onQuickPreview === nextProps.onQuickPreview;
+});

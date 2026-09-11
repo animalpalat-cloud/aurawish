@@ -856,13 +856,18 @@ export function isUrduFont(fontId) {
 }
 
 /**
- * Dynamically loads a font from Google Fonts
+ * Dynamically loads a font from Google Fonts with caching
  */
+const loadedFonts = new Set();
+
 export async function loadFont(fontId) {
   if (typeof window === 'undefined' || !fontId) return true;
 
   const font = FONT_MAP[fontId] || FONT_MAP[fontId.toLowerCase()];
   if (!font) return true;
+
+  // Check if already loaded
+  if (loadedFonts.has(font.id)) return true;
 
   const familyName = font.family;
   const googleFamily = font.googleFamily || `${font.id.replace(/ /g, '+')}:wght@400;700`;
@@ -875,6 +880,9 @@ export async function loadFont(fontId) {
     link.href = `https://fonts.googleapis.com/css2?family=${googleFamily}&display=swap`;
     document.head.appendChild(link);
   }
+
+  // Mark as loaded immediately to prevent duplicate requests
+  loadedFonts.add(font.id);
 
   if (document.fonts && document.fonts.load) {
     try {
@@ -901,21 +909,20 @@ export function containsUrduText(text) {
 }
 
 /**
- * Preloads essential multilingual anchor fonts
+ * Preloads ONLY essential fonts for initial page load (lazy load the rest)
+ * Reduced from 6 to 2 critical fonts to improve initial load time
  */
 export function preloadMultilingualFonts() {
   if (typeof window === 'undefined') return;
+  // Only preload the absolute essentials - others load on-demand
   const essentials = [
-    'Noto Nastaliq Urdu',
-    'Amiri',
-    'Rozha One',
-    'Noto Serif SC',
-    'Shippori Mincho',
-    'Playfair Display'
+    'Playfair Display', // Default English
+    'Noto Nastaliq Urdu', // Default Urdu
   ];
   essentials.forEach(f => loadFont(f));
 }
 
 export function preloadUrduFonts() {
-  preloadMultilingualFonts();
+  // Deprecated - fonts now load on demand
+  // Keeping function for backward compatibility
 }

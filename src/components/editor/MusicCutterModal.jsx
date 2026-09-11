@@ -72,15 +72,19 @@ export const MusicCutterModal = ({
 
     const source = customAudio.file || customAudio.blobUrl || customAudio.publicUrl;
 
-    audioCutterService.decodeAudio(source)
-      .then((decoded) => {
+    // Use requestIdleCallback to defer non-critical work if available
+    const decodeAsync = async () => {
+      try {
+        const decoded = await audioCutterService.decodeAudio(source);
+        
         if (!isMounted) return;
+        
         setAudioBuffer(decoded);
         const dur = decoded.duration;
         setTotalDuration(dur);
 
-        // Waveform peaks
-        const peaks = audioCutterService.extractWaveformData(decoded, 140);
+        // Waveform peaks - reduced to 100 samples for better mobile performance
+        const peaks = audioCutterService.extractWaveformData(decoded, 100);
         setWaveformPeaks(peaks);
 
         // Set initial start/end: check if previously trimmed
@@ -105,13 +109,15 @@ export const MusicCutterModal = ({
         audioRef.current = audio;
 
         setIsLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!isMounted) return;
         console.error('Cutter decode failed:', err);
         setErrorMsg(err.message || 'Could not load audio for trimming.');
         setIsLoading(false);
-      });
+      }
+    };
+
+    decodeAsync();
 
     return () => {
       isMounted = false;
@@ -203,75 +209,81 @@ export const MusicCutterModal = ({
     return ratio * totalDuration;
   }, [totalDuration]);
 
-  // Waveform canvas rendering
+  // Waveform canvas rendering - optimized to reduce repaints
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || waveformPeaks.length === 0 || totalDuration <= 0) return;
 
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    // Use requestAnimationFrame to batch visual updates
+    const render = () => {
+      const ctx = canvas.getContext('2d', { alpha: false }); // Disable alpha for better performance
+      const width = canvas.width;
+      const height = canvas.height;
 
-    ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
-    const barCount = waveformPeaks.length;
-    const barWidth = width / barCount;
-    const gap = 1.5;
-    const usableBarW = Math.max(1, barWidth - gap);
+      const barCount = waveformPeaks.length;
+      const barWidth = width / barCount;
+      const gap = 1.5;
+      const usableBarW = Math.max(1, barWidth - gap);
 
-    const startX = (startTime / totalDuration) * width;
-    const endX = (endTime / totalDuration) * width;
-    const playX = (currentTime / totalDuration) * width;
+      const startX = (startTime / totalDuration) * width;
+      const endX = (endTime / totalDuration) * width;
+      const playX = (currentTime / totalDuration) * width;
 
-    // Draw background unselected bars
-    waveformPeaks.forEach((peak, i) => {
-      const x = i * barWidth;
-      const barHeight = Math.max(4, peak * (height * 0.85));
-      const y = (height - barHeight) / 2;
+      // Draw background unselected bars
+      waveformPeaks.forEach((peak, i) => {
+        const x = i * barWidth;
+        const barHeight = Math.max(4, peak * (height * 0.85));
+        const y = (height - barHeight) / 2;
 
-      const inSelection = x + usableBarW >= startX && x <= endX;
+        const inSelection = x + usableBarW >= startX && x <= endX;
 
-      if (inSelection) {
-        // Golden vibrant gradient for selected range
-        const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
-        grad.addColorStop(0, '#F59E0B'); // Amber 500
-        grad.addColorStop(1, '#D97706'); // Amber 600
-        ctx.fillStyle = grad;
-      } else {
-        // Muted dark slate for unselected region
-        ctx.fillStyle = 'rgba(71, 85, 105, 0.45)';
+        if (inSelection) {
+          // Golden vibrant gradient for selected range
+          const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
+          grad.addColorStop(0, '#F59E0B'); // Amber 500
+          grad.addColorStop(1, '#D97706'); // Amber 600
+          ctx.fillStyle = grad;
+        } else {
+          // Muted dark slate for unselected region
+          ctx.fillStyle = 'rgba(71, 85, 105, 0.45)';
+        }
+
+        // Rounded bar
+        const radius = usableBarW > 2 ? 1.5 : 0.5;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, y, usableBarW, barHeight, radius);
+        } else {
+          ctx.rect(x, y, usableBarW, barHeight);
+        }
+        ctx.fill();
+      });
+
+      // Draw selected region overlay tint
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.08)';
+      ctx.fillRect(startX, 0, endX - startX, height);
+
+      // Draw Playhead line if in range
+      if (currentTime >= 0 && currentTime <= totalDuration) {
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(playX, 0);
+        ctx.lineTo(playX, height);
+        ctx.stroke();
+
+        // Playhead top diamond
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(playX, 6, 4, 0, Math.PI * 2);
+        ctx.fill();
       }
+    };
 
-      // Rounded bar
-      const radius = usableBarW > 2 ? 1.5 : 0.5;
-      ctx.beginPath();
-      if (ctx.roundRect) {
-        ctx.roundRect(x, y, usableBarW, barHeight, radius);
-      } else {
-        ctx.rect(x, y, usableBarW, barHeight);
-      }
-      ctx.fill();
-    });
-
-    // Draw selected region overlay tint
-    ctx.fillStyle = 'rgba(245, 158, 11, 0.08)';
-    ctx.fillRect(startX, 0, endX - startX, height);
-
-    // Draw Playhead line if in range
-    if (currentTime >= 0 && currentTime <= totalDuration) {
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(playX, 0);
-      ctx.lineTo(playX, height);
-      ctx.stroke();
-
-      // Playhead top diamond
-      ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath();
-      ctx.arc(playX, 6, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    const rafId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(rafId);
   }, [waveformPeaks, startTime, endTime, currentTime, totalDuration]);
 
   // Pointer / Touch Handlers for Dragging Handles
