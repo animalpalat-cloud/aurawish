@@ -115,7 +115,7 @@ export const TemplatesPage = () => {
       <SEOHead
         title={selectedCategory !== 'all' ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Birthday Card Templates | Birthday Wishes` : 'Digital Birthday Card Templates - Luxury & Animated Designs | Birthday Wishes'}
         description="Browse 250+ luxury digital birthday card templates. Personalize photos, celebration music, and heartfelt messages with instant 3D unboxing."
-        canonicalUrl={selectedCategory !== 'all' ? `/birthday-card-templates/${selectedCategory}` : '/birthday-card-templates'}
+        canonicalUrl={selectedCategory !== 'all' ? `/birthday-card-templates/${selectedCategory}` : '/templates'}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">

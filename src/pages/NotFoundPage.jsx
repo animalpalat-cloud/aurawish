@@ -1,11 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Compass, Home } from 'lucide-react';
+import { SEOHead } from '../components/common/SEOHead';
 import { Button } from '../components/common/Button';
 
 export const NotFoundPage = () => {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+      <SEOHead
+        title="404 Page Not Found | Birthday Wishes"
+        description="The page you are looking for could not be found."
+        canonicalUrl="/404"
+        noIndex={true}
+      />
       <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 mb-6">
         <Sparkles className="w-8 h-8" />
       </div>

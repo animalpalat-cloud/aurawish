@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { SEOHead } from '../components/common/SEOHead';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/common/Button';
 import { useToast } from '../components/common/Toast';
@@ -68,6 +69,12 @@ export const SignupPage = () => {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center p-4 relative overflow-hidden">
+      <SEOHead
+        title="Sign Up | Birthday Wishes"
+        description="Create your Birthday Wishes account to save birthday cards, track live views, and access luxury templates."
+        canonicalUrl="/signup"
+        noIndex={true}
+      />
       {/* Ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-[140px] pointer-events-none" />
 

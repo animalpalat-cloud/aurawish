@@ -5,10 +5,14 @@ export const SEOHead = ({
   description,
   canonicalUrl,
   ogType = 'website',
-  ogImage = 'https://aurawish.com/og-cover.jpg',
+  ogImage = 'https://birthdaywishly.com/og-cover.jpg',
   schemaJson,
   noIndex = false
 }) => {
+  // Single source of truth for the production domain.
+  // All canonical URLs and og:url values are built from this constant.
+  const SITE_URL = 'https://birthdaywishly.com';
+
   useEffect(() => {
     // 1. Title Tag
     const formattedTitle = title.includes('Birthday Wishes') ? title : `${title} | Birthday Wishes`;
@@ -39,7 +43,14 @@ export const SEOHead = ({
     setMeta('property', 'og:description', description);
     setMeta('property', 'og:type', ogType);
     if (ogImage) setMeta('property', 'og:image', ogImage);
-    const fullCanonical = canonicalUrl ? `https://aurawish.com${canonicalUrl}` : window.location.href;
+
+    // Canonical is always the clean path on the production domain —
+    // no query parameters, no fragments, consistent trailing-slash handling.
+    const cleanPath = canonicalUrl
+      ? canonicalUrl.split('?')[0].split('#')[0]   // strip ?query and #hash
+      : window.location.pathname;                   // current path as fallback
+    const fullCanonical = `${SITE_URL}${cleanPath}`;
+
     setMeta('property', 'og:url', fullCanonical);
     setMeta('property', 'og:site_name', 'Birthday Wishes');
 
@@ -49,7 +60,7 @@ export const SEOHead = ({
     setMeta('name', 'twitter:description', description);
     if (ogImage) setMeta('name', 'twitter:image', ogImage);
 
-    // 5. Canonical Link
+    // 5. Canonical Link — exactly one per page, always pointing to the clean URL
     let canonicalElem = document.querySelector('link[rel="canonical"]');
     if (!canonicalElem) {
       canonicalElem = document.createElement('link');
@@ -71,7 +82,7 @@ export const SEOHead = ({
     } else if (schemaScript) {
       schemaScript.remove();
     }
-  }, [title, description, canonicalUrl, ogType, ogImage, schemaJson, noIndex]);
+  }, [title, description, canonicalUrl, ogType, ogImage, schemaJson, noIndex, SITE_URL]);
 
   return null;
 };

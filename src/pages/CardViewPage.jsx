@@ -6,6 +6,7 @@ import { cardService } from '../services/cardService';
 import { templateService } from '../services/templateService';
 import { EnvelopeUnbox } from '../components/public/EnvelopeUnbox';
 import { CardRecipientView } from '../components/public/CardRecipientView';
+import { SEOHead } from '../components/common/SEOHead';
 import { Button } from '../components/common/Button';
 import { loadFont } from '../data/fontsData';
 
@@ -55,7 +56,7 @@ export const CardViewPage = () => {
           setCard(foundCard);
           const resolvedTpl = templateService.getTemplateById(foundCard.templateId);
           setTemplate(resolvedTpl);
-          
+
           // Ensure the specific card font is loaded for recipient view
           const fontToLoad = foundCard.font || resolvedTpl?.fontFamily || 'Playfair Display';
           if (fontToLoad) {
@@ -112,6 +113,20 @@ export const CardViewPage = () => {
 
   return (
     <div className="min-h-screen bg-[#090b10] text-slate-100 relative">
+      {/*
+        Canonical for shared card pages: self-referencing /card/:shareId.
+        noIndex keeps user-generated card URLs out of search indices —
+        they are private by nature and should not be crawled.
+      */}
+      <SEOHead
+        title={card.recipientName
+          ? `Happy Birthday ${card.recipientName}! 🎂 | Birthday Wishes`
+          : 'Birthday Card | Birthday Wishes'}
+        description="Open your personalized interactive birthday card with music, photos, and a 3D digital envelope unboxing experience."
+        canonicalUrl={`/card/${shareId}`}
+        noIndex={true}
+      />
+
       <AnimatePresence mode="wait">
         {!isEnvelopeOpened ? (
           <motion.div

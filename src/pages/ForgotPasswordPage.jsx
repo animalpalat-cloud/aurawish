@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Sparkles, Mail, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { SEOHead } from '../components/common/SEOHead';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/common/Button';
 import { useToast } from '../components/common/Toast';
@@ -35,6 +36,12 @@ export const ForgotPasswordPage = () => {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center p-4 relative overflow-hidden">
+      <SEOHead
+        title="Reset Password | Birthday Wishes"
+        description="Reset your Birthday Wishes account password and regain access to your saved cards and studio."
+        canonicalUrl="/forgot-password"
+        noIndex={true}
+      />
       {/* Ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-500/10 rounded-full blur-[140px] pointer-events-none" />
 

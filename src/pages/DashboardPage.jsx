@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  LayoutGrid, 
-  PlusCircle, 
-  Sparkles, 
-  Search, 
-  SlidersHorizontal, 
+import {
+  LayoutGrid,
+  PlusCircle,
+  Sparkles,
+  Search,
+  SlidersHorizontal,
   Heart,
   Layers,
   Share2,
   FileEdit
 } from 'lucide-react';
+import { SEOHead } from '../components/common/SEOHead';
 import { cardService } from '../services/cardService';
 import { useAuth } from '../contexts/AuthContext';
 import { DashboardCard } from '../components/dashboard/DashboardCard';
@@ -76,6 +77,12 @@ export const DashboardPage = () => {
 
   return (
     <div className="py-10 sm:py-16">
+      <SEOHead
+        title="My Dashboard | Birthday Wishes"
+        description="Manage your saved birthday cards, track views, and create new personalized greeting cards."
+        canonicalUrl="/dashboard"
+        noIndex={true}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header Section */}

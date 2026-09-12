@@ -1,4 +1,5 @@
 import React from 'react';
+import { SEOHead } from '../components/common/SEOHead';
 import { HeroSection } from '../components/home/HeroSection';
 import { FeaturedTemplates } from '../components/home/FeaturedTemplates';
 import { BirthdayWishesDiscovery } from '../components/home/BirthdayWishesDiscovery';
@@ -13,6 +14,12 @@ import { motion } from 'framer-motion';
 export const HomePage = () => {
   return (
     <div className="relative overflow-hidden">
+      <SEOHead
+        title="Birthday Wishes & Digital Birthday Cards | Birthday Wishes"
+        description="Create beautiful birthday wishes and personalized digital birthday cards. Choose stylish templates, customize heartfelt messages and photos, and share instantly via a link."
+        canonicalUrl="/"
+      />
+
       {/* 1. Hero — above-fold, NOT deferred */}
       <HeroSection />
 

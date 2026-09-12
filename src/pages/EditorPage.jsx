@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Sparkles, Share2, Bookmark, Eye } from 'lucide-react';
+import { SEOHead } from '../components/common/SEOHead';
 import { templateService } from '../services/templateService';
 import { cardService } from '../services/cardService';
 import { soundService } from '../services/soundService';
@@ -114,6 +115,12 @@ export const EditorPage = () => {
 
   return (
     <div className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <SEOHead
+        title={`${template.name} Birthday Card Editor | Birthday Wishes`}
+        description="Customize your birthday card with personal messages, photos, music and effects using the Birthday Wishes Studio editor."
+        canonicalUrl={`/create/${template.templateId}`}
+        noIndex={true}
+      />
       {/* Top Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
         <div className="flex items-center gap-3">
