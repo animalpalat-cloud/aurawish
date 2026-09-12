@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { templateService } from '../services/templateService';
 
 export const useCardEditor = (initialTemplateId, initialCardData = null) => {
-  const template = templateService.getTemplateById(initialTemplateId);
+  const template = templateService.getTemplateByIdSync(initialTemplateId);
 
   const [cardData, setCardData] = useState(() => {
     if (initialCardData) {

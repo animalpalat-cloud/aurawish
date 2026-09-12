@@ -15,7 +15,7 @@ export const SuccessScreen = ({ card, onShareAgain }) => {
   const [copied, setCopied] = React.useState(false);
   const [isDownloadOpen, setIsDownloadOpen] = React.useState(false);
 
-  const resolvedTemplate = templateService.getTemplateById(card.templateId);
+  const resolvedTemplate = templateService.getTemplateByIdSync(card.templateId);
   const shareUrl = `${window.location.origin}/card/${card.shareId}`;
 
   useEffect(() => {

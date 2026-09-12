@@ -11,7 +11,7 @@ export const DashboardCard = ({
   onDuplicate,
   onDelete,
 }) => {
-  const template = templateService.getTemplateById(card.templateId);
+  const template = templateService.getTemplateByIdSync(card.templateId);
   const formattedDate = new Date(card.createdAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

@@ -28,26 +28,33 @@ export const TemplatesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
   const [previewTemplate, setPreviewTemplate] = useState(null);
-  const [templatesList, setTemplatesList] = useState(() => {
-    try {
-      return templateService.getAllTemplates() || [];
-    } catch (e) {
-      console.warn('Error reading initial templates:', e);
-      return [];
-    }
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [templatesList, setTemplatesList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     const loadTemplates = async () => {
       try {
+        // Try Supabase first, fallback to built-in templates
         const data = await templateService.fetchTemplatesFromSupabase();
         if (isMounted && Array.isArray(data) && data.length > 0) {
           setTemplatesList(data);
         }
       } catch (err) {
-        console.warn('Supabase fetch failed, continuing with built-in templates:', err);
+        console.warn('Template fetch failed:', err);
+        // Fallback to built-in templates
+        try {
+          const builtInTemplates = await templateService.getAllTemplates();
+          if (isMounted && Array.isArray(builtInTemplates)) {
+            setTemplatesList(builtInTemplates);
+          }
+        } catch (e) {
+          console.error('Failed to load templates:', e);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -73,7 +80,13 @@ export const TemplatesPage = () => {
 
   const filteredTemplates = useMemo(() => {
     try {
-      return templateService.searchTemplates(searchQuery, selectedCategory, sortBy, templatesList) || [];
+      // Use synchronous filterTemplates instead of async searchTemplates
+      return templateService.filterTemplates({
+        query: searchQuery,
+        category: selectedCategory,
+        sortBy: sortBy,
+        templateList: templatesList
+      }) || [];
     } catch (err) {
       console.error("Error filtering templates:", err);
       return [];

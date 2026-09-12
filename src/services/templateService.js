@@ -124,6 +124,61 @@ export const templateService = {
     }
   },
 
+  /**
+   * Synchronous template getter - returns from cache or a default fallback
+   * Use this only when you need immediate access (like in hooks or synchronous renders)
+   * For most cases, prefer the async getTemplateById()
+   */
+  getTemplateByIdSync: (templateId) => {
+    try {
+      // If templates are cached, find it
+      if (templatesCache && Array.isArray(templatesCache) && templatesCache.length > 0) {
+        const template = templatesCache.find(t => t.templateId === templateId);
+        return template || templatesCache[0];
+      }
+
+      // Return a minimal fallback template
+      return {
+        templateId: templateId || 'velvet-obsidian-gold',
+        name: 'Loading Template...',
+        category: 'luxury',
+        badge: '',
+        description: '',
+        previewGradient: 'from-[#0a0a0c] via-[#16181f] to-[#0a0a0c]',
+        accentColor: '#E5C07B',
+        fontFamily: 'Cinzel',
+        layoutStyle: 'luxury-bordered',
+        envelopeStyle: 'obsidian-gold',
+        photoSupport: true,
+        musicSupport: true,
+        defaultMusic: 'cinematic-strings',
+        defaultEffect: 'sparkles',
+        defaultData: {
+          recipientName: 'Someone Special',
+          age: '',
+          title: 'Happy Birthday',
+          subtitle: 'Celebrating You Today',
+          message: 'Wishing you all the joy, laughter, and blessings in the world!',
+          senderName: 'With Love',
+          photoUrl: '',
+          effect: 'sparkles',
+          font: 'Cinzel',
+          themeColor: '#E5C07B',
+        }
+      };
+    } catch (e) {
+      console.error("Error in getTemplateByIdSync:", e);
+      // Return absolute minimal fallback
+      return {
+        templateId: 'default',
+        name: 'Default Template',
+        defaultData: {},
+        accentColor: '#E5C07B',
+        fontFamily: 'Cinzel',
+      };
+    }
+  },
+
   getCategories: () => {
     try {
       return Array.isArray(CATEGORIES) ? [...CATEGORIES] : [];

@@ -27,7 +27,7 @@ export const CardViewPage = () => {
 
         // Fallback gracefully if direct link or template preview
         if (!foundCard) {
-          const allTemplates = templateService.getAllTemplates();
+          const allTemplates = await templateService.getAllTemplates();
           const matchingTemplate = allTemplates.find(t => t.templateId === shareId);
           if (matchingTemplate) {
             foundCard = {
@@ -54,7 +54,7 @@ export const CardViewPage = () => {
 
         if (isMounted) {
           setCard(foundCard);
-          const resolvedTpl = templateService.getTemplateById(foundCard.templateId);
+          const resolvedTpl = await templateService.getTemplateById(foundCard.templateId);
           setTemplate(resolvedTpl);
 
           // Ensure the specific card font is loaded for recipient view
