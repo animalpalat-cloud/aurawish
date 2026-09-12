@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, Compass } from 'lucide-react';
 import { TemplateCard } from '../gallery/TemplateCard';
-import { templateService } from '../../services/templateService';
+import { getFeaturedTemplateMeta } from '../../data/templatesMeta';
 import { Button } from '../common/Button';
 
 // Prefetch the EditorPage chunk when the user shows intent to open a template.
@@ -17,8 +17,10 @@ function prefetchEditor() {
 
 export const FeaturedTemplates = () => {
   const navigate = useNavigate();
-  const allTemplates = templateService.getAllTemplates();
-  const featured = allTemplates.slice(0, 6);
+  
+  // PERFORMANCE: Use lightweight metadata instead of full 299KB template data
+  // Only 6 templates with minimal data (~2KB instead of ~50KB for 6 full templates)
+  const featured = getFeaturedTemplateMeta();
 
   // Stable callback — prefetch on first hover over any card
   const handlePointerEnter = useCallback(() => prefetchEditor(), []);
@@ -51,11 +53,8 @@ export const FeaturedTemplates = () => {
         </div>
 
         {/* Template Grid
-            First 3 cards (above-fold on desktop, first visible on mobile) render
-            eagerly.  The last 3 are wrapped in a div with loading="lazy"-equivalent
-            treatment — they still render immediately in React, but heavy sub-images
-            inside TemplateCard already have loading=lazy so the browser won't decode
-            them until they approach the viewport.
+            PERFORMANCE: Using lightweight template metadata (no full defaultData, config)
+            Images inside TemplateCard use loading=lazy for below-fold cards
         */}
         <div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"

@@ -23,19 +23,38 @@ export const EditorPage = () => {
   const editCardId = searchParams.get('edit');
   const existingCard = editCardId ? cardService.getCardById(editCardId) : null;
 
-  // Resolve valid template
-  const resolvedTemplate = templateService.getTemplateById(
-    templateId || existingCard?.templateId || 'velvet-luxury'
-  );
+  // State for async template loading
+  const [template, setTemplate] = useState(null);
+  const [isLoadingTemplate, setIsLoadingTemplate] = useState(true);
+
+  // Load template asynchronously
+  useEffect(() => {
+    const loadTemplate = async () => {
+      setIsLoadingTemplate(true);
+      try {
+        const loadedTemplate = await templateService.getTemplateById(
+          templateId || existingCard?.templateId || 'velvet-obsidian-gold'
+        );
+        setTemplate(loadedTemplate);
+      } catch (error) {
+        console.error('Failed to load template:', error);
+        addToast('Failed to load template', 'error');
+        navigate('/templates');
+      } finally {
+        setIsLoadingTemplate(false);
+      }
+    };
+    loadTemplate();
+  }, [templateId, existingCard, navigate, addToast]);
 
   const {
     cardData,
     setCardData,
-    template,
+    template: editorTemplate,
     updateField,
     resetToTemplateDefaults,
     isDirty,
-  } = useCardEditor(resolvedTemplate.templateId, existingCard);
+  } = useCardEditor(template?.templateId || 'velvet-obsidian-gold', existingCard);
 
   const [isSaving, setIsSaving] = useState(false);
   const [createdCard, setCreatedCard] = useState(null);
@@ -51,7 +70,7 @@ export const EditorPage = () => {
   // Handle generating the card & saving
   const handleGenerateCard = async () => {
     if (!cardData.recipientName?.trim()) {
-      addToast('Please enter the recipient’s name before sharing!', 'error');
+      addToast("Please enter the recipient's name before sharing!", 'error');
       return;
     }
 
@@ -59,7 +78,7 @@ export const EditorPage = () => {
     try {
       const payload = {
         ...cardData,
-        templateId: template.templateId,
+        templateId: (template || editorTemplate).templateId,
         isDraft: false,
       };
 
@@ -82,7 +101,7 @@ export const EditorPage = () => {
     try {
       const payload = {
         ...cardData,
-        templateId: template.templateId,
+        templateId: (template || editorTemplate).templateId,
         isDraft: true,
       };
       await cardService.saveCard(payload);
@@ -94,6 +113,18 @@ export const EditorPage = () => {
       setIsSaving(false);
     }
   };
+
+  // Show loading state while template is being fetched
+  if (isLoadingTemplate || !template) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-full border-2 border-brand-500 border-t-transparent animate-spin" />
+          <p className="text-xs text-slate-500 font-medium tracking-wide">Loading template...</p>
+        </div>
+      </div>
+    );
+  }
 
   // If card generation is complete, show the success screen
   if (createdCard) {

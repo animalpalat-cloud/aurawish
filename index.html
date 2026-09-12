@@ -116,16 +116,40 @@
     }
     </script>
     
-    <!-- Google Fonts Preconnect & Non-Blocking Font Loading -->
+    <!-- 
+      PERFORMANCE OPTIMIZED FONT LOADING
+      
+      Strategy:
+      1. CRITICAL: Outfit (primary UI font) - preloaded with font-display: swap
+      2. DEFERRED: Playfair Display - loads async with swap, only used in specific sections
+      3. LAZY: All other fonts (Cinzel, Dancing Script, Great Vibes, etc.) load on-demand via fontsData.js
+      
+      Why font-display: swap?
+      - Shows text immediately with fallback font (no invisible text)
+      - Swaps to custom font when loaded (no flash of invisible text)
+      - Critical for LCP/FCP performance on slow connections
+    -->
+    
+    <!-- Preconnect to Google Fonts (DNS + TLS handshake before font request) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Non-blocking: only critical UI fonts (Outfit) and one display font (Playfair Display) load first.
-         Dancing Script, Cinzel, Great Vibes, Plus Jakarta Sans are loaded on-demand via fontsData.js loadFont() -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
+    
+    <!-- Preconnect to image CDN for faster LCP image loading -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    
+    <!-- CRITICAL: Preload LCP image (hero card portrait) for fastest loading -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&auto=format&fit=crop&q=75" fetchpriority="high">
+    
+    <!-- CRITICAL: Primary UI font (Outfit) - preload for immediate availability -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    
+    <!-- DEFERRED: Playfair Display (display font) - async load with low priority -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap" media="print" onload="this.media='all'">
+    
+    <!-- Fallback for no-JS environments -->
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&display=swap">
     </noscript>
   </head>
   <body class="bg-[#090B10] text-slate-100 antialiased selection:bg-brand-500 selection:text-white min-h-screen overflow-x-hidden">

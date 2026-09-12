@@ -170,13 +170,13 @@ export const HeroSection = () => {
                 Alexandra Vance ✨
               </p>
 
-              {/* Photo Area Mock */}
+              {/* Photo Area Mock - LCP CRITICAL IMAGE */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 border border-amber-400/30 shadow-md">
                 <img
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&auto=format&fit=crop&q=75"
                   alt="Personalized birthday card preview with celebratory portrait photo and warm wishes"
                   className="w-full h-full object-cover"
-                  loading="lazy"
+                  fetchpriority="high"
                   decoding="async"
                   width="480"
                   height="360"

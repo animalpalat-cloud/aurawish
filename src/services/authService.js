@@ -1,8 +1,11 @@
 // Authentication Service
 // Combines Supabase (Email/Password & Database Profile Sync) + Firebase (Google OAuth)
+//
+// PERFORMANCE OPTIMIZATION:
+// Firebase initialization is now LAZY — it only loads when the user clicks "Sign in with Google".
+// This prevents the ~93 KB Firebase auth iframe from blocking the initial page render.
 import { supabase, isSupabaseConfigured } from '../supabase/client';
-import { firebaseAuth, googleProvider, isFirebaseConfigured } from './firebase';
-import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { initializeFirebase, getFirebaseAuth, getGoogleProvider, checkFirebaseConfigured } from './firebase';
 
 const LOCAL_USER_KEY = 'aurawish_auth_user';
 
@@ -213,14 +216,26 @@ export const authService = {
 
   /**
    * Sign in with Google via Firebase Popup
+   * PERFORMANCE: Firebase is initialized lazily only when this method is called
    */
   async loginWithGoogle() {
-    if (!isFirebaseConfigured || !firebaseAuth || !googleProvider) {
+    // Check if Firebase can be configured
+    if (!checkFirebaseConfigured()) {
       throw new Error('Google Sign-In is temporarily unavailable. Firebase is not configured.');
     }
 
     try {
-      const result = await signInWithPopup(firebaseAuth, googleProvider);
+      // Lazy initialization — Firebase loads only when user clicks "Sign in with Google"
+      const { firebaseAuth, googleProvider } = await initializeFirebase();
+      
+      if (!firebaseAuth || !googleProvider) {
+        throw new Error('Google Sign-In initialization failed');
+      }
+
+      // Dynamic import of Firebase auth functions
+      const firebaseAuthModule = await import('firebase/auth');
+      
+      const result = await firebaseAuthModule.signInWithPopup(firebaseAuth, googleProvider);
       const fbUser = result.user;
 
       if (!fbUser) throw new Error('Google Sign-In failed to retrieve user');
@@ -267,9 +282,13 @@ export const authService = {
    */
   async logout() {
     try {
-      if (isFirebaseConfigured && firebaseAuth) {
-        await firebaseSignOut(firebaseAuth).catch(() => {});
+      // Only sign out from Firebase if it's been initialized
+      const firebaseAuth = getFirebaseAuth();
+      if (firebaseAuth) {
+        const firebaseAuthModule = await import('firebase/auth');
+        await firebaseAuthModule.signOut(firebaseAuth).catch(() => {});
       }
+      
       if (supabase && isSupabaseConfigured) {
         await supabase.auth.signOut().catch(() => {});
       }
@@ -282,9 +301,10 @@ export const authService = {
 
   /**
    * Setup session observers
+   * PERFORMANCE: Firebase observer is set up lazily to avoid blocking initial render
    */
   initAuthObserver(callback) {
-    // 1. Supabase Auth state listener
+    // 1. Supabase Auth state listener (immediate)
     let supabaseSub = null;
     if (supabase && isSupabaseConfigured) {
       const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -299,6 +319,7 @@ export const authService = {
           callback(user);
         } else {
           // If no supabase session and no firebase user, clear
+          const firebaseAuth = getFirebaseAuth();
           if (!firebaseAuth?.currentUser) {
             const cached = this.getCurrentUser();
             if (cached?.provider === 'email') {
@@ -311,22 +332,46 @@ export const authService = {
       supabaseSub = data?.subscription;
     }
 
-    // 2. Firebase Auth state listener
+    // 2. Firebase Auth state listener (lazy - only if Firebase was initialized)
+    // This won't block initial page load since Firebase is now lazy-loaded
     let fbUnsub = null;
-    if (isFirebaseConfigured && firebaseAuth) {
-      fbUnsub = onAuthStateChanged(firebaseAuth, async (fbUser) => {
-        if (fbUser) {
-          const user = await this.syncUserProfile({
-            id: fbUser.uid,
-            email: fbUser.email,
-            displayName: fbUser.displayName,
-            avatarUrl: fbUser.photoURL,
-            provider: 'google',
-            firebaseUid: fbUser.uid
+    
+    // Schedule Firebase auth observer setup after initial render (low priority)
+    const setupFirebaseObserver = async () => {
+      // Only set up observer if Firebase can be configured
+      if (!checkFirebaseConfigured()) return;
+      
+      try {
+        // Initialize Firebase lazily
+        const { firebaseAuth } = await initializeFirebase();
+        
+        if (firebaseAuth) {
+          const firebaseAuthModule = await import('firebase/auth');
+          
+          fbUnsub = firebaseAuthModule.onAuthStateChanged(firebaseAuth, async (fbUser) => {
+            if (fbUser) {
+              const user = await this.syncUserProfile({
+                id: fbUser.uid,
+                email: fbUser.email,
+                displayName: fbUser.displayName,
+                avatarUrl: fbUser.photoURL,
+                provider: 'google',
+                firebaseUid: fbUser.uid
+              });
+              callback(user);
+            }
           });
-          callback(user);
         }
-      });
+      } catch (err) {
+        console.warn('Firebase observer setup deferred:', err.message);
+      }
+    };
+
+    // Use requestIdleCallback to defer Firebase observer setup until browser is idle
+    // This ensures it doesn't compete with critical rendering work
+    if (typeof window !== 'undefined') {
+      const scheduleIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
+      scheduleIdle(() => setupFirebaseObserver());
     }
 
     return () => {

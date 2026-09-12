@@ -1,5 +1,11 @@
-import { TEMPLATES, CATEGORIES } from '../data/templatesData';
+// Template Service - Lazy Loading Architecture
+// PERFORMANCE: Template data (299KB) is loaded on-demand, not on initial app load
+import { loadFullTemplateData, loadTemplateById as loadTemplateByIdLazy, CATEGORIES } from '../data/templatesMeta';
 import { supabase, isSupabaseConfigured } from '../supabase/client';
+
+// Cache for full template data once loaded
+let templatesCache = null;
+let templateLoadPromise = null;
 
 // Transform Supabase DB template row to Frontend Template format
 const transformDbTemplate = (row) => {
@@ -38,15 +44,36 @@ const transformDbTemplate = (row) => {
 
 export const templateService = {
   /**
-   * Synchronous template list for instant UI rendering (with fallback to local seed templates)
+   * Async template list - loads full template data lazily
+   * Use this in routes that actually need all templates (Templates page, Editor)
    */
-  getAllTemplates: () => {
-    try {
-      return Array.isArray(TEMPLATES) ? [...TEMPLATES] : [];
-    } catch (e) {
-      console.error("Error retrieving local templates:", e);
+  getAllTemplates: async () => {
+    // Return cached data if already loaded
+    if (templatesCache) return [...templatesCache];
+
+    // Return existing promise if already loading
+    if (templateLoadPromise) return templateLoadPromise;
+
+    // Start loading
+    templateLoadPromise = loadFullTemplateData().then(templates => {
+      templatesCache = templates || [];
+      templateLoadPromise = null;
+      return [...templatesCache];
+    }).catch(e => {
+      console.error("Error loading templates:", e);
+      templateLoadPromise = null;
       return [];
-    }
+    });
+
+    return templateLoadPromise;
+  },
+
+  /**
+   * Synchronous access to cached templates (may be empty if not loaded yet)
+   * Only use this if you've already called getAllTemplates() before
+   */
+  getCachedTemplates: () => {
+    return templatesCache ? [...templatesCache] : [];
   },
 
   /**
@@ -76,13 +103,24 @@ export const templateService = {
     }
   },
 
-  getTemplateById: (templateId) => {
+  /**
+   * Get template by ID - loads lazily if not already in cache
+   */
+  getTemplateById: async (templateId) => {
     try {
-      if (!Array.isArray(TEMPLATES) || TEMPLATES.length === 0) return null;
-      return TEMPLATES.find(t => t.templateId === templateId) || TEMPLATES[0];
+      // If templates are already cached, use them
+      if (templatesCache && Array.isArray(templatesCache)) {
+        const template = templatesCache.find(t => t.templateId === templateId);
+        return template || templatesCache[0];
+      }
+
+      // Otherwise load just this template
+      return await loadTemplateByIdLazy(templateId);
     } catch (e) {
       console.error("Error retrieving template by ID:", e);
-      return TEMPLATES?.[0] || null;
+      // Fallback: load all templates and find it
+      const templates = await templateService.getAllTemplates();
+      return templates.find(t => t.templateId === templateId) || templates[0];
     }
   },
 
@@ -94,8 +132,9 @@ export const templateService = {
     }
   },
 
-  searchTemplates: (query = '', category = 'all', sortBy = 'popular', templateList = null) => {
-    return templateService.filterTemplates({ query, category, sortBy, templateList });
+  searchTemplates: async (query = '', category = 'all', sortBy = 'popular') => {
+    const templates = await templateService.getAllTemplates();
+    return templateService.filterTemplates({ query, category, sortBy, templateList: templates });
   },
 
   filterTemplates: (params = {}) => {
@@ -105,7 +144,7 @@ export const templateService = {
       let sortBy = 'popular';
       let list = Array.isArray(params.templateList) && params.templateList.length > 0 
         ? [...params.templateList] 
-        : (Array.isArray(TEMPLATES) ? [...TEMPLATES] : []);
+        : [];
 
       if (typeof params === 'string') {
         query = params;
@@ -141,7 +180,8 @@ export const templateService = {
       return list;
     } catch (e) {
       console.error("Error filtering templates:", e);
-      return Array.isArray(TEMPLATES) ? [...TEMPLATES] : [];
+      return [];
     }
   }
 };
+

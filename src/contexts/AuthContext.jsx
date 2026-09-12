@@ -4,28 +4,24 @@ import { authService } from '../services/authService';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  // Initialize with cached user immediately (synchronous, no delay)
   const [user, setUser] = useState(() => authService.getCurrentUser());
-  const [loading, setLoading] = useState(true);
+  // Start as false to not block rendering
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Initial sync from cache or observer
-    const initialUser = authService.getCurrentUser();
-    if (initialUser) {
-      setUser(initialUser);
-    }
-
+    // Sync from local cache is already done in initial state
+    // Set up auth observers but don't block rendering
     const unsubscribe = authService.initAuthObserver((updatedUser) => {
       setUser(updatedUser);
       setLoading(false);
     });
 
-    // Mark loading false after brief initial sync
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 400);
+    // No timeout needed — we already have the cached user from initial state
+    // Set loading to false immediately since we're not blocking anything
+    setLoading(false);
 
     return () => {
-      clearTimeout(timer);
       if (unsubscribe) unsubscribe();
     };
   }, []);
