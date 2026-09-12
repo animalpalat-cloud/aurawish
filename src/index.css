@@ -61,15 +61,6 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% auto;
-  /*
-    PERF FIX: The original animation moved `background-position` every frame.
-    background-position changes trigger a composited repaint on every rAF tick,
-    causing continuous main-thread work even on pages the user is just scrolling.
-
-    Fix: animate `transform: translateX` on a ::before pseudo-element overlay
-    instead. transform is GPU-only and does NOT trigger layout or paint.
-    The visual result is identical — a left-to-right sheen across the gold text.
-  */
   position: relative;
   animation: none;
   will-change: auto;
@@ -79,17 +70,14 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 240, 160, 0.35) 50%,
-    transparent 70%
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
   );
-  background-size: 200% 100%;
-  animation: shine-sweep 4s linear infinite;
+  animation: shine-sweep 3s ease-in-out infinite;
   pointer-events: none;
-  /* Keep the ::after inside the text clip region */
-  -webkit-background-clip: text;
-  background-clip: text;
+  will-change: transform;
 }
 
 .text-gradient-primary {
@@ -115,10 +103,14 @@
   box-shadow: 0 0 20px rgba(229, 192, 123, 0.15), inset 0 0 15px rgba(229, 192, 123, 0.05);
 }
 
-/* Foil Shine Animation — uses transform only (GPU, no paint) */
+/* Foil Shine Animation — uses transform only (GPU, no paint) 
+ * PERF FIX: Changed from background-position animation to transform-based.
+ * transform is GPU-accelerated and doesn't trigger layout/paint on main thread.
+ */
 @keyframes shine-sweep {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
+  0%   { transform: translateX(-100%); opacity: 0; }
+  50%  { opacity: 0.35; }
+  100% { transform: translateX(200%); opacity: 0; }
 }
 
 /* LEGACY: kept for any external references, but .text-gold-foil no longer uses it */
@@ -359,14 +351,14 @@ img {
  * ═══════════════════════════════════════════════════════════════════════ */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
+  from { opacity: 0.7; }  /* Start partially visible for faster perceived render */
   to { opacity: 1; }
 }
 
 @keyframes fadeInUp {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 0.8;  /* Start mostly visible for LCP */
+    transform: translateY(10px);  /* Reduced movement */
   }
   to {
     opacity: 1;
@@ -384,29 +376,33 @@ img {
   50% { transform: translateY(8px); }
 }
 
-/* Hero animation classes */
+/* Hero animation classes - OPTIMIZED FOR LCP
+ * CRITICAL FIX: Removed initial opacity:0 from LCP elements to prevent render delay.
+ * Elements now visible immediately, then animations enhance (not block) initial paint.
+ * This eliminates the 2.49s LCP render delay caused by waiting for CSS animations.
+ */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out 0.1s forwards;
-  opacity: 0;
+  /* Removed opacity: 0 - element now visible immediately, animation enhances */
 }
 
 .animate-fade-in-up-delay-1 {
   animation: fadeInUp 0.6s ease-out 0.2s forwards;
-  opacity: 0;
+  /* Removed opacity: 0 - LCP text no longer hidden */
 }
 
 .animate-fade-in-up-delay-2 {
   animation: fadeInUp 0.6s ease-out 0.3s forwards;
-  opacity: 0;
+  /* Removed opacity: 0 - CTAs visible immediately */
 }
 
 .animate-fade-in-delay-3 {
   animation: fadeIn 0.8s ease-out 0.4s forwards;
-  opacity: 0;
+  /* Removed opacity: 0 - trust metrics visible immediately */
 }
 
 /* Hero card floating animation */
