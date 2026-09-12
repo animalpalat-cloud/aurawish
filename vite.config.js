@@ -9,6 +9,13 @@ export default defineConfig({
     // Raise the warning threshold slightly (we'll still be well under after chunking)
     chunkSizeWarningLimit: 600,
 
+    // PERF: Disable Vite's automatic modulepreload injection.
+    // Vite aggressively preloads ALL statically-analyzable chunk dependencies,
+    // which causes the browser to download editor/music/export chunks immediately
+    // even though they're only needed when the user navigates to the editor.
+    // We manually add preload hints only for truly critical chunks in index.html.
+    modulePreload: false,
+
     rollupOptions: {
       output: {
         manualChunks(id) {

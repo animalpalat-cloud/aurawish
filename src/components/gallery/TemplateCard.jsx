@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, Eye, Music, Camera } from 'lucide-react';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 
-// Memoize TemplateCard to prevent unnecessary re-renders
+// PERF: Removed framer-motion — replaced whileHover with CSS hover:-translate-y-1.5
+// Identical visual effect, zero JS animation library overhead.
 export const TemplateCard = React.memo(({ template, onQuickPreview }) => {
   const navigate = useNavigate();
 
@@ -20,10 +20,8 @@ export const TemplateCard = React.memo(({ template, onQuickPreview }) => {
   const previewGradient = template.previewGradient || 'from-[#11141e] via-[#1a1f2e] to-[#0c0e14]';
 
   return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="group relative bg-[#11141e] border border-slate-800 hover:border-brand-500/50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-brand-500/10 flex flex-col justify-between transition-all"
+    <div
+      className="group relative bg-[#11141e] border border-slate-800 hover:border-brand-500/50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-brand-500/10 flex flex-col justify-between transition-all duration-[250ms] ease-out hover:-translate-y-1.5"
     >
       <div>
         {/* Template Visual Preview Header */}
@@ -114,7 +112,7 @@ export const TemplateCard = React.memo(({ template, onQuickPreview }) => {
           Customize
         </Button>
       </div>
-    </motion.div>
+    </div>
   );
 }, (prevProps, nextProps) => {
   // Only re-render if template ID changes

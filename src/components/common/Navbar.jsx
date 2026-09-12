@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
   LayoutGrid, 
@@ -192,39 +191,36 @@ export const Navbar = () => {
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
-                <AnimatePresence>
-                  {userDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.15, ease: 'easeOut' }}
-                      className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#0f121a] border border-white/10 shadow-2xl shadow-black/80 p-1.5 z-50 focus:outline-none"
-                    >
-                      <div className="px-3 py-2 border-b border-white/[0.07] mb-1">
-                        <p className="text-xs font-semibold text-white truncate">{user.name}</p>
-                        <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
-                      </div>
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setUserDropdown(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 hover:text-white hover:bg-white/[0.06] transition-colors"
-                      >
-                        <LayoutGrid className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                        <span>My Cards Dashboard</span>
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 mt-0.5 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors text-left"
-                      >
-                        <LogOut className="w-3.5 h-3.5 text-rose-400" aria-hidden="true" />
-                        <span>Sign Out</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Dropdown Menu — CSS transition (no framer-motion) */}
+                <div
+                  className={`absolute right-0 mt-2 w-56 rounded-2xl bg-[#0f121a] border border-white/10 shadow-2xl shadow-black/80 p-1.5 z-50 focus:outline-none transition-all duration-150 origin-top-right ${
+                    userDropdown
+                      ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                  }`}
+                  style={{ transform: userDropdown ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(8px)' }}
+                >
+                  <div className="px-3 py-2 border-b border-white/[0.07] mb-1">
+                    <p className="text-xs font-semibold text-white truncate">{user.name}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setUserDropdown(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+                    <span>My Cards Dashboard</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 mt-0.5 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors text-left"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-400" aria-hidden="true" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -276,30 +272,23 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile & Tablet Drawer Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 top-[68px] bg-black/60 z-30 xl:hidden"
-              aria-hidden="true"
-            />
+      {/* Mobile & Tablet Drawer Menu — CSS transition (no framer-motion) */}
+      {/* Backdrop */}
+      <div
+        onClick={() => setMobileMenuOpen(false)}
+        className={`fixed inset-0 top-[68px] bg-black/60 z-30 xl:hidden transition-opacity duration-200 ${
+          mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden="true"
+      />
 
-            {/* Menu Panel */}
-            <motion.div
-              id="mobile-navigation-drawer"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="relative z-40 xl:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-md px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3"
-            >
+      {/* Menu Panel */}
+      <div
+        id="mobile-navigation-drawer"
+        className={`relative z-40 xl:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-md px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3 transition-all duration-200 origin-top overflow-hidden ${
+          mobileMenuOpen ? 'opacity-100 translate-y-0 max-h-[600px] pointer-events-auto' : 'opacity-0 -translate-y-2 max-h-0 pointer-events-none py-0'
+        }`}
+      >
               {/* Navigation Links */}
               <nav className="space-y-1">
                 {navLinks.map((link) => {
@@ -404,10 +393,7 @@ export const Navbar = () => {
                   </div>
                 )}
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            </div>
     </header>
   );
 };

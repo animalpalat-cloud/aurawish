@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 
+// PERFORMANCE: Removed framer-motion — uses CSS transitions instead
+// Same visual effect (fade + slide) at zero JS cost.
 export const BackToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -31,25 +32,21 @@ export const BackToTopButton = () => {
   };
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.button
-          type="button"
-          onClick={scrollToTop}
-          initial={{ opacity: 0, y: 16, scale: 0.85 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 16, scale: 0.85 }}
-          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          aria-label="Back to top"
-          title="Back to top"
-          className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-slate-900/95 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 hover:border-brand-500/50 shadow-xl shadow-black/40 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/60 focus:ring-offset-2 focus:ring-offset-[#090b10] group"
-        >
-          <ArrowUp
-            className="w-5 h-5 transition-transform duration-200 group-hover:-translate-y-0.5 text-brand-400 group-hover:text-brand-300"
-            aria-hidden="true"
-          />
-        </motion.button>
-      )}
-    </AnimatePresence>
+    <button
+      type="button"
+      onClick={scrollToTop}
+      aria-label="Back to top"
+      title="Back to top"
+      className={`fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-slate-900/95 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 hover:border-brand-500/50 shadow-xl shadow-black/40 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/60 focus:ring-offset-2 focus:ring-offset-[#090b10] group ${
+        isVisible
+          ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+          : 'opacity-0 translate-y-4 scale-90 pointer-events-none'
+      }`}
+    >
+      <ArrowUp
+        className="w-5 h-5 transition-transform duration-200 group-hover:-translate-y-0.5 text-brand-400 group-hover:text-brand-300"
+        aria-hidden="true"
+      />
+    </button>
   );
 };

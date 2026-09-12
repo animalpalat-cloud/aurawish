@@ -2,10 +2,14 @@
 // Combines Supabase (Email/Password & Database Profile Sync) + Firebase (Google OAuth)
 //
 // PERFORMANCE OPTIMIZATION:
-// Firebase initialization is now LAZY — it only loads when the user clicks "Sign in with Google".
-// This prevents the ~93 KB Firebase auth iframe from blocking the initial page render.
-import { supabase, isSupabaseConfigured } from '../supabase/client';
-import { initializeFirebase, getFirebaseAuth, getGoogleProvider, checkFirebaseConfigured } from './firebase';
+// Both Supabase AND Firebase initialization are now LAZY — they only load when
+// the user actually needs them (login, signup, Google sign-in, etc.).
+// This removes ~444 KB of vendor JS from the critical render path.
+//
+// The homepage and all public pages now render without loading either auth SDK.
+
+import { getSupabaseClient } from '../supabase/lazyClient';
+import { initializeFirebase, getFirebaseAuth, checkFirebaseConfigured } from './firebase';
 
 const LOCAL_USER_KEY = 'aurawish_auth_user';
 
@@ -32,6 +36,8 @@ export const authService = {
    * Synchronize or upsert a user profile into Supabase profiles table
    */
   async syncUserProfile({ id, email, displayName, avatarUrl, provider, firebaseUid, supabaseAuthId }) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    
     if (!supabase || !isSupabaseConfigured) {
       const localUser = this.formatUser({
         id: id || firebaseUid || `user_${Date.now()}`,
@@ -143,6 +149,8 @@ export const authService = {
     if (!email || !password) throw new Error('Email and password are required');
     if (password.length < 6) throw new Error('Password must be at least 6 characters');
 
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+
     if (supabase && isSupabaseConfigured) {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -183,6 +191,8 @@ export const authService = {
    */
   async login({ email, password }) {
     if (!email || !password) throw new Error('Email and password are required');
+
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
 
     if (supabase && isSupabaseConfigured) {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -266,6 +276,8 @@ export const authService = {
   async resetPassword(email) {
     if (!email) throw new Error('Please enter your email address');
 
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+
     if (supabase && isSupabaseConfigured) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/login`
@@ -289,6 +301,8 @@ export const authService = {
         await firebaseAuthModule.signOut(firebaseAuth).catch(() => {});
       }
       
+      // Lazy load supabase for sign out
+      const { supabase, isSupabaseConfigured } = await getSupabaseClient();
       if (supabase && isSupabaseConfigured) {
         await supabase.auth.signOut().catch(() => {});
       }
@@ -301,42 +315,47 @@ export const authService = {
 
   /**
    * Setup session observers
-   * PERFORMANCE: Firebase observer is set up lazily to avoid blocking initial render
+   * PERFORMANCE: Both Supabase and Firebase observers set up lazily to avoid blocking initial render
    */
   initAuthObserver(callback) {
-    // 1. Supabase Auth state listener (immediate)
     let supabaseSub = null;
-    if (supabase && isSupabaseConfigured) {
-      const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
-          const user = await this.syncUserProfile({
-            id: session.user.id,
-            email: session.user.email,
-            displayName: session.user.user_metadata?.display_name,
-            provider: 'email',
-            supabaseAuthId: session.user.id
-          });
-          callback(user);
-        } else {
-          // If no supabase session and no firebase user, clear
-          const firebaseAuth = getFirebaseAuth();
-          if (!firebaseAuth?.currentUser) {
-            const cached = this.getCurrentUser();
-            if (cached?.provider === 'email') {
-              localStorage.removeItem(LOCAL_USER_KEY);
-              callback(null);
+    let fbUnsub = null;
+
+    // 1. Supabase Auth state listener (lazy — loads after idle)
+    const setupSupabaseObserver = async () => {
+      try {
+        const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+        if (!supabase || !isSupabaseConfigured) return;
+
+        const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session?.user) {
+            const user = await this.syncUserProfile({
+              id: session.user.id,
+              email: session.user.email,
+              displayName: session.user.user_metadata?.display_name,
+              provider: 'email',
+              supabaseAuthId: session.user.id
+            });
+            callback(user);
+          } else {
+            // If no supabase session and no firebase user, clear
+            const firebaseAuth = getFirebaseAuth();
+            if (!firebaseAuth?.currentUser) {
+              const cached = this.getCurrentUser();
+              if (cached?.provider === 'email') {
+                localStorage.removeItem(LOCAL_USER_KEY);
+                callback(null);
+              }
             }
           }
-        }
-      });
-      supabaseSub = data?.subscription;
-    }
+        });
+        supabaseSub = data?.subscription;
+      } catch (err) {
+        console.warn('Supabase observer setup deferred:', err.message);
+      }
+    };
 
     // 2. Firebase Auth state listener (lazy - only if Firebase was initialized)
-    // This won't block initial page load since Firebase is now lazy-loaded
-    let fbUnsub = null;
-    
-    // Schedule Firebase auth observer setup after initial render (low priority)
     const setupFirebaseObserver = async () => {
       // Only set up observer if Firebase can be configured
       if (!checkFirebaseConfigured()) return;
@@ -367,11 +386,14 @@ export const authService = {
       }
     };
 
-    // Use requestIdleCallback to defer Firebase observer setup until browser is idle
+    // Use requestIdleCallback to defer auth observer setup until browser is idle
     // This ensures it doesn't compete with critical rendering work
     if (typeof window !== 'undefined') {
       const scheduleIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
-      scheduleIdle(() => setupFirebaseObserver());
+      scheduleIdle(() => {
+        setupSupabaseObserver();
+        setupFirebaseObserver();
+      });
     }
 
     return () => {

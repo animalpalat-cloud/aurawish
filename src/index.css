@@ -414,4 +414,16 @@ img {
   animation: miniCardFloat 7s ease-in-out infinite;
 }
 
+/* Toast slide-in animation (replaces framer-motion in Toast.jsx) */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 

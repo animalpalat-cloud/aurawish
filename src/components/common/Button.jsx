@@ -1,7 +1,8 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
+// PERFORMANCE: Removed framer-motion (whileHover/whileTap) — replaced with CSS active:scale
+// CSS transforms are GPU-accelerated and don't require a 128 KB library.
 export const Button = React.forwardRef(({
   children,
   className,
@@ -15,7 +16,7 @@ export const Button = React.forwardRef(({
   type = 'button',
   ...props
 }, ref) => {
-  const baseStyles = "relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#090b10] disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl";
+  const baseStyles = "relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#090b10] disabled:opacity-50 disabled:cursor-not-allowed select-none rounded-xl hover:scale-[1.02] active:scale-[0.98]";
 
   const variants = {
     primary: "bg-gradient-to-r from-brand-600 via-brand-500 to-pink-500 text-white shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:brightness-110 focus:ring-brand-500 border border-brand-400/30",
@@ -35,11 +36,9 @@ export const Button = React.forwardRef(({
   };
 
   return (
-    <motion.button
+    <button
       ref={ref}
       type={type}
-      whileHover={disabled || loading ? {} : { scale: 1.02 }}
-      whileTap={disabled || loading ? {} : { scale: 0.98 }}
       disabled={disabled || loading}
       onClick={onClick}
       className={cn(baseStyles, variants[variant], sizes[size], className)}
@@ -56,7 +55,7 @@ export const Button = React.forwardRef(({
       {!loading && Icon && iconPosition === 'right' ? (
         <Icon className={cn("w-4 h-4", size === 'lg' && "w-5 h-5", size === 'xl' && "w-6 h-6")} />
       ) : null}
-    </motion.button>
+    </button>
   );
 });
 
