@@ -25,14 +25,14 @@ export const BirthdayArticlePage = () => {
     "description": article.seoDescription,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://Birthday Wishes.com/birthday-ideas/${article.slug}`
+      "@id": `https://birthdaywishly.com/birthday-ideas/${article.slug}`
     },
     "publisher": {
       "@type": "Organization",
       "name": "Birthday Wishes",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://Birthday Wishes.com/logo.png"
+        "url": "https://birthdaywishly.com/logo.png"
       }
     }
   };

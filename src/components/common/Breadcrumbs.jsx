@@ -13,13 +13,13 @@ export const Breadcrumbs = ({ items = [] }) => {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://aurawish.com/"
+        "item": "https://birthdaywishly.com/"
       },
       ...items.map((item, index) => ({
         "@type": "ListItem",
         "position": index + 2,
         "name": item.label,
-        "item": item.href ? `https://aurawish.com${item.href}` : undefined
+        "item": item.href ? `https://birthdaywishly.com${item.href}` : undefined
       }))
     ]
   };

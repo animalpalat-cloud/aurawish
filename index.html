@@ -32,8 +32,12 @@
           "url": "https://birthdaywishly.com/",
           "name": "Birthday Wishes",
           "description": "Create beautiful birthday wishes and personalized digital birthday cards that are easy to customize and share.",
+          "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://birthdaywishly.com/templates?search={search_term_string}",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://birthdaywishly.com/templates?search={search_term_string}"
+            },
             "query-input": "required name=search_term_string"
           }
         },
