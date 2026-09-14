@@ -40,9 +40,9 @@ export const Footer = () => {
 
           {/* Column 2: Core Platform Hubs */}
           <div>
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
+            <h2 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
               Explore Birthday Wishes
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li><Link to="/birthday-wishes" className="hover:text-white transition-colors">Birthday Wishes Hub</Link></li>
               <li><Link to="/templates" className="hover:text-white transition-colors">Card Templates Gallery</Link></li>
@@ -56,9 +56,9 @@ export const Footer = () => {
 
           {/* Column 3: Trust & Company */}
           <div>
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
+            <h2 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
               Trust & Company
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
@@ -71,9 +71,9 @@ export const Footer = () => {
 
           {/* Column 4: Popular Categories */}
           <div>
-            <h4 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
+            <h2 className="text-xs font-semibold text-white uppercase tracking-wider mb-4">
               Popular Categories
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li><Link to="/birthday-wishes-for-mom" className="hover:text-white transition-colors">Birthday Wishes for Mom</Link></li>
               <li><Link to="/birthday-wishes-for-dad" className="hover:text-white transition-colors">Birthday Wishes for Dad</Link></li>

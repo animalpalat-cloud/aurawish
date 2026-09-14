@@ -6,14 +6,16 @@ import { BirthdayWishesDiscovery } from '../components/home/BirthdayWishesDiscov
 import { HowItWorks } from '../components/home/HowItWorks';
 import { FeaturesSection } from '../components/home/FeaturesSection';
 import { FAQSection } from '../components/home/FAQSection';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/common/Button';
-import { Sparkles, ArrowRight, PartyPopper } from 'lucide-react';
+import { Sparkles, PartyPopper } from 'lucide-react';
 
 // PERFORMANCE: HomePage now renders without Motion (129 KB saved from critical path)
 // Motion can be lazy-loaded later for below-fold animations if desired
 
 export const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative overflow-hidden">
       <SEOHead
@@ -54,27 +56,25 @@ export const HomePage = () => {
             </p>
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/templates">
-                <Button
-                  variant="gold"
-                  size="xl"
-                  icon={Sparkles}
-                  iconPosition="right"
-                  className="w-full sm:w-auto shadow-2xl"
-                >
-                  Create Free Birthday Card Now
-                </Button>
-              </Link>
+              <Button
+                variant="gold"
+                size="xl"
+                icon={Sparkles}
+                iconPosition="right"
+                className="w-full sm:w-auto shadow-2xl"
+                onClick={() => navigate('/templates')}
+              >
+                Create Free Birthday Card Now
+              </Button>
 
-              <Link to="/dashboard">
-                <Button
-                  variant="secondary"
-                  size="xl"
-                  className="w-full sm:w-auto"
-                >
-                  View My Saved Cards
-                </Button>
-              </Link>
+              <Button
+                variant="secondary"
+                size="xl"
+                className="w-full sm:w-auto"
+                onClick={() => navigate('/dashboard')}
+              >
+                View My Saved Cards
+              </Button>
             </div>
           </div>
         </div>

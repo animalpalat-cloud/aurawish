@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, Compass } from 'lucide-react';
 import { TemplateCard } from '../gallery/TemplateCard';
 import { getFeaturedTemplateMeta } from '../../data/templatesMeta';
@@ -18,6 +18,7 @@ function prefetchEditor() {
 const FEATURED = getFeaturedTemplateMeta();
 
 export const FeaturedTemplates = () => {
+  const navigate = useNavigate();
   // PERFORMANCE: Use lightweight metadata instead of full 299KB template data
   // Only 6 templates with minimal data (~2KB instead of ~50KB for 6 full templates)
 
@@ -49,11 +50,15 @@ export const FeaturedTemplates = () => {
             </p>
           </div>
 
-          <Link to="/templates">
-            <Button variant="outline" size="md" icon={Compass} iconPosition="right">
-              View All 12+ Templates
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            size="md"
+            icon={Compass}
+            iconPosition="right"
+            onClick={() => navigate('/templates')}
+          >
+            View All 12+ Templates
+          </Button>
         </div>
 
         {/* Template Grid
@@ -74,11 +79,16 @@ export const FeaturedTemplates = () => {
 
         {/* Bottom Callout */}
         <div className="mt-14 text-center">
-          <Link to="/templates">
-            <Button variant="primary" size="lg" icon={ArrowRight} iconPosition="right" className="shadow-xl">
-              Browse Complete Template Gallery
-            </Button>
-          </Link>
+          <Button
+            variant="primary"
+            size="lg"
+            icon={ArrowRight}
+            iconPosition="right"
+            className="shadow-xl"
+            onClick={() => navigate('/templates')}
+          >
+            Browse Complete Template Gallery
+          </Button>
         </div>
       </div>
     </section>
