@@ -308,14 +308,94 @@ article,
    get deferred rendering. */
 .cv-section {
   content-visibility: auto;
-  contain-intrinsic-size: 0 600px; /* safe fallback height estimate */
+  contain-intrinsic-size: auto 900px;
+}
+.cv-section-md {
+  contain-intrinsic-size: auto 1200px;
+}
+.cv-section-tall {
+  contain-intrinsic-size: auto 2900px;
+}
+
+/* Per-card skip-paint. Intrinsic size matches the idle card (~header 256px + body + footer).
+   Parent featured section must NOT also use content-visibility, or Chrome paints
+   all 6 cards in one unlock (~3100px) and scrolling freezes. */
+.template-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 460px;
+  /* Border/transform only — never transition box-shadow (paint-heavy on Android). */
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .template-card:hover {
+    border-color: rgba(217, 70, 239, 0.5);
+    transform: translateY(-6px);
+  }
+  .template-card:hover .template-card-name {
+    color: rgb(192 132 252);
+  }
+}
+
+.card-glass-pill {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.card-hover-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-hover-overlay {
+    transition: opacity 180ms ease;
+  }
+  .template-card:hover .card-hover-overlay {
+    opacity: 1;
+    pointer-events: auto;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .card-glass-pill {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+@media (hover: none) {
+  .card-hover-overlay {
+    display: none;
+  }
+}
+
+/* Sticky nav: skip backdrop-filter on coarse/mobile so it is not re-sampled
+   over every card as they scroll underneath. Solid fill matches the page bg. */
+@media (max-width: 768px) {
+  .site-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: #090b10;
+  }
+}
+
+html.is-scrolling .hero-card,
+html.is-scrolling .hero-mini-card,
+html.is-scrolling .text-gold-foil::after {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-scrolling .hero-card,
+  html.is-scrolling .hero-mini-card {
+    animation: none;
+  }
 }
 
 /* Promote glass panels to their own layer up-front so backdrop-filter
-   recalculation doesn't stall scrolling. */
+   recalculation doesn't stall scrolling. Do NOT will-change hundreds of cards. */
 .glass-panel,
 .glass-card {
-  will-change: transform;
   transform: translateZ(0);
 }
 
@@ -408,10 +488,12 @@ img {
 /* Hero card floating animation */
 .hero-card {
   animation: heroFloat 6s ease-in-out 1s infinite;
+  will-change: transform;
 }
 
 .hero-mini-card {
   animation: miniCardFloat 7s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Toast slide-in animation (replaces framer-motion in Toast.jsx) */

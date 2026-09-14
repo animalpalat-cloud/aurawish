@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     return await authService.resetPassword(email);
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     isAuthenticated: !!user,
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     loginWithGoogle,
     logout,
     resetPassword
-  };
+  }), [user, loading]);
 
   return (
     <AuthContext.Provider value={value}>

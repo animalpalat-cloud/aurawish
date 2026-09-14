@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Sparkles, Compass, Eye, ArrowRight, ArrowLeft, X, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CategoryFilter } from '../components/gallery/CategoryFilter';
@@ -66,6 +66,10 @@ export const TemplatesPage = () => {
   }, []);
 
   const [visibleCount, setVisibleCount] = useState(24);
+
+  const handleQuickPreview = useCallback((tpl) => {
+    setPreviewTemplate(tpl);
+  }, []);
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -185,7 +189,7 @@ export const TemplatesPage = () => {
                 <TemplateCard
                   key={template.templateId || template.name}
                   template={template}
-                  onQuickPreview={(tpl) => setPreviewTemplate(tpl)}
+                  onQuickPreview={handleQuickPreview}
                 />
               ))}
             </div>

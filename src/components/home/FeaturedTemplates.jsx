@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, Compass } from 'lucide-react';
 import { TemplateCard } from '../gallery/TemplateCard';
 import { getFeaturedTemplateMeta } from '../../data/templatesMeta';
@@ -15,15 +15,19 @@ function prefetchEditor() {
   import('../../pages/EditorPage').catch(() => {});
 }
 
+const FEATURED = getFeaturedTemplateMeta();
+
 export const FeaturedTemplates = () => {
-  const navigate = useNavigate();
-  
   // PERFORMANCE: Use lightweight metadata instead of full 299KB template data
   // Only 6 templates with minimal data (~2KB instead of ~50KB for 6 full templates)
-  const featured = getFeaturedTemplateMeta();
 
-  // Stable callback — prefetch on first hover over any card
-  const handlePointerEnter = useCallback(() => prefetchEditor(), []);
+  // Prefetch the editor chunk only on real hover (desktop). Touch scrolling
+  // can fire pointerenter and would otherwise parse a huge JS chunk mid-fling.
+  const handlePointerEnter = useCallback(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+      prefetchEditor();
+    }
+  }, []);
 
   return (
     <section className="py-20 relative">
@@ -60,11 +64,10 @@ export const FeaturedTemplates = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
           onPointerEnter={handlePointerEnter}
         >
-          {featured.map((template) => (
+          {FEATURED.map((template) => (
             <TemplateCard
               key={template.templateId}
               template={template}
-              onQuickPreview={() => navigate(`/create/${template.templateId}`)}
             />
           ))}
         </div>

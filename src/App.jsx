@@ -48,16 +48,18 @@ const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage
 // downloaded and cached by the browser; the lazy() wrappers above will
 // resolve instantly from cache when the route is actually navigated to.
 function prefetchLikelyRoutes() {
-  // Idle callback / rAF so we don't block the initial paint
-  const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
-  schedule(() => {
-    // Priority 1: Templates page (most common next navigation from Home)
+  // Defer until the browser is idle AND the user is not mid-scroll.
+  // Prefetching the editor chunk during the first homepage fling caused
+  // parse/compile stalls exactly when featured cards entered the viewport.
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2800));
+  const runWhenQuiet = () => {
+    if (document.documentElement.classList.contains('is-scrolling')) {
+      setTimeout(runWhenQuiet, 500);
+      return;
+    }
     import('./pages/TemplatesPage').catch(() => {});
-    // Priority 2: Editor — opened from Templates immediately after
-    import('./pages/EditorPage').catch(() => {});
-    // Priority 3: Card view — shared card link might be opened on the same device
-    import('./pages/CardViewPage').catch(() => {});
-  });
+  };
+  idle(runWhenQuiet, { timeout: 5000 });
 }
 
 // ── Route Loading Fallback ─────────────────────────────────────────────────

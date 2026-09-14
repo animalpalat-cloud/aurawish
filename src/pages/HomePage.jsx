@@ -25,13 +25,14 @@ export const HomePage = () => {
       {/* 1. Hero — above-fold, NOT deferred */}
       <HeroSection />
 
-      {/* 2–8. Below-fold sections — cv-section enables content-visibility:auto
-              so the browser skips rendering until they approach the viewport */}
-      <div className="cv-section"><FeaturedTemplates /></div>
-      <div className="cv-section"><BirthdayWishesDiscovery /></div>
+      {/* Featured cards: NO parent content-visibility.
+          Parent cv was unlocking ~3100px of cards in one paint (contain-intrinsic-size
+          was 600px). Each card uses its own content-visibility instead. */}
+      <FeaturedTemplates />
+      <div className="cv-section cv-section-tall"><BirthdayWishesDiscovery /></div>
       <div className="cv-section"><HowItWorks /></div>
-      <div className="cv-section"><FeaturesSection /></div>
-      <div className="cv-section"><FAQSection /></div>
+      <div className="cv-section cv-section-md"><FeaturesSection /></div>
+      <div className="cv-section cv-section-md"><FAQSection /></div>
 
       {/* CTA Banner - CSS animations instead of Motion */}
       <section className="cv-section py-20 relative overflow-hidden bg-gradient-to-b from-[#090b10] via-[#151128] to-[#090b10] border-t border-white/[0.06]">

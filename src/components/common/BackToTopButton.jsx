@@ -13,7 +13,8 @@ export const BackToTopButton = () => {
       if (ticking) return;
       ticking = true;
       window.requestAnimationFrame(() => {
-        setIsVisible(window.scrollY > 350);
+        const next = window.scrollY > 350;
+        setIsVisible((prev) => (prev === next ? prev : next));
         ticking = false;
       });
     };

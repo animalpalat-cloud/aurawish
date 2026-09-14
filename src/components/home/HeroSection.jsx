@@ -126,13 +126,15 @@ export const HeroSection = () => {
               {/* Photo Area Mock - LCP CRITICAL IMAGE */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 border border-amber-400/30 shadow-md">
                 <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&auto=format&fit=crop&q=75"
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=70"
+                  srcSet="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=70 320w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=70 380w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=760&auto=format&fit=crop&q=70 760w"
+                  sizes="(max-width: 640px) 286px, 380px"
                   alt="Personalized birthday card preview with celebratory portrait photo and warm wishes"
                   className="w-full h-full object-cover"
                   fetchpriority="high"
                   decoding="async"
-                  width="480"
-                  height="360"
+                  width="380"
+                  height="285"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <span className="absolute bottom-2 left-3 text-xs text-amber-200 font-serif italic">

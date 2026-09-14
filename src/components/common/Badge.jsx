@@ -13,7 +13,7 @@ export const Badge = ({ children, variant = 'default', className }) => {
 
   return (
     <span className={cn(
-      "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border backdrop-blur-md select-none",
+      "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border select-none",
       variants[variant],
       className
     )}>

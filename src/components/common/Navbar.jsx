@@ -95,7 +95,7 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#090b10]/92 backdrop-blur-md border-b border-white/[0.07] transition-colors duration-200" style={{ willChange: 'transform' }}>
+    <header className="site-header sticky top-0 z-40 w-full bg-[#090b10]/92 backdrop-blur-md border-b border-white/[0.07] transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[68px]">
           
