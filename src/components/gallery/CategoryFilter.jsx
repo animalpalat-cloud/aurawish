@@ -25,7 +25,7 @@ import {
   Film,
   Compass
 } from 'lucide-react';
-import { CATEGORIES } from '../../data/templatesData';
+import { CATEGORIES } from '../../data/templatesMeta';
 
 const ICON_MAP = {
   Sparkles,

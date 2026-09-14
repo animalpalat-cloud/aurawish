@@ -355,18 +355,25 @@ export const authService = {
       }
     };
 
-    // 2. Firebase Auth state listener (lazy - only if Firebase was initialized)
+    // 2. Firebase Auth state listener — ONLY for existing Google users.
+    // CRITICAL PERFORMANCE: We NEVER call initializeFirebase() on page load unless
+    // the cached user is a Google/Firebase user. This prevents the Firebase auth
+    // iframe (92 KB) from loading on the homepage for non-Google users.
     const setupFirebaseObserver = async () => {
-      // Only set up observer if Firebase can be configured
+      // Skip entirely if Firebase env vars are not present
       if (!checkFirebaseConfigured()) return;
-      
+
+      // Skip if the cached user is NOT a Google user — no need to load Firebase
+      const cachedUser = this.getCurrentUser();
+      if (!cachedUser || cachedUser.provider !== 'google') return;
+
       try {
-        // Initialize Firebase lazily
+        // Only reaches here for users who previously signed in with Google
         const { firebaseAuth } = await initializeFirebase();
-        
+
         if (firebaseAuth) {
           const firebaseAuthModule = await import('firebase/auth');
-          
+
           fbUnsub = firebaseAuthModule.onAuthStateChanged(firebaseAuth, async (fbUser) => {
             if (fbUser) {
               const user = await this.syncUserProfile({
@@ -386,14 +393,14 @@ export const authService = {
       }
     };
 
-    // Use requestIdleCallback to defer auth observer setup until browser is idle
-    // This ensures it doesn't compete with critical rendering work
+    // Use requestIdleCallback to defer auth observer setup until browser is idle.
+    // Increased delay to 3500ms so it runs well after LCP/FID measurement window.
     if (typeof window !== 'undefined') {
-      const scheduleIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2000));
+      const scheduleIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 3500));
       scheduleIdle(() => {
         setupSupabaseObserver();
         setupFirebaseObserver();
-      });
+      }, { timeout: 5000 });
     }
 
     return () => {

@@ -141,8 +141,14 @@
     <!-- Preconnect to image CDN for faster LCP image loading -->
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     
-    <!-- CRITICAL: Preload LCP image (hero card portrait) for fastest loading -->
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=480&auto=format&fit=crop&q=75" fetchpriority="high">
+    <!-- Preconnect to Firebase auth for users who sign in with Google.
+         Saves ~310ms handshake latency when the auth popup opens.
+         Low priority preconnect — browser queues it after critical resources. -->
+    <link rel="preconnect" href="https://aurawish-dbd78.firebaseapp.com" crossorigin>
+    
+    <!-- CRITICAL: Preload LCP image at correct mobile size (320w for ~286px display slot).
+         Using 320w avoids downloading the 760w version Lighthouse was flagging. -->
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=80" fetchpriority="high" imagesrcset="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=80 320w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=75 380w" imagesizes="(max-width: 640px) 286px, 380px">
     
     <!-- CRITICAL: Primary UI font (Outfit) - preload for immediate availability -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">

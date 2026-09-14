@@ -125,14 +125,22 @@ export const HeroSection = () => {
 
               {/* Photo Area Mock - LCP CRITICAL IMAGE */}
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 border border-amber-400/30 shadow-md">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=70"
-                  srcSet="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=70 320w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=70 380w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=760&auto=format&fit=crop&q=70 760w"
+                {/*
+                * LCP IMAGE — PERFORMANCE NOTES:
+                * - src uses 320w (correct size for mobile ~286px display)
+                * - srcSet tops out at 380w (1x for desktop card, enough for 2x mobile)
+                * - sizes: mobile gets 286px slot, desktop gets 380px slot — no 760w download
+                * - fetchpriority="high" + decoding="sync" tells browser to prioritize immediately
+                * - No lazy loading — this is above-fold and is the LCP element
+                */}
+              <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=80"
+                  srcSet="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=320&auto=format&fit=crop&q=80 320w, https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=380&auto=format&fit=crop&q=75 380w"
                   sizes="(max-width: 640px) 286px, 380px"
                   alt="Personalized birthday card preview with celebratory portrait photo and warm wishes"
                   className="w-full h-full object-cover"
                   fetchpriority="high"
-                  decoding="async"
+                  decoding="sync"
                   width="380"
                   height="285"
                 />
