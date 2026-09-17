@@ -69,22 +69,28 @@ export const EnvelopeUnbox = ({ cardData, onOpen }) => {
         onClick={handleOpen}
       >
         {/* Envelope Body */}
-        <div className={`relative w-[320px] sm:w-[400px] h-[220px] sm:h-[260px] rounded-2xl bg-gradient-to-tr from-[#1a1c26] via-[#242938] to-[#14161f] border border-amber-400/30 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(229,192,123,0.15)] transition-transform duration-500 ${
+        <div className={`relative w-[300px] xs:w-[340px] sm:w-[400px] max-w-[calc(100vw-2rem)] h-[210px] xs:h-[230px] sm:h-[260px] rounded-2xl bg-gradient-to-tr from-[#1a1c26] via-[#242938] to-[#14161f] border border-amber-400/30 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(229,192,123,0.15)] transition-transform duration-500 overflow-hidden ${
           isOpening ? 'scale-105' : 'group-hover:scale-102'
         }`}>
-          {/* Envelope Top Flap Triangle */}
-          <div className="absolute top-0 left-0 right-0 h-0 border-l-[160px] sm:border-l-[200px] border-l-transparent border-r-[160px] sm:border-r-[200px] border-r-transparent border-t-[110px] sm:border-t-[130px] border-t-[#2d3345] rounded-t-2xl filter drop-shadow-md" />
+          {/* Envelope Top Flap SVG to scale perfectly across all widths without pixel borders breaking */}
+          <svg
+            className="absolute top-0 left-0 w-full h-[110px] sm:h-[130px] filter drop-shadow-md pointer-events-none"
+            viewBox="0 0 400 130"
+            preserveAspectRatio="none"
+          >
+            <polygon points="0,0 400,0 200,130" fill="#2d3345" />
+          </svg>
 
           {/* Envelope Inner Card Peek */}
           <motion.div
             animate={isOpening ? { y: -80, opacity: 1 } : { y: 0, opacity: 0.6 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-x-6 top-4 bottom-6 bg-gradient-to-b from-amber-100 to-amber-200 rounded-xl shadow-inner border border-amber-300/60 flex flex-col items-center justify-center p-4 text-slate-900"
+            className="absolute inset-x-4 sm:inset-x-6 top-4 bottom-6 bg-gradient-to-b from-amber-100 to-amber-200 rounded-xl shadow-inner border border-amber-300/60 flex flex-col items-center justify-center p-3 sm:p-4 text-slate-900"
           >
             <p className="text-xs uppercase font-serif tracking-widest text-amber-800 font-bold">
               Personal Invitation
             </p>
-            <p className="font-display font-bold text-lg text-slate-900 mt-1 truncate max-w-full">
+            <p className="font-display font-bold text-base sm:text-lg text-slate-900 mt-1 truncate max-w-full px-2">
               {cardData.recipientName || 'Dear Friend'}
             </p>
           </motion.div>
@@ -104,9 +110,9 @@ export const EnvelopeUnbox = ({ cardData, onOpen }) => {
           </motion.div>
 
           {/* Recipient Label on Front */}
-          <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-xs text-amber-300/80 font-mono">
-            <span>TO: {cardData.recipientName}</span>
-            <span>✦ UNBOX ✦</span>
+          <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between text-xs text-amber-300/80 font-mono">
+            <span className="truncate max-w-[60%]">TO: {cardData.recipientName || 'Friend'}</span>
+            <span className="shrink-0">✦ UNBOX ✦</span>
           </div>
         </div>
 

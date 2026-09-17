@@ -39,14 +39,14 @@ export const LuxuryBorderedLayout = ({ data }) => {
         {data.subtitle || 'Exclusive Birthday Celebration'}
       </p>
 
-      <h1 className="text-3xl sm:text-5xl font-display font-black text-gold-foil tracking-tight mb-4">
+      <h1 className="text-2xl xs:text-3xl sm:text-5xl font-display font-black text-gold-foil tracking-tight mb-4 break-words-safe">
         {data.title || 'Happy Birthday'}
       </h1>
 
-      <div className="my-6 py-2 px-6 rounded-full inline-block bg-white/[0.04] border border-amber-400/30">
-        <h2 className="text-2xl sm:text-3xl font-display font-bold text-amber-200 tracking-wide">
+      <div className="my-6 py-2 px-4 sm:px-6 rounded-full inline-block max-w-full bg-white/[0.04] border border-amber-400/30">
+        <h2 className="text-xl xs:text-2xl sm:text-3xl font-display font-bold text-amber-200 tracking-wide break-words-safe">
           {data.recipientName || 'Someone Special'}
-          {data.age && <span className="text-lg font-normal text-amber-400/70 ml-2">({data.age})</span>}
+          {data.age && <span className="text-base sm:text-lg font-normal text-amber-400/70 ml-2">({data.age})</span>}
         </h2>
       </div>
 
@@ -56,7 +56,7 @@ export const LuxuryBorderedLayout = ({ data }) => {
         </div>
       )}
 
-      <p className="text-base sm:text-lg text-slate-300 font-serif leading-relaxed max-w-lg mx-auto my-6 italic">
+      <p className="text-sm sm:text-lg text-slate-300 font-serif leading-relaxed max-w-lg mx-auto my-6 italic break-words-safe">
         "{data.message}"
       </p>
 
@@ -115,12 +115,12 @@ export const NeonCyberLayout = ({ data }) => {
         <PartyPopper className="w-3.5 h-3.5" /> SYSTEM CELEBRATION ACTIVE
       </div>
 
-      <h1 className="text-3xl sm:text-5xl font-outfit font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-300 tracking-tight drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] mb-3">
+      <h1 className="text-2xl xs:text-3xl sm:text-5xl font-outfit font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-300 tracking-tight drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] mb-3 break-words-safe">
         {data.title || 'LEVEL UNLOCKED!'}
       </h1>
 
-      <div className="my-4">
-        <span className="text-2xl sm:text-3xl font-outfit font-extrabold text-white px-4 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+      <div className="my-4 max-w-full inline-block">
+        <span className="text-xl xs:text-2xl sm:text-3xl font-outfit font-extrabold text-white px-3 sm:px-4 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 shadow-[0_0_15px_rgba(0,240,255,0.3)] break-words-safe inline-block max-w-full">
           {data.recipientName}
           {data.age && <span className="text-cyan-300 ml-2">#{data.age}</span>}
         </span>
@@ -132,7 +132,7 @@ export const NeonCyberLayout = ({ data }) => {
         </div>
       )}
 
-      <p className="text-base sm:text-lg text-cyan-100 font-sans leading-relaxed max-w-lg mx-auto my-6 font-medium">
+      <p className="text-sm sm:text-lg text-cyan-100 font-sans leading-relaxed max-w-lg mx-auto my-6 font-medium break-words-safe">
         {data.message}
       </p>
 

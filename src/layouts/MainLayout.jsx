@@ -24,9 +24,9 @@ export const MainLayout = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#090b10] text-slate-100">
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden bg-[#090b10] text-slate-100">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 w-full overflow-x-hidden">
         <Outlet />
       </main>
       <Footer />

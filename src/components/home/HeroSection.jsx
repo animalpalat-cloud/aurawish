@@ -41,7 +41,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Main Headline - Static for LCP */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.15] animate-fade-in-up">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-[1.15] animate-fade-in-up break-words-safe">
               Create Beautiful Birthday Wishes &{' '}
               <span className="text-gold-foil">Digital Birthday Cards</span>
             </h1>

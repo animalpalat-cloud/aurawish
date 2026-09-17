@@ -47,7 +47,7 @@ export const HomePage = () => {
               <span>Make Someone Smile Today</span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight">
+            <h2 className="text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight break-words-safe">
               Ready to Craft an <span className="text-gold-foil">Unforgettable</span> Birthday Moment?
             </h2>
 

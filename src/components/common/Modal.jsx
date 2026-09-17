@@ -48,16 +48,16 @@ export const Modal = ({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.4, bounce: 0.15 }}
             className={cn(
-              "relative w-full rounded-2xl bg-[#11141e] border border-slate-700/80 shadow-2xl p-6 z-10 overflow-hidden",
+              "relative w-full max-h-[90vh] overflow-y-auto rounded-2xl bg-[#11141e] border border-slate-700/80 shadow-2xl p-4 sm:p-6 z-10",
               maxWidth,
               className
             )}
           >
             {/* Header */}
-            <div className="flex items-start justify-between mb-5">
-              <div>
-                {title && <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>}
-                {subtitle && <p className="text-sm text-slate-400 mt-1">{subtitle}</p>}
+            <div className="flex items-start justify-between mb-4 sm:mb-5">
+              <div className="pr-3">
+                {title && <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">{title}</h3>}
+                {subtitle && <p className="text-xs sm:text-sm text-slate-400 mt-0.5 sm:mt-1">{subtitle}</p>}
               </div>
               <button
                 onClick={onClose}

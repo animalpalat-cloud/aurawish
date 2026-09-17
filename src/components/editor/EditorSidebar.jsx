@@ -22,7 +22,7 @@ export const EditorSidebar = ({
   ];
 
   return (
-    <div className="w-full bg-[#0d1017] border border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col h-full">
+    <div className="w-full bg-[#0d1017] border border-slate-800 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-2xl flex flex-col h-full">
       {/* Studio Brand Header */}
       <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800/80">
         <div className="flex items-center gap-2.5">
@@ -48,7 +48,7 @@ export const EditorSidebar = ({
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full pb-3 mb-4 border-b border-slate-800/60">
+      <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full pb-3 mb-4 border-b border-slate-800/60 no-scrollbar">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -57,7 +57,7 @@ export const EditorSidebar = ({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                 isActive
                   ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25'
                   : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'

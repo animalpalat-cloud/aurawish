@@ -283,11 +283,12 @@ export const TemplatesPage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto justify-end">
                 <Button
                   variant="secondary"
                   size="md"
                   onClick={() => setPreviewTemplate(null)}
+                  className="w-full sm:w-auto"
                 >
                   Close Preview
                 </Button>
@@ -302,6 +303,7 @@ export const TemplatesPage = () => {
                     setPreviewTemplate(null);
                     navigate(`/create/${id}`);
                   }}
+                  className="w-full sm:w-auto"
                 >
                   Customize Template
                 </Button>

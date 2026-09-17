@@ -206,7 +206,7 @@ export const EditorPage = () => {
       {/* Main Studio Workspace Split Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Editor Controls Sidebar */}
-        <div className="lg:col-span-6 xl:col-span-5 order-2 lg:order-1 h-[720px] max-h-[85vh]">
+        <div className="lg:col-span-6 xl:col-span-5 order-2 lg:order-1 h-auto min-h-[480px] lg:h-[720px] lg:max-h-[85vh] flex flex-col">
           <EditorSidebar
             cardData={cardData}
             updateField={updateField}
@@ -216,7 +216,7 @@ export const EditorPage = () => {
         </div>
 
         {/* Right Column: Real-Time Live Preview Pane */}
-        <div className="lg:col-span-6 xl:col-span-7 order-1 lg:order-2 h-[720px] max-h-[85vh]">
+        <div className="lg:col-span-6 xl:col-span-7 order-1 lg:order-2 h-[520px] sm:h-[620px] lg:h-[720px] lg:max-h-[85vh] flex flex-col">
           <LivePreviewPane
             cardData={cardData}
             template={template}

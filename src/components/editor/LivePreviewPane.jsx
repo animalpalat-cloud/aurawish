@@ -119,22 +119,22 @@ export const LivePreviewPane = ({
   const wrapperHeight = Math.round(effectiveH * activeScale);
 
   return (
-    <div className="w-full bg-[#0d1017] border border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col h-full relative overflow-hidden">
+    <div className="w-full bg-[#0d1017] border border-slate-800 rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-2xl flex flex-col h-full relative overflow-hidden">
       
       {/* ===== TOP TOOLBAR ===== */}
-      <div className="flex items-center justify-between pb-3.5 mb-2 border-b border-slate-800/80 shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-2 border-b border-slate-800/80 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
           <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
             Real-Time Live Canvas
           </span>
-          <span className="hidden sm:inline-block text-[11px] text-slate-500 font-mono">
+          <span className="hidden xs:inline-block sm:inline-block text-[11px] text-slate-500 font-mono">
             ({Math.round(activeScale * 100)}%)
           </span>
         </div>
 
         {/* Zoom & Viewport Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Zoom switch */}
           <div className="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs gap-1">
             <button
@@ -253,9 +253,9 @@ export const LivePreviewPane = ({
       </div>
 
       {/* Bottom Action Footer */}
-      <div className="pt-3.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+      <div className="pt-3.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
         {/* Left: Save Draft */}
-        <div>
+        <div className="w-full sm:w-auto">
           <Button
             variant="secondary"
             size="md"
@@ -269,13 +269,13 @@ export const LivePreviewPane = ({
         </div>
 
         {/* Right: Download & Generate Shareable Card */}
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="flex flex-col xs:flex-row sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <Button
             variant="secondary"
             size="md"
             icon={Download}
             onClick={() => setIsDownloadOpen(true)}
-            className="flex-1 sm:flex-initial sm:min-w-[120px] border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-white shadow-sm"
+            className="w-full sm:w-auto sm:min-w-[110px] border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-white shadow-sm"
           >
             Download
           </Button>
@@ -286,7 +286,7 @@ export const LivePreviewPane = ({
             icon={Share2}
             onClick={onGenerateCard}
             loading={isSaving}
-            className="flex-1 sm:flex-initial sm:min-w-[210px] shadow-lg shadow-brand-500/20 font-semibold"
+            className="w-full sm:w-auto sm:min-w-[190px] shadow-lg shadow-brand-500/20 font-semibold"
           >
             Generate Shareable Card
           </Button>

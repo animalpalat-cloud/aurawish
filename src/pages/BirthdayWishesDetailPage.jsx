@@ -65,14 +65,14 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
           {category.intro}
         </p>
 
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-          <Link to={`/create/${category.recommendedTemplate || 'velvet-luxury'}`}>
-            <Button variant="gold" size="md" icon={Sparkles}>
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+          <Link to={`/create/${category.recommendedTemplate || 'velvet-luxury'}`} className="w-full sm:w-auto">
+            <Button variant="gold" size="md" icon={Sparkles} className="w-full sm:w-auto">
               Create a Card with These Wishes
             </Button>
           </Link>
-          <Link to="/templates">
-            <Button variant="secondary" size="md">
+          <Link to="/templates" className="w-full sm:w-auto">
+            <Button variant="secondary" size="md" className="w-full sm:w-auto">
               View Recommended Templates
             </Button>
           </Link>

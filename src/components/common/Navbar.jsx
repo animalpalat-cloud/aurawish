@@ -125,9 +125,9 @@ export const Navbar = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop & Laptop Navigation Links */}
           <nav 
-            className="hidden xl:flex items-center gap-1 lg:gap-1.5"
+            className="hidden lg:flex items-center gap-0.5 xl:gap-1.5"
             aria-label="Main Navigation"
           >
             {navLinks.map((link) => {
@@ -137,7 +137,7 @@ export const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative inline-flex items-center gap-2 px-3.5 py-2 text-[13.5px] font-medium rounded-lg transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10] ${
+                  className={`relative inline-flex items-center gap-1.5 xl:gap-2 px-2.5 xl:px-3.5 py-2 text-xs xl:text-[13.5px] font-medium rounded-lg transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10] ${
                     active
                       ? 'text-white bg-white/[0.08] shadow-sm font-semibold'
                       : 'text-slate-300 hover:text-white hover:bg-white/[0.05]'
@@ -146,7 +146,7 @@ export const Navbar = () => {
                   <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${active ? 'text-amber-300' : 'text-slate-400 group-hover:text-slate-200'}`} aria-hidden="true" />
                   <span>{link.name}</span>
                   {active && (
-                    <span className="absolute bottom-1 left-3.5 right-3.5 h-[2px] bg-gradient-to-r from-brand-500 to-amber-400 rounded-full" />
+                    <span className="absolute bottom-1 left-2.5 xl:left-3.5 right-2.5 xl:right-3.5 h-[2px] bg-gradient-to-r from-brand-500 to-amber-400 rounded-full" />
                   )}
                 </Link>
               );
@@ -154,14 +154,14 @@ export const Navbar = () => {
           </nav>
 
           {/* Action CTAs (Desktop / Tablet) */}
-          <div className="hidden md:flex items-center gap-2.5">
+          <div className="hidden sm:flex items-center gap-2 xl:gap-2.5">
             {/* Primary Action: Create Card */}
             <button
               type="button"
               onClick={() => navigate('/templates')}
-              className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-xl text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-brand-600 via-brand-500 to-pink-500 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/35 hover:brightness-105 active:scale-[0.98] border border-brand-400/30 transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
+              className="inline-flex items-center justify-center gap-1.5 xl:gap-2 h-9 px-3 xl:px-4 rounded-xl text-xs xl:text-sm font-medium text-white bg-gradient-to-r from-brand-600 via-brand-500 to-pink-500 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/35 hover:brightness-105 active:scale-[0.98] border border-brand-400/30 transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
             >
-              <Sparkles className="w-4 h-4 flex-shrink-0 text-amber-200" aria-hidden="true" />
+              <Sparkles className="w-3.5 h-3.5 xl:w-4 xl:h-4 flex-shrink-0 text-amber-200" aria-hidden="true" />
               <span>Create Card</span>
             </button>
 
@@ -186,7 +186,7 @@ export const Navbar = () => {
                       {user.name ? user.name.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5 text-brand-300" aria-hidden="true" />}
                     </div>
                   )}
-                  <span className="text-xs font-medium text-slate-200 max-w-[90px] truncate hidden lg:inline-block">
+                  <span className="text-xs font-medium text-slate-200 max-w-[90px] truncate hidden xl:inline-block">
                     {user.name?.split(' ')[0] || 'Account'}
                   </span>
                 </button>
@@ -223,11 +223,11 @@ export const Navbar = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 xl:gap-2">
                 {/* Secondary CTA: Sign In */}
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 px-2.5 xl:px-3 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
                 >
                   <LogIn className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
                   <span>Sign In</span>
@@ -236,7 +236,7 @@ export const Navbar = () => {
                 {/* Secondary CTA: Sign Up */}
                 <Link
                   to="/signup"
-                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3.5 text-xs sm:text-sm font-medium text-slate-100 bg-white/[0.06] hover:bg-white/[0.12] hover:text-white border border-white/15 hover:border-white/25 rounded-xl transition-all duration-150 whitespace-nowrap shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 px-3 xl:px-3.5 text-xs sm:text-sm font-medium text-slate-100 bg-white/[0.06] hover:bg-white/[0.12] hover:text-white border border-white/15 hover:border-white/25 rounded-xl transition-all duration-150 whitespace-nowrap shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
                 >
                   <UserPlus className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
                   <span>Sign Up</span>
@@ -246,12 +246,12 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile / Tablet Menu Trigger & Mobile Create Shortcut */}
-          <div className="flex items-center gap-2 xl:hidden">
-            {/* Quick Create shortcut for tablet/mobile */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {/* Quick Create shortcut for mobile only */}
             <button
               type="button"
               onClick={() => navigate('/templates')}
-              className="md:hidden inline-flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium text-white bg-gradient-to-r from-brand-600 to-pink-500 shadow-sm border border-brand-400/30 active:scale-[0.97]"
+              className="sm:hidden inline-flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium text-white bg-gradient-to-r from-brand-600 to-pink-500 shadow-sm border border-brand-400/30 active:scale-[0.97]"
               aria-label="Create Card"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-200" aria-hidden="true" />
@@ -276,7 +276,7 @@ export const Navbar = () => {
       {/* Backdrop */}
       <div
         onClick={() => setMobileMenuOpen(false)}
-        className={`fixed inset-0 top-[68px] bg-black/60 z-30 xl:hidden transition-opacity duration-200 ${
+        className={`fixed inset-0 top-[68px] bg-black/60 z-30 lg:hidden transition-opacity duration-200 ${
           mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         aria-hidden="true"
@@ -285,7 +285,7 @@ export const Navbar = () => {
       {/* Menu Panel */}
       <div
         id="mobile-navigation-drawer"
-        className={`relative z-40 xl:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-md px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3 transition-all duration-200 origin-top overflow-hidden ${
+        className={`relative z-40 lg:hidden border-b border-white/[0.08] bg-[#0c0e14]/98 backdrop-blur-md px-4 sm:px-6 pt-3 pb-6 shadow-2xl shadow-black/90 space-y-3 transition-all duration-200 origin-top overflow-hidden ${
           mobileMenuOpen ? 'opacity-100 translate-y-0 max-h-[600px] pointer-events-auto' : 'opacity-0 -translate-y-2 max-h-0 pointer-events-none py-0'
         }`}
       >

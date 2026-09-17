@@ -23,14 +23,14 @@ export const WishCard = ({ wish, templateId = 'velvet-luxury' }) => {
 
   return (
     <div className="group relative rounded-2xl bg-[#121622]/90 border border-slate-800/80 hover:border-brand-500/40 p-5 sm:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-brand-500/5 flex flex-col justify-between">
-      <p className="text-slate-200 text-sm sm:text-base leading-relaxed mb-6 font-normal">
+      <p className="text-slate-200 text-sm sm:text-base leading-relaxed mb-6 font-normal break-words-safe">
         “{wish}”
       </p>
 
-      <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-800/60">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-slate-800/60">
         <button
           onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg hover:bg-white/5"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg hover:bg-white/5 cursor-pointer"
           title="Copy message"
         >
           {copied ? (
@@ -48,7 +48,7 @@ export const WishCard = ({ wish, templateId = 'velvet-luxury' }) => {
 
         <button
           onClick={handleCreateCard}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 transition-colors py-1.5 px-3 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 transition-colors py-1.5 px-3 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 cursor-pointer"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>Put in Card</span>
