@@ -46,7 +46,7 @@ export const BirthdayWishesHubPage = () => {
           <span>Curated Birthday Wishes & Greetings</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
+        <h1 className="text-2xl xs:text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight break-words-safe">
           Find the Perfect <span className="text-gold-foil">Birthday Wish</span> for Anyone
         </h1>
 
@@ -165,8 +165,8 @@ export const BirthdayWishesHubPage = () => {
       </div>
 
       {/* Pre-footer Call to Action */}
-      <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-brand-900/40 via-[#131726] to-amber-900/30 border border-brand-500/20 text-center space-y-5">
-        <h2 className="text-2xl sm:text-3xl font-display font-bold text-white">
+      <div className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-r from-brand-900/40 via-[#131726] to-amber-900/30 border border-brand-500/20 text-center space-y-5">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-display font-bold text-white break-words-safe">
           Create an Interactive Digital Card With Your Words
         </h2>
         <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">

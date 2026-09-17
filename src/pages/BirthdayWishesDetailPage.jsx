@@ -57,7 +57,7 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
           <span>{category.navLabel} Collection</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
+        <h1 className="text-2xl xs:text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight break-words-safe">
           {category.h1}
         </h1>
 

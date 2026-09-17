@@ -92,7 +92,7 @@ export const DashboardPage = () => {
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>Personal Card Studio</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl font-display font-bold text-white tracking-tight">
               {user?.name ? `${user.name}’s Studio Cards` : 'My Birthday Cards'}
             </h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -101,8 +101,8 @@ export const DashboardPage = () => {
 
           </div>
 
-          <Link to="/templates">
-            <Button variant="primary" size="md" icon={PlusCircle} className="shadow-lg shadow-brand-500/20">
+          <Link to="/templates" className="w-full sm:w-auto">
+            <Button variant="primary" size="md" icon={PlusCircle} className="w-full sm:w-auto shadow-lg shadow-brand-500/20">
               Create New Card
             </Button>
           </Link>

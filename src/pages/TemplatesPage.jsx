@@ -150,7 +150,7 @@ export const TemplatesPage = () => {
             <span>Interactive Birthday Card Catalog ({allTemplatesCount} Designs)</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-display font-black text-white tracking-tight">
+          <h1 className="text-2xl xs:text-3xl sm:text-5xl font-display font-black text-white tracking-tight break-words-safe">
             Digital Birthday Card Templates
           </h1>
 
