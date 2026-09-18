@@ -95,11 +95,11 @@ export const BirthdayWishesDiscovery = () => {
   };
 
   return (
-    <section className="py-20 bg-[#080a10] border-t border-white/[0.06] relative">
+    <section className="py-12 sm:py-16 bg-[#080a10] border-t border-white/[0.06] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-semibold mb-3">
             <Heart className="w-3.5 h-3.5 text-rose-400" />
             <span>Curated Birthday Messages</span>

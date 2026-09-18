@@ -9,7 +9,7 @@ export const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative pt-12 pb-24 lg:pt-20 lg:pb-32 overflow-hidden">
+    <section className="relative pt-6 pb-14 sm:pt-8 sm:pb-16 lg:pt-10 lg:pb-18 overflow-hidden">
       {/*
         Background ambient lighting.
         PERF: Reduced blur radii (140px→80px, 130px→70px) and sizes (650px→420px, 450px→300px).

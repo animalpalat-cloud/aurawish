@@ -128,7 +128,7 @@ export const TemplatesPage = () => {
   };
 
   return (
-    <div className="py-10 sm:py-16 min-h-[85vh]">
+    <div className="pt-6 pb-12 sm:pt-8 sm:pb-16 min-h-[85vh]">
       <SEOHead
         title={selectedCategory !== 'all' ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Birthday Card Templates | Birthday Wishes` : 'Digital Birthday Card Templates - Luxury & Animated Designs | Birthday Wishes'}
         description="Browse 250+ luxury digital birthday card templates. Personalize photos, celebration music, and heartfelt messages with instant 3D unboxing."

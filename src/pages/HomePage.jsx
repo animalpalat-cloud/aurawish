@@ -37,7 +37,7 @@ export const HomePage = () => {
       <div className="cv-section cv-section-md"><FAQSection /></div>
 
       {/* CTA Banner - CSS animations instead of Motion */}
-      <section className="cv-section py-20 relative overflow-hidden bg-gradient-to-b from-[#090b10] via-[#151128] to-[#090b10] border-t border-white/[0.06]">
+      <section className="cv-section py-12 sm:py-16 relative overflow-hidden bg-gradient-to-b from-[#090b10] via-[#151128] to-[#090b10] border-t border-white/[0.06]">
         <div className="absolute inset-0 bg-radial-gradient from-brand-500/10 via-transparent to-transparent pointer-events-none" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">

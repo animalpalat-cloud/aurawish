@@ -44,11 +44,11 @@ export const FAQSection = () => {
   };
 
   return (
-    <section className="py-20 bg-[#07080c] border-t border-white/[0.06] relative">
+    <section className="py-12 sm:py-16 bg-[#07080c] border-t border-white/[0.06] relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-semibold mb-3">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Got Questions?</span>

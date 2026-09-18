@@ -13,6 +13,7 @@ import {
   Laugh,
   UserCheck,
   Flower2,
+  Flower,
   Camera,
   Image as ImageIcon,
   Palette,
@@ -23,7 +24,20 @@ import {
   Award,
   Layers,
   Film,
-  Compass
+  Compass,
+  Cpu,
+  Trophy,
+  Music,
+  Plane,
+  UtensilsCrossed,
+  Gamepad2,
+  TreePine,
+  CloudSun,
+  Briefcase,
+  Star,
+  Church,
+  Globe,
+  CalendarDays
 } from 'lucide-react';
 import { CATEGORIES } from '../../data/templatesMeta';
 
@@ -41,6 +55,7 @@ const ICON_MAP = {
   Laugh,
   UserCheck,
   Flower2,
+  Flower,
   Camera,
   ImageIcon,
   Palette,
@@ -51,7 +66,20 @@ const ICON_MAP = {
   Award,
   Layers,
   Film,
-  Compass
+  Compass,
+  Cpu,
+  Trophy,
+  Music,
+  Plane,
+  UtensilsCrossed,
+  Gamepad2,
+  TreePine,
+  CloudSun,
+  Briefcase,
+  Star,
+  Church,
+  Globe,
+  CalendarDays
 };
 
 export const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {

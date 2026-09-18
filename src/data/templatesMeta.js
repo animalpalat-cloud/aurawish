@@ -76,42 +76,269 @@ export const loadTemplateById = async (templateId) => {
 
 // Categories are lightweight, can be included here
 export const CATEGORIES = [
-  { id: 'all', name: 'All', icon: 'Sparkles' },
-  { id: 'elegant', name: 'Elegant', icon: 'Feather' },
-  { id: 'luxury', name: 'Luxury', icon: 'Crown' },
-  { id: 'minimal', name: 'Minimal', icon: 'Layout' },
-  { id: 'modern', name: 'Modern', icon: 'Layout' },
-  { id: 'premium', name: 'Premium', icon: 'Crown' },
-  { id: 'cute', name: 'Cute', icon: 'HeartHandshake' },
-  { id: 'funny', name: 'Funny', icon: 'Laugh' },
-  { id: 'romantic', name: 'Romantic', icon: 'Heart' },
-  { id: 'love', name: 'Love', icon: 'Heart' },
-  { id: 'best-friend', name: 'Best Friend', icon: 'Smile' },
-  { id: 'family', name: 'Family', icon: 'Users' },
-  { id: 'mom', name: 'Mom', icon: 'Heart' },
-  { id: 'dad', name: 'Dad', icon: 'Crown' },
-  { id: 'sister', name: 'Sister', icon: 'Smile' },
-  { id: 'brother', name: 'Brother', icon: 'Zap' },
-  { id: 'kids', name: 'Kids', icon: 'Baby' },
-  { id: 'teen', name: 'Teen', icon: 'Flame' },
-  { id: 'party', name: 'Party', icon: 'PartyPopper' },
-  { id: 'floral', name: 'Floral', icon: 'Flower' },
-  { id: 'vintage', name: 'Vintage', icon: 'Camera' },
-  { id: 'artistic', name: 'Artistic', icon: 'Palette' },
-  { id: 'tech', name: 'Tech', icon: 'Cpu' },
-  { id: 'sports', name: 'Sports', icon: 'Trophy' },
-  { id: 'music', name: 'Music', icon: 'Music' },
-  { id: 'travel', name: 'Travel', icon: 'Plane' },
-  { id: 'food', name: 'Food', icon: 'UtensilsCrossed' },
-  { id: 'gaming', name: 'Gaming', icon: 'Gamepad2' },
-  { id: 'nature', name: 'Nature', icon: 'TreePine' },
-  { id: 'cosmic', name: 'Cosmic', icon: 'Sparkles' },
-  { id: 'pastel', name: 'Pastel', icon: 'CloudSun' },
-  { id: 'bold', name: 'Bold', icon: 'Zap' },
-  { id: 'professional', name: 'Professional', icon: 'Briefcase' },
-  { id: 'milestone', name: 'Milestone', icon: 'Star' },
-  { id: 'religious', name: 'Religious', icon: 'Church' },
-  { id: 'cultural', name: 'Cultural', icon: 'Globe' },
-  { id: 'seasonal', name: 'Seasonal', icon: 'CalendarDays' },
-  { id: 'pride', name: 'Pride', icon: 'Heart' },
+  {
+    "id": "all",
+    "name": "All",
+    "icon": "Sparkles"
+  },
+  {
+    "id": "elegant",
+    "name": "Elegant",
+    "icon": "Feather"
+  },
+  {
+    "id": "luxury",
+    "name": "Luxury",
+    "icon": "Crown"
+  },
+  {
+    "id": "minimal",
+    "name": "Minimal",
+    "icon": "Layout"
+  },
+  {
+    "id": "modern",
+    "name": "Modern",
+    "icon": "Layout"
+  },
+  {
+    "id": "premium",
+    "name": "Premium",
+    "icon": "Crown"
+  },
+  {
+    "id": "cute",
+    "name": "Cute",
+    "icon": "HeartHandshake"
+  },
+  {
+    "id": "funny",
+    "name": "Funny",
+    "icon": "Laugh"
+  },
+  {
+    "id": "romantic",
+    "name": "Romantic",
+    "icon": "Heart"
+  },
+  {
+    "id": "love",
+    "name": "Love",
+    "icon": "Heart"
+  },
+  {
+    "id": "best-friend",
+    "name": "Best Friend",
+    "icon": "Smile"
+  },
+  {
+    "id": "family",
+    "name": "Family",
+    "icon": "Users"
+  },
+  {
+    "id": "mom",
+    "name": "Mom",
+    "icon": "Heart"
+  },
+  {
+    "id": "dad",
+    "name": "Dad",
+    "icon": "Crown"
+  },
+  {
+    "id": "sister",
+    "name": "Sister",
+    "icon": "Smile"
+  },
+  {
+    "id": "brother",
+    "name": "Brother",
+    "icon": "Zap"
+  },
+  {
+    "id": "kids",
+    "name": "Kids",
+    "icon": "Baby"
+  },
+  {
+    "id": "teen",
+    "name": "Teen",
+    "icon": "Flame"
+  },
+  {
+    "id": "party",
+    "name": "Party",
+    "icon": "PartyPopper"
+  },
+  {
+    "id": "floral",
+    "name": "Floral",
+    "icon": "Flower"
+  },
+  {
+    "id": "vintage",
+    "name": "Vintage",
+    "icon": "Camera"
+  },
+  {
+    "id": "artistic",
+    "name": "Artistic",
+    "icon": "Palette"
+  },
+  {
+    "id": "tech",
+    "name": "Tech",
+    "icon": "Cpu"
+  },
+  {
+    "id": "sports",
+    "name": "Sports",
+    "icon": "Trophy"
+  },
+  {
+    "id": "music",
+    "name": "Music",
+    "icon": "Music"
+  },
+  {
+    "id": "travel",
+    "name": "Travel",
+    "icon": "Plane"
+  },
+  {
+    "id": "food",
+    "name": "Food",
+    "icon": "UtensilsCrossed"
+  },
+  {
+    "id": "gaming",
+    "name": "Gaming",
+    "icon": "Gamepad2"
+  },
+  {
+    "id": "nature",
+    "name": "Nature",
+    "icon": "TreePine"
+  },
+  {
+    "id": "cosmic",
+    "name": "Cosmic",
+    "icon": "Sparkles"
+  },
+  {
+    "id": "pastel",
+    "name": "Pastel",
+    "icon": "CloudSun"
+  },
+  {
+    "id": "bold",
+    "name": "Bold",
+    "icon": "Zap"
+  },
+  {
+    "id": "professional",
+    "name": "Professional",
+    "icon": "Briefcase"
+  },
+  {
+    "id": "milestone",
+    "name": "Milestone",
+    "icon": "Star"
+  },
+  {
+    "id": "religious",
+    "name": "Religious",
+    "icon": "Church"
+  },
+  {
+    "id": "cultural",
+    "name": "Cultural",
+    "icon": "Globe"
+  },
+  {
+    "id": "seasonal",
+    "name": "Seasonal",
+    "icon": "CalendarDays"
+  },
+  {
+    "id": "pride",
+    "name": "Pride",
+    "icon": "Heart"
+  },
+  {
+    "id": "photo",
+    "name": "Photo",
+    "icon": "Camera"
+  },
+  {
+    "id": "memories",
+    "name": "Memories",
+    "icon": "ImageIcon"
+  },
+  {
+    "id": "colorful",
+    "name": "Colorful",
+    "icon": "Palette"
+  },
+  {
+    "id": "animated",
+    "name": "Animated",
+    "icon": "Wand2"
+  },
+  {
+    "id": "celebration",
+    "name": "Celebration",
+    "icon": "Gift"
+  },
+  {
+    "id": "classy",
+    "name": "Classy",
+    "icon": "Feather"
+  },
+  {
+    "id": "glamorous",
+    "name": "Glamorous",
+    "icon": "Sparkles"
+  },
+  {
+    "id": "editorial",
+    "name": "Editorial",
+    "icon": "Layout"
+  },
+  {
+    "id": "emotional",
+    "name": "Emotional",
+    "icon": "Heart"
+  },
+  {
+    "id": "corporate",
+    "name": "Corporate",
+    "icon": "Award"
+  },
+  {
+    "id": "black-and-gold",
+    "name": "Black & Gold",
+    "icon": "Crown"
+  },
+  {
+    "id": "neon",
+    "name": "Neon",
+    "icon": "Zap"
+  },
+  {
+    "id": "3d",
+    "name": "3D",
+    "icon": "Layers"
+  },
+  {
+    "id": "cinematic",
+    "name": "Cinematic",
+    "icon": "Film"
+  },
+  {
+    "id": "festive",
+    "name": "Festive",
+    "icon": "PartyPopper"
+  }
 ];

@@ -30,7 +30,7 @@ export const BirthdayWishesHubPage = () => {
   ];
 
   return (
-    <div className="py-10 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="pt-6 pb-12 sm:pt-8 sm:pb-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <SEOHead
         title="Birthday Wishes - Heartfelt, Funny & Romantic Messages | Birthday Wishes"
         description="Discover genuinely heartfelt, funny, romantic, and sweet birthday wishes for mom, dad, best friends, and partners. Turn any message into a digital birthday card."
