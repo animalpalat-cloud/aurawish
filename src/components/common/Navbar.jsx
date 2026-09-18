@@ -14,6 +14,7 @@ import {
   Palette,
   Lightbulb,
   Info,
+  BookOpen,
   LogIn,
   UserPlus
 } from 'lucide-react';
@@ -82,11 +83,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'Birthday Wishes', path: '/birthday-wishes', icon: Gift },
-    { name: 'Card Templates', path: '/templates', icon: Layout },
-    { name: 'Card Maker', path: '/birthday-card-maker', icon: Palette },
-    { name: 'Birthday Ideas', path: '/birthday-ideas', icon: Lightbulb },
     { name: 'About', path: '/about', icon: Info },
+    { name: 'Blog', path: '/blog', icon: BookOpen },
   ];
 
   const isLinkActive = (path) => {
