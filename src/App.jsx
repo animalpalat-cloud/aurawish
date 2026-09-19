@@ -1,10 +1,12 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+﻿import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/common/Toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './layouts/MainLayout';
 import { PublicLayout } from './layouts/PublicLayout';
+import { AdminLayout } from './layouts/AdminLayout';
+import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
 
 // ── Lazy-loaded Page Chunks ────────────────────────────────────────────────
 // Each page is split into its own JS chunk and only loaded when the user
@@ -37,6 +39,13 @@ const BirthdayWishesDetailPage = lazy(() => import('./pages/BirthdayWishesDetail
 const BirthdayIdeasHubPage     = lazy(() => import('./pages/BirthdayIdeasHubPage'));
 const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'));
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
+
+// Admin Panel — completely separate auth surface, loaded on demand
+const AdminLoginPage        = lazy(() => import('./pages/admin/AdminLoginPage'));
+const AdminBlogPage         = lazy(() => import('./pages/admin/AdminBlogPage'));
+const AdminBlogEditorPage   = lazy(() => import('./pages/admin/AdminBlogEditorPage'));
+const AdminSignupPage    = lazy(() => import('./pages/admin/AdminSignupPage'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
 
 // ── Prefetch high-likelihood next routes ───────────────────────────────────
 // When the user lands on the homepage, they almost always navigate to
@@ -180,6 +189,48 @@ function App() {
               <Route element={<PublicLayout />}>
                 <Route path="/card/:shareId" element={<CardViewPage />} />
                 <Route path="/view/:shareId" element={<CardViewPage />} />
+              </Route>
+              {/* ─────────────────────────────────────────────────
+                  Admin Panel — Separate auth surface at /admin
+                  Uses AdminLayout (no site Navbar/Footer) and
+                  AdminAuthContext (Firebase email/password only).
+                  Zero overlap with user auth routes.
+              ───────────────────────────────────────────────── */}
+              <Route element={<AdminLayout />}>
+                <Route path="/admin" element={<AdminLoginPage />} />
+                <Route path="/admin/signup" element={<AdminSignupPage />} />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminDashboardPage />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/blog"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminBlogPage />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/blog/new"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminBlogEditorPage />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/blog/:id/edit"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminBlogEditorPage />
+                    </AdminProtectedRoute>
+                  }
+                />
               </Route>
             </Routes>
           </Suspense>

@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured, SUPABASE_URL } from '../supabase/client
 
 const BUCKET_NAME = 'card-images';
 const AUDIO_BUCKET_NAME = 'birthday-audio';
+const BLOG_BUCKET_NAME = 'blog-images';
 
 export const MAX_DEVICE_MUSIC_SIZE = 25 * 1024 * 1024; // 25 MB
 
@@ -241,6 +242,67 @@ export const storageService = {
     }
   },
 
+  /**
+   * Uploads admin blog featured image to Supabase Storage bucket 'blog-images'
+   * Path: posts/{timestamp}_{unique}_{sanitizedFileName}
+   */
+  uploadBlogImage: async (file, onProgress = null) => {
+    validateImageFile(file);
+
+    if (typeof onProgress === 'function') onProgress(15);
+
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, falling back to local object URL for preview');
+      if (typeof onProgress === 'function') onProgress(100);
+      return {
+        downloadUrl: URL.createObjectURL(file),
+        storagePath: `local_blog_${Date.now()}`
+      };
+    }
+
+    try {
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const sanitizedName = (file.name || 'blog-image.jpg')
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, '_');
+      const storagePath = `posts/${timestamp}_${randomStr}_${sanitizedName}`;
+
+      if (typeof onProgress === 'function') onProgress(45);
+
+      const { data, error } = await supabase.storage
+        .from(BLOG_BUCKET_NAME)
+        .upload(storagePath, file, {
+          contentType: file.type || 'image/jpeg',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Supabase blog storage upload error:', error);
+        throw new Error(error.message || 'Failed to upload blog image to Supabase Storage');
+      }
+
+      if (typeof onProgress === 'function') onProgress(80);
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from(BLOG_BUCKET_NAME)
+        .getPublicUrl(storagePath);
+
+      const downloadUrl = publicUrlData?.publicUrl || `${SUPABASE_URL}/storage/v1/object/public/${BLOG_BUCKET_NAME}/${storagePath}`;
+
+      if (typeof onProgress === 'function') onProgress(100);
+
+      return {
+        downloadUrl,
+        storagePath
+      };
+    } catch (err) {
+      console.error('Upload blog image error:', err);
+      throw new Error(err.message || 'Image upload is temporarily unavailable. Please try again.');
+    }
+  },
+
   deleteCardPhoto: async (storagePathOrUrl) => {
     if (!storagePathOrUrl || !supabase || !isSupabaseConfigured) return false;
 
@@ -267,6 +329,36 @@ export const storageService = {
       return true;
     } catch (e) {
       console.warn('Delete card photo failed gracefully:', e.message);
+      return false;
+    }
+  },
+
+  deleteBlogImage: async (storagePathOrUrl) => {
+    if (!storagePathOrUrl || !supabase || !isSupabaseConfigured) return false;
+
+    try {
+      let relativePath = storagePathOrUrl;
+      if (storagePathOrUrl.startsWith('http://') || storagePathOrUrl.startsWith('https://')) {
+        const marker = `/object/public/${BLOG_BUCKET_NAME}/`;
+        const idx = storagePathOrUrl.indexOf(marker);
+        if (idx !== -1) {
+          relativePath = storagePathOrUrl.substring(idx + marker.length);
+        } else {
+          return false;
+        }
+      }
+
+      const { error } = await supabase.storage
+        .from(BLOG_BUCKET_NAME)
+        .remove([relativePath]);
+
+      if (error) {
+        console.warn('Supabase blog storage deletion error:', error.message);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.warn('Delete blog image failed gracefully:', e.message);
       return false;
     }
   },

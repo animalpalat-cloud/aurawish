@@ -263,9 +263,85 @@ ON CONFLICT (id) DO UPDATE SET
   file_size_limit = 20971520,
   allowed_mime_types = ARRAY['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm'];
 
--- Storage RLS for Audio
-DROP POLICY IF EXISTS "Public can stream birthday audio" ON storage.objects;
-CREATE POLICY "Public can stream birthday audio"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'birthday-audio');
+-- ==========================================================
+-- 7. BLOG POSTS TABLE & POLICIES
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS public.blog_posts (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title          TEXT NOT NULL,
+  slug           TEXT UNIQUE NOT NULL,
+  excerpt        TEXT,
+  content        JSONB, -- Array of sections: [{h2: string, body: string}]
+  featured_image TEXT,
+  category       TEXT,
+  author         TEXT NOT NULL DEFAULT 'Admin',
+  status         TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  published_at   TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+-- Blog Performance Indexes
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON public.blog_posts (slug);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON public.blog_posts (status);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_category ON public.blog_posts (category);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON public.blog_posts (published_at DESC NULLS LAST);
+
+-- Blog RLS
+ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
+
+-- Public read access for published posts
+DROP POLICY IF EXISTS "Public read published blog posts" ON public.blog_posts;
+CREATE POLICY "Public read published blog posts"
+  ON public.blog_posts FOR SELECT
+  USING (status = 'published');
+
+-- Admin full access (managed via frontend Firebase admin auth guard)
+DROP POLICY IF EXISTS "Admin full access to blog posts" ON public.blog_posts;
+CREATE POLICY "Admin full access to blog posts"
+  ON public.blog_posts FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- ==========================================================
+-- 8. BLOG IMAGES STORAGE BUCKET & POLICIES (blog-images)
+-- ==========================================================
+
+-- 1. Create or update the dedicated 'blog-images' storage bucket
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'blog-images',
+  'blog-images',
+  true,
+  10485760, -- 10MB limit
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = true,
+  file_size_limit = 10485760,
+  allowed_mime_types = ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+
+-- 2. Storage RLS Policies for blog-images
+DROP POLICY IF EXISTS "Public can view blog images" ON storage.objects;
+CREATE POLICY "Public can view blog images" 
+  ON storage.objects FOR SELECT 
+  USING (bucket_id = 'blog-images');
+
+DROP POLICY IF EXISTS "Anyone can upload blog images" ON storage.objects;
+CREATE POLICY "Anyone can upload blog images" 
+  ON storage.objects FOR INSERT 
+  WITH CHECK (bucket_id = 'blog-images');
+
+DROP POLICY IF EXISTS "Anyone can update blog images" ON storage.objects;
+CREATE POLICY "Anyone can update blog images" 
+  ON storage.objects FOR UPDATE 
+  USING (bucket_id = 'blog-images')
+  WITH CHECK (bucket_id = 'blog-images');
+
+DROP POLICY IF EXISTS "Anyone can delete blog images" ON storage.objects;
+CREATE POLICY "Anyone can delete blog images" 
+  ON storage.objects FOR DELETE 
+  USING (bucket_id = 'blog-images');
+
+
 
