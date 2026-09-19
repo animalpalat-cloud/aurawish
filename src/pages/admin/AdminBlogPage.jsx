@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   PenLine, Plus, Trash2, Eye, EyeOff, Edit2,
-  Loader2, AlertCircle, FileText, RefreshCw, ExternalLink
+  Loader2, AlertCircle, FileText, RefreshCw, ExternalLink, FolderTree
 } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { blogService } from '../../services/blogService';
@@ -78,7 +78,7 @@ export const AdminBlogPage = () => {
       {/* ── Header row ─────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-xl font-bold text-white">Blog Posts</h2>
+          <h2 className="text-xl font-bold text-white">Blog Management</h2>
           <p className="text-xs text-slate-500 mt-0.5">{posts.length} post{posts.length !== 1 ? 's' : ''} total</p>
         </div>
         <div className="flex items-center gap-2">
@@ -97,6 +97,27 @@ export const AdminBlogPage = () => {
             New Post
           </Link>
         </div>
+      </div>
+
+      {/* ── Navigation Tabs ─────────────────────────────────── */}
+      <div className="flex items-center gap-2 border-b border-slate-800 mb-6">
+        <Link
+          to="/admin/blog"
+          className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all"
+        >
+          <FileText className="w-4 h-4" />
+          <span>Posts</span>
+          <span className="px-2 py-0.5 rounded-full bg-indigo-500/15 text-[11px] text-indigo-300 font-bold ml-1">
+            {posts.length}
+          </span>
+        </Link>
+        <Link
+          to="/admin/blog/categories"
+          className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-400 hover:text-white border-b-2 border-transparent transition-all"
+        >
+          <FolderTree className="w-4 h-4" />
+          <span>Categories</span>
+        </Link>
       </div>
 
       {/* ── Error ──────────────────────────────────────── */}

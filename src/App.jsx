@@ -1,4 +1,4 @@
-﻿import React, { lazy, Suspense, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/common/Toast';
 import { AuthProvider } from './contexts/AuthContext';
@@ -41,11 +41,12 @@ const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
 
 // Admin Panel — completely separate auth surface, loaded on demand
-const AdminLoginPage        = lazy(() => import('./pages/admin/AdminLoginPage'));
-const AdminBlogPage         = lazy(() => import('./pages/admin/AdminBlogPage'));
-const AdminBlogEditorPage   = lazy(() => import('./pages/admin/AdminBlogEditorPage'));
-const AdminSignupPage    = lazy(() => import('./pages/admin/AdminSignupPage'));
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminLoginPage          = lazy(() => import('./pages/admin/AdminLoginPage'));
+const AdminBlogPage           = lazy(() => import('./pages/admin/AdminBlogPage'));
+const AdminBlogEditorPage     = lazy(() => import('./pages/admin/AdminBlogEditorPage'));
+const AdminBlogCategoriesPage = lazy(() => import('./pages/admin/AdminBlogCategoriesPage'));
+const AdminSignupPage         = lazy(() => import('./pages/admin/AdminSignupPage'));
+const AdminDashboardPage      = lazy(() => import('./pages/admin/AdminDashboardPage'));
 
 // ── Prefetch high-likelihood next routes ───────────────────────────────────
 // When the user lands on the homepage, they almost always navigate to
@@ -220,6 +221,14 @@ function App() {
                   element={
                     <AdminProtectedRoute>
                       <AdminBlogEditorPage />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/blog/categories"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminBlogCategoriesPage />
                     </AdminProtectedRoute>
                   }
                 />

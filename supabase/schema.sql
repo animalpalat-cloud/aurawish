@@ -274,6 +274,7 @@ CREATE TABLE IF NOT EXISTS public.blog_posts (
   content        JSONB, -- Array of sections: [{h2: string, body: string}]
   featured_image TEXT,
   category       TEXT,
+  subcategory    TEXT, -- Selected subtopic string from blog_categories.subtopics[]
   author         TEXT NOT NULL DEFAULT 'Admin',
   status         TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
   published_at   TIMESTAMPTZ,
@@ -285,6 +286,7 @@ CREATE TABLE IF NOT EXISTS public.blog_posts (
 CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON public.blog_posts (slug);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON public.blog_posts (status);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_category ON public.blog_posts (category);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_subcategory ON public.blog_posts (subcategory);
 CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON public.blog_posts (published_at DESC NULLS LAST);
 
 -- Blog RLS
@@ -342,6 +344,72 @@ DROP POLICY IF EXISTS "Anyone can delete blog images" ON storage.objects;
 CREATE POLICY "Anyone can delete blog images" 
   ON storage.objects FOR DELETE 
   USING (bucket_id = 'blog-images');
+
+-- ==========================================================
+-- 9. BLOG CATEGORIES TABLE & RELATIONSHIPS
+-- ==========================================================
+
+-- 1. Create Blog Categories Table
+CREATE TABLE IF NOT EXISTS public.blog_categories (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL,
+  slug        TEXT UNIQUE NOT NULL,
+  description TEXT,
+  subtopics   JSONB NOT NULL DEFAULT '[]'::jsonb,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+-- Index for fast slug lookups
+CREATE INDEX IF NOT EXISTS idx_blog_categories_slug ON public.blog_categories (slug);
+
+-- Enable RLS
+ALTER TABLE public.blog_categories ENABLE ROW LEVEL SECURITY;
+
+-- Public read access for categories
+DROP POLICY IF EXISTS "Public read blog categories" ON public.blog_categories;
+CREATE POLICY "Public read blog categories"
+  ON public.blog_categories FOR SELECT
+  USING (true);
+
+-- Admin full access to categories
+DROP POLICY IF EXISTS "Admin full access to blog categories" ON public.blog_categories;
+CREATE POLICY "Admin full access to blog categories"
+  ON public.blog_categories FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- 2. Add foreign key category_id to blog_posts
+ALTER TABLE public.blog_posts 
+  ADD COLUMN IF NOT EXISTS category_id UUID REFERENCES public.blog_categories(id) ON DELETE RESTRICT;
+
+-- 3. Add subcategory column (stores the selected subtopic string from blog_categories.subtopics[])
+ALTER TABLE public.blog_posts
+  ADD COLUMN IF NOT EXISTS subcategory TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_blog_posts_category_id ON public.blog_posts (category_id);
+
+-- 3. Seed Default Categories
+INSERT INTO public.blog_categories (name, slug, description, subtopics)
+VALUES 
+(
+  'Trending Sports & Hobbies',
+  'trending-sports-hobbies',
+  'Emerging sports, modern hobbies, recreational activities, equipment guides, and hobby trends gaining popularity in the US and Europe.',
+  '["Pickleball", "Indoor Gardening", "Emerging Sports", "Outdoor Recreation", "Creative Hobbies", "Fitness & Active Hobbies", "Hobby Equipment & Reviews"]'::jsonb
+),
+(
+  'Specialized Pet Care',
+  'specialized-pet-care',
+  'Detailed care information for specific dog breeds, cat breeds, exotic pets, nutrition, training, grooming, and breed-specific health guidance.',
+  '["Specific Dog Breeds", "Specific Cat Breeds", "Exotic Pets", "Specialized Pet Nutrition", "Breed-Specific Training", "Breed-Specific Health", "Grooming & Care", "Pet Products & Equipment"]'::jsonb
+)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  description = EXCLUDED.description,
+  subtopics = EXCLUDED.subtopics,
+  updated_at = timezone('utc'::text, now());
+
 
 
 

@@ -1,6 +1,6 @@
-﻿// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // Blog Service
-// Supabase CRUD for the blog_posts table.
+// Supabase CRUD for the blog_posts and blog_categories tables.
 // Uses the anon key (read + admin writes).
 // Admin writes are safe because the admin panel is protected by Firebase auth.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -17,19 +17,227 @@ function slugify(text) {
 }
 
 export const blogService = {
-  // ── Public ────────────────────────────────────────────────────────────────
+  // ── Categories CRUD ───────────────────────────────────────────────────────
 
-  /** Fetch all published posts ordered by published_at desc */
-  async getPublishedPosts() {
+  /**
+   * Lightweight category fetch — only fetches the blog_categories table.
+   * Used by the blog editor dropdown (no post-count subquery).
+   */
+  async getCategoriesSimple() {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) return { data: [], error: null };
+
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('id, name, slug, description, subtopics')
+      .order('name', { ascending: true });
+
+    const cats = (data || []).map(cat => ({
+      ...cat,
+      subtopics: Array.isArray(cat.subtopics) ? cat.subtopics : [],
+    }));
+
+    return { data: cats, error };
+  },
+
+  /** Fetch all categories with associated blog post count */
+  async getCategories() {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) return { data: [], error: null };
+
+    try {
+      // 1. Fetch all categories
+      const { data: categories, error: catError } = await supabase
+        .from('blog_categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (catError) throw catError;
+
+      // 2. Fetch post counts grouped or calculate from posts
+      const { data: posts, error: postError } = await supabase
+        .from('blog_posts')
+        .select('id, category_id, category, status');
+
+      const counts = {};
+      if (!postError && Array.isArray(posts)) {
+        posts.forEach(p => {
+          if (p.category_id) {
+            counts[p.category_id] = (counts[p.category_id] || 0) + 1;
+          } else if (p.category) {
+            // Match by name fallback
+            const matchingCat = categories?.find(c => c.name.toLowerCase() === p.category.toLowerCase());
+            if (matchingCat) {
+              counts[matchingCat.id] = (counts[matchingCat.id] || 0) + 1;
+            }
+          }
+        });
+      }
+
+      const categoriesWithCount = (categories || []).map(cat => ({
+        ...cat,
+        subtopics: Array.isArray(cat.subtopics) ? cat.subtopics : [],
+        post_count: counts[cat.id] || 0,
+      }));
+
+      return { data: categoriesWithCount, error: null };
+    } catch (err) {
+      console.warn('Error fetching categories from Supabase:', err.message);
+      return { data: [], error: err };
+    }
+  },
+
+  /** Fetch single category by ID */
+  async getCategoryById(id) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) return { data: null, error: new Error('Supabase not configured') };
+
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (data && !Array.isArray(data.subtopics)) {
+      data.subtopics = [];
+    }
+
+    return { data, error };
+  },
+
+  /** Fetch single category by Slug */
+  async getCategoryBySlug(slug) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) return { data: null, error: null };
 
     const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (data && !Array.isArray(data.subtopics)) {
+      data.subtopics = [];
+    }
+
+    return { data, error };
+  },
+
+  /** Create a new category */
+  async createCategory({ name, slug, description, subtopics }) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
+
+    const finalSlug = slug?.trim() || slugify(name);
+    const cleanSubtopics = Array.isArray(subtopics) 
+      ? subtopics.filter(t => typeof t === 'string' && t.trim().length > 0)
+      : [];
+
+    const payload = {
+      name: name?.trim(),
+      slug: finalSlug,
+      description: description?.trim() || null,
+      subtopics: cleanSubtopics,
+    };
+
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /** Update an existing category */
+  async updateCategory(id, { name, slug, description, subtopics }) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
+
+    const payload = {
+      name: name?.trim(),
+      slug: slug?.trim() || slugify(name),
+      description: description?.trim() || null,
+      subtopics: Array.isArray(subtopics) 
+        ? subtopics.filter(t => typeof t === 'string' && t.trim().length > 0)
+        : [],
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .update(payload)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  /** Delete a category if not in use by any post */
+  async deleteCategory(id) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
+
+    // 1. Check if category is used by any posts
+    const { count, error: countErr } = await supabase
       .from('blog_posts')
-      .select('id, title, slug, excerpt, featured_image, category, author, published_at, content')
+      .select('id', { count: 'exact', head: true })
+      .eq('category_id', id);
+
+    if (countErr) throw countErr;
+
+    if (count && count > 0) {
+      throw new Error(`Cannot delete this category because ${count} blog post(s) are currently assigned to it. Reassign or delete those posts first.`);
+    }
+
+    // 2. Delete category
+    const { error } = await supabase
+      .from('blog_categories')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  },
+
+  // ── Public Blog Posts ─────────────────────────────────────────────────────
+
+  /** Fetch all published posts, optionally filtered strictly by category ID or slug */
+  async getPublishedPosts(categoryFilter = null) {
+    const { supabase, isSupabaseConfigured } = await getSupabaseClient();
+    if (!supabase || !isSupabaseConfigured) return { data: null, error: null };
+
+    let query = supabase
+      .from('blog_posts')
+      .select('id, title, slug, excerpt, featured_image, category, category_id, author, published_at, content')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
+    if (categoryFilter && categoryFilter !== 'all') {
+      // Check if filter is UUID or category name/slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryFilter);
+      if (isUUID) {
+        query = query.eq('category_id', categoryFilter);
+      } else {
+        // Find category by slug first to filter by category_id or exact category name
+        const { data: cat } = await supabase
+          .from('blog_categories')
+          .select('id, name')
+          .eq('slug', categoryFilter)
+          .maybeSingle();
+
+        if (cat) {
+          query = query.or(`category_id.eq.${cat.id},category.eq.${cat.name}`);
+        } else {
+          query = query.eq('category', categoryFilter);
+        }
+      }
+    }
+
+    const { data, error } = await query;
     return { data, error };
   },
 
@@ -48,18 +256,23 @@ export const blogService = {
     return { data, error };
   },
 
-  // ── Admin ─────────────────────────────────────────────────────────────────
+  // ── Admin Blog Posts ──────────────────────────────────────────────────────
 
   /** Fetch ALL posts (any status) for admin table */
-  async getAllPostsAdmin() {
+  async getAllPostsAdmin(categoryId = null) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) return { data: [], error: null };
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('blog_posts')
       .select('*')
       .order('created_at', { ascending: false });
 
+    if (categoryId) {
+      query = query.eq('category_id', categoryId);
+    }
+
+    const { data, error } = await query;
     return { data: data || [], error };
   },
 
@@ -78,7 +291,9 @@ export const blogService = {
   },
 
   /** Create a new post */
-  async createPost({ title, slug, excerpt, content, featured_image, category, author, status, published_at }) {
+  // NOTE: subcategory is intentionally omitted from the payload until the migration
+  // "ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS subcategory TEXT;" is applied.
+  async createPost({ title, slug, excerpt, content, featured_image, category_id, category, subcategory, author, status, published_at }) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
@@ -90,7 +305,9 @@ export const blogService = {
       excerpt: excerpt?.trim() || null,
       content: content || null,
       featured_image: featured_image?.trim() || null,
+      category_id: category_id || null,
       category: category?.trim() || null,
+      // subcategory omitted — column does not exist in live DB yet (run migration first)
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
@@ -107,7 +324,8 @@ export const blogService = {
   },
 
   /** Update an existing post by id */
-  async updatePost(id, { title, slug, excerpt, content, featured_image, category, author, status, published_at }) {
+  // NOTE: subcategory omitted from payload until migration is applied.
+  async updatePost(id, { title, slug, excerpt, content, featured_image, category_id, category, subcategory, author, status, published_at }) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
@@ -117,10 +335,13 @@ export const blogService = {
       excerpt: excerpt?.trim() || null,
       content: content || null,
       featured_image: featured_image?.trim() || null,
+      category_id: category_id || null,
       category: category?.trim() || null,
+      // subcategory omitted — column does not exist in live DB yet (run migration first)
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
+      updated_at: new Date().toISOString(),
     };
 
     const { data, error } = await supabase
@@ -160,6 +381,7 @@ export const blogService = {
       .update({
         status: newStatus,
         published_at: newStatus === 'published' ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
       .select()

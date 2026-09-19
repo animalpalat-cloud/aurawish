@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Save, ArrowLeft, Plus, Trash2, AlertCircle,
   Loader2, Eye, EyeOff, GripVertical, ImageIcon, CheckCircle2,
-  Upload, X, ExternalLink
+  Upload, X, ExternalLink, FolderTree
 } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { blogService } from '../../services/blogService';
@@ -11,14 +11,13 @@ import { storageService } from '../../services/storageService';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin Blog Editor — /admin/blog/new  and  /admin/blog/:id/edit
-// Create or edit a blog post with a visual section builder.
+// Create or edit a blog post with a visual section builder and category selector.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CATEGORIES = ['Writing Guides', 'Creative Ideas', 'Surprises', 'Tutorials', 'General'];
 const BLANK_SECTION = () => ({ h2: '', body: '' });
 const BLANK_FORM = {
   title: '', slug: '', excerpt: '', featured_image: '',
-  category: '', author: 'Admin', status: 'draft',
+  category_id: '', category: '', subcategory: '', author: 'Admin', status: 'draft',
   published_at: '', sections: [BLANK_SECTION()],
 };
 
@@ -38,6 +37,9 @@ export const AdminBlogEditorPage = () => {
   const isEditing = Boolean(id);
 
   const [form, setForm] = useState(BLANK_FORM);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoryError, setCategoryError] = useState('');
   const [slugManual, setSlugManual] = useState(false);
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
@@ -49,6 +51,21 @@ export const AdminBlogEditorPage = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageError, setImageError] = useState('');
+
+  // Fetch categories using the lightweight query (no post-count subquery)
+  useEffect(() => {
+    setCategoryError('');
+    blogService.getCategoriesSimple()
+      .then(({ data, error: err }) => {
+        if (err) throw err;
+        setCategories(data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to load categories:', err);
+        setCategoryError('Could not load categories. Check your Supabase connection.');
+      })
+      .finally(() => setLoadingCategories(false));
+  }, []);
 
   // Load existing post when editing
   useEffect(() => {
@@ -63,7 +80,9 @@ export const AdminBlogEditorPage = () => {
           slug:           data.slug || '',
           excerpt:        data.excerpt || '',
           featured_image: data.featured_image || '',
+          category_id:    data.category_id || '',
           category:       data.category || '',
+          subcategory:    data.subcategory || '',
           author:         data.author || 'Admin',
           status:         data.status || 'draft',
           published_at:   toInputDate(data.published_at),
@@ -86,6 +105,23 @@ export const AdminBlogEditorPage = () => {
 
   const setField = useCallback((key, value) =>
     setForm(prev => ({ ...prev, [key]: value })), []);
+
+  // Category change handler — always resolves to a UUID category_id
+  // Resets subcategory whenever the main category changes.
+  const handleCategoryChange = (e) => {
+    const selectedId = e.target.value; // always a UUID from <option value={cat.id}>
+    if (!selectedId) {
+      setForm(prev => ({ ...prev, category_id: '', category: '', subcategory: '' }));
+      return;
+    }
+    const cat = categories.find(c => c.id === selectedId);
+    if (cat) {
+      // Store both the UUID (for the FK) and the name (for the legacy text column).
+      // Reset subcategory so user must re-pick for the new category.
+      setForm(prev => ({ ...prev, category_id: cat.id, category: cat.name, subcategory: '' }));
+    }
+    // If cat is not found (shouldn't happen), ignore the selection
+  };
 
   // ── Section helpers ─────────────────────────────────────────────────────
   const addSection = () =>
@@ -154,6 +190,10 @@ export const AdminBlogEditorPage = () => {
     setSuccess('');
     if (!form.title.trim()) { setError('Title is required.'); return; }
     if (!form.slug.trim())  { setError('Slug is required.'); return; }
+    if (!form.category_id && !form.category) {
+      setError('Category is required. Please select a primary category for this post.');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -162,7 +202,9 @@ export const AdminBlogEditorPage = () => {
         slug:           form.slug.trim(),
         excerpt:        form.excerpt.trim(),
         featured_image: form.featured_image.trim(),
-        category:       form.category,
+        category_id:    form.category_id || null,
+        category:       form.category || null,
+        subcategory:    form.subcategory || null,
         author:         form.author.trim() || 'Admin',
         status:         targetStatus,
         published_at:   targetStatus === 'published'
@@ -436,20 +478,124 @@ export const AdminBlogEditorPage = () => {
 
             {/* Category / Author */}
             <div className="bg-[#11141e] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">Meta</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">Meta</h3>
+                <Link
+                  to="/admin/blog/categories"
+                  target="_blank"
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1 font-medium"
+                >
+                  <FolderTree className="w-3 h-3" />
+                  <span>Manage</span>
+                </Link>
+              </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Category</label>
-                <select
-                  id="post-category"
-                  value={form.category}
-                  onChange={e => setField('category', e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 transition-all"
-                >
-                  <option value="">Select category…</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                  Primary Category <span className="text-rose-400">*</span>
+                </label>
+
+                {/* Error state */}
+                {categoryError && (
+                  <div className="mb-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 text-[11px] flex items-center gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    {categoryError}
+                  </div>
+                )}
+
+                {/* Loading state */}
+                {loadingCategories ? (
+                  <div className="w-full px-3 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-500 text-sm flex items-center gap-2">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+                    Loading categories…
+                  </div>
+                ) : (
+                  <select
+                    id="post-category"
+                    value={form.category_id}
+                    onChange={handleCategoryChange}
+                    disabled={loadingCategories || categories.length === 0}
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    required
+                  >
+                    <option value="">Select category…</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                {/* Empty categories warning */}
+                {!loadingCategories && !categoryError && categories.length === 0 && (
+                  <p className="mt-1.5 text-[11px] text-amber-400">
+                    No categories found.{' '}
+                    <a href="/admin/blog/categories" target="_blank" className="underline hover:text-amber-300">
+                      Create one first.
+                    </a>
+                  </p>
+                )}
+
+                {/* Selected category helper details */}
+                {(() => {
+                  const selectedCat = categories.find(c => c.id === form.category_id);
+                  if (!selectedCat) return null;
+                  return (
+                    <div className="mt-2.5 p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 text-left">
+                      {selectedCat.description && (
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          {selectedCat.description}
+                        </p>
+                      )}
+                      {Array.isArray(selectedCat.subtopics) && selectedCat.subtopics.length > 0 && (
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {selectedCat.subtopics.slice(0, 5).map((tag, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-indigo-500/10 text-[10px] text-indigo-300 font-medium border border-indigo-500/20">
+                              {tag}
+                            </span>
+                          ))}
+                          {selectedCat.subtopics.length > 5 && (
+                            <span className="text-[10px] text-slate-500 self-center">
+                              +{selectedCat.subtopics.length - 5} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
+
+              {/* Subcategory — shown only when a category with subtopics is selected */}
+              {(() => {
+                const selectedCat = categories.find(c => c.id === form.category_id);
+                const subtopics = selectedCat?.subtopics || [];
+                if (!selectedCat || subtopics.length === 0) return null;
+                return (
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Subcategory / Topic
+                    </label>
+                    <select
+                      id="post-subcategory"
+                      value={form.subcategory}
+                      onChange={e => setField('subcategory', e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                    >
+                      <option value="">Select subcategory… (optional)</option>
+                      {subtopics.map((topic, idx) => (
+                        <option key={idx} value={topic}>{topic}</option>
+                      ))}
+                    </select>
+                    {form.subcategory && (
+                      <p className="text-[10px] text-indigo-400 mt-1">
+                        📌 {form.subcategory}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div>
                 <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Author</label>
