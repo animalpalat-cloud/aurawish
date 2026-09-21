@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, BarChart3, Settings, FileText, Bell, ChevronRight, Activity, PenLine } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
@@ -17,8 +17,8 @@ const colorMap = {
 };
 
 const QUICK_LINKS = [
+  { label: 'Real-Time Analytics', desc: 'Live visitor traffic and active pages', icon: BarChart3, href: '/admin/analytics' },
   { label: 'Blog Management',   desc: 'Create, edit, publish blog posts',   icon: PenLine,  href: '/admin/blog' },
-  { label: 'Analytics',         desc: 'Traffic, conversions, and card stats', icon: BarChart3, href: '#' },
   { label: 'User Management',   desc: 'View and manage user accounts',       icon: Users,     href: '#' },
   { label: 'Settings',          desc: 'Platform configuration and policies', icon: Settings,  href: '#' },
 ];
@@ -26,11 +26,22 @@ const QUICK_LINKS = [
 export const AdminDashboardPage = () => {
   const { adminUser } = useAdminAuth();
   const [blogCount, setBlogCount] = useState(null);
+  const [liveUsers, setLiveUsers] = useState(null);
 
   useEffect(() => {
     blogService.getAllPostsAdmin().then(({ data }) => {
       if (data) setBlogCount(data.length);
     }).catch(() => {});
+
+    // Fetch real-time active users from GA4 proxy endpoint
+    fetch('/api/analytics?type=realtime')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && typeof data.activeUsers === 'number') {
+          setLiveUsers(data.activeUsers);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const initials = adminUser?.displayName
@@ -39,7 +50,7 @@ export const AdminDashboardPage = () => {
 
   const STAT_CARDS = [
     { label: 'Total Users',    value: '—',                                   icon: Users,    color: 'indigo' },
-    { label: 'Active Sessions', value: '—',                                  icon: Activity, color: 'emerald' },
+    { label: 'Live Visitors',  value: liveUsers !== null ? String(liveUsers) : '—', icon: Activity, color: 'emerald' },
     { label: 'Blog Posts',     value: blogCount !== null ? String(blogCount) : '—', icon: FileText, color: 'amber' },
     { label: 'Notifications',  value: '—',                                   icon: Bell,     color: 'rose' },
   ];

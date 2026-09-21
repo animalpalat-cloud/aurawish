@@ -47,6 +47,7 @@ const AdminBlogEditorPage     = lazy(() => import('./pages/admin/AdminBlogEditor
 const AdminBlogCategoriesPage = lazy(() => import('./pages/admin/AdminBlogCategoriesPage'));
 const AdminSignupPage         = lazy(() => import('./pages/admin/AdminSignupPage'));
 const AdminDashboardPage      = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminAnalyticsPage      = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 
 // ── Prefetch high-likelihood next routes ───────────────────────────────────
 // When the user lands on the homepage, they almost always navigate to
@@ -205,6 +206,14 @@ function App() {
                   element={
                     <AdminProtectedRoute>
                       <AdminDashboardPage />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/analytics"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminAnalyticsPage />
                     </AdminProtectedRoute>
                   }
                 />

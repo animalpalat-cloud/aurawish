@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, LogOut, LayoutDashboard, FileText, Menu, X, ChevronRight } from 'lucide-react';
+import { Shield, LogOut, LayoutDashboard, FileText, Menu, X, ChevronRight, Activity } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -10,6 +10,7 @@ import { useAdminAuth } from '../../contexts/AdminAuthContext';
 
 const NAV_ITEMS = [
   { label: 'Dashboard',        href: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Analytics',        href: '/admin/analytics', icon: Activity },
   { label: 'Blog Management',  href: '/admin/blog',      icon: FileText },
 ];
 
