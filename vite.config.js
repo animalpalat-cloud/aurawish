@@ -1,9 +1,50 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+
+// Dev middleware to serve /api/analytics during local development (npm run dev)
+function analyticsDevPlugin() {
+  return {
+    name: 'analytics-dev-plugin',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url && req.url.startsWith('/api/analytics')) {
+          try {
+            const env = loadEnv('development', process.cwd(), '');
+            if (env.GA4_PROPERTY_ID && !process.env.GA4_PROPERTY_ID) {
+              process.env.GA4_PROPERTY_ID = env.GA4_PROPERTY_ID;
+            }
+            if (env.GA4_SERVICE_ACCOUNT_JSON && !process.env.GA4_SERVICE_ACCOUNT_JSON) {
+              process.env.GA4_SERVICE_ACCOUNT_JSON = env.GA4_SERVICE_ACCOUNT_JSON;
+            }
+            const { default: handler } = await import('./api/analytics.js');
+            const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+            req.query = Object.fromEntries(parsedUrl.searchParams.entries());
+            res.status = (code) => {
+              res.statusCode = code;
+              return res;
+            };
+            res.json = (data) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return res;
+            };
+            await handler(req, res);
+          } catch (err) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: err.message }));
+          }
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), analyticsDevPlugin()],
 
   build: {
     // Raise the warning threshold slightly (we'll still be well under after chunking)

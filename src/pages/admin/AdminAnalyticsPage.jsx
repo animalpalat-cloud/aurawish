@@ -166,7 +166,7 @@ export const AdminAnalyticsPage = () => {
             <h2 className="text-lg font-bold text-white tracking-tight">Real-time Overview</h2>
           </div>
           <p className="text-xs text-slate-500">
-            Powered by Google Analytics · Property <span className="font-mono text-slate-400">G-CL04BYZ1GZ</span>
+            Powered by Google Analytics · Property ID: <span className="font-mono text-slate-400">555173694</span> · Tag: <span className="font-mono text-slate-400">G-CL04BYZ1GZ</span>
           </p>
         </div>
 
@@ -349,6 +349,22 @@ export const AdminAnalyticsPage = () => {
                 <li><code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300">GA4_PROPERTY_ID</code> — your GA4 numeric property ID (find in GA4 Admin → Property Settings)</li>
               </ul>
             </li>
+          </ol>
+        </div>
+      )}
+
+      {/* ── Permission guide (shown if Google rejects service account access) ── */}
+      {error && (error.toLowerCase().includes('permission') || error.toLowerCase().includes('403')) && (
+        <div className="mt-8 rounded-3xl border border-amber-500/20 bg-amber-500/5 p-7">
+          <h3 className="text-sm font-bold text-amber-300 mb-2">🔐 Grant GA4 Viewer Permission</h3>
+          <p className="text-xs text-slate-300 mb-3">
+            The service account authenticated successfully, but Google Analytics needs access to your property.
+          </p>
+          <ol className="space-y-2 text-xs text-slate-400 list-decimal list-inside">
+            <li>Open Google Analytics Admin ⚙️ for Property ID <span className="font-mono text-amber-300">555173694</span></li>
+            <li>Click <strong>Property Access Management</strong></li>
+            <li>Click <strong>+</strong> (Add users) and enter: <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300">firebase-adminsdk-fbsvc@aurawish-dbd78.iam.gserviceaccount.com</code></li>
+            <li>Select the <strong>Viewer</strong> role and click <strong>Add</strong></li>
           </ol>
         </div>
       )}

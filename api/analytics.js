@@ -41,7 +41,7 @@ async function getGoogleAccessToken(serviceAccount) {
 
   // Use Node.js crypto to sign with RS256
   const crypto = await import('crypto');
-  const privateKey = serviceAccount.private_key;
+  const privateKey = (serviceAccount.private_key || '').replace(/\\n/g, '\n');
   const sign = crypto.createSign('RSA-SHA256');
   sign.update(signingInput);
   const signature = base64UrlEncode(sign.sign(privateKey));
@@ -82,20 +82,69 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // ── Validate env vars ────────────────────────────────────────────────────
-  const { GA4_SERVICE_ACCOUNT_JSON, GA4_PROPERTY_ID } = process.env;
+  // ── Helper to resolve env vars locally or on server ──────────────────────
+  let propertyId = process.env.GA4_PROPERTY_ID;
+  let serviceAccountJson = process.env.GA4_SERVICE_ACCOUNT_JSON;
 
-  if (!GA4_SERVICE_ACCOUNT_JSON || !GA4_PROPERTY_ID) {
+  // If running locally with Node/Vite without process.env populated, check .env
+  if (!propertyId || (!serviceAccountJson && !process.env.GA4_SERVICE_ACCOUNT_PATH)) {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const envPath = path.resolve(process.cwd(), '.env');
+      if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        for (const line of envContent.split('\n')) {
+          const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+          if (match) {
+            const key = match[1];
+            let value = (match[2] || '').trim();
+            if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+            if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+            if (!propertyId && key === 'GA4_PROPERTY_ID') propertyId = value;
+            if (!serviceAccountJson && key === 'GA4_SERVICE_ACCOUNT_JSON') serviceAccountJson = value;
+            if (!process.env.GA4_SERVICE_ACCOUNT_PATH && key === 'GA4_SERVICE_ACCOUNT_PATH') {
+              process.env.GA4_SERVICE_ACCOUNT_PATH = value;
+            }
+          }
+        }
+      }
+    } catch {}
+  }
+
+  // Also support reading from a local JSON key file if GA4_SERVICE_ACCOUNT_PATH is given
+  if (!serviceAccountJson && process.env.GA4_SERVICE_ACCOUNT_PATH) {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const keyPath = path.resolve(process.cwd(), process.env.GA4_SERVICE_ACCOUNT_PATH);
+      if (fs.existsSync(keyPath)) {
+        serviceAccountJson = fs.readFileSync(keyPath, 'utf8');
+      }
+    } catch {}
+  }
+
+  if (propertyId) {
+    propertyId = String(propertyId).replace(/['"]/g, '').trim();
+  }
+
+  if (!propertyId) {
     return res.status(500).json({
-      error: 'Missing GA4_SERVICE_ACCOUNT_JSON or GA4_PROPERTY_ID environment variables.',
+      error: 'Missing GA4_PROPERTY_ID environment variable.',
+    });
+  }
+
+  if (!serviceAccountJson) {
+    return res.status(500).json({
+      error: 'Missing GA4_SERVICE_ACCOUNT_JSON environment variable (or GA4_SERVICE_ACCOUNT_PATH).',
     });
   }
 
   let serviceAccount;
   try {
-    serviceAccount = JSON.parse(GA4_SERVICE_ACCOUNT_JSON);
-  } catch {
-    return res.status(500).json({ error: 'GA4_SERVICE_ACCOUNT_JSON is not valid JSON.' });
+    serviceAccount = typeof serviceAccountJson === 'object' ? serviceAccountJson : JSON.parse(serviceAccountJson);
+  } catch (err) {
+    return res.status(500).json({ error: `GA4_SERVICE_ACCOUNT_JSON is not valid JSON: ${err.message}` });
   }
 
   try {
@@ -105,7 +154,7 @@ export default async function handler(req, res) {
     if (type === 'realtime') {
       // ── GA4 Realtime Report ──────────────────────────────────────────────
       const gaRes = await fetch(
-        `https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runRealtimeReport`,
+        `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runRealtimeReport`,
         {
           method: 'POST',
           headers: {
@@ -120,8 +169,15 @@ export default async function handler(req, res) {
       );
 
       if (!gaRes.ok) {
-        const err = await gaRes.text();
-        return res.status(gaRes.status).json({ error: `GA4 API error: ${err}` });
+        const errText = await gaRes.text();
+        let message = errText;
+        try {
+          const parsed = JSON.parse(errText);
+          if (parsed.error?.message) {
+            message = parsed.error.message;
+          }
+        } catch {}
+        return res.status(gaRes.status).json({ error: `GA4 API error: ${message}` });
       }
 
       const data = await gaRes.json();
@@ -138,7 +194,12 @@ export default async function handler(req, res) {
           }))
           .sort((a, b) => b.users - a.users)
           .slice(0, 10);
+      }
 
+      // Check totals first, or fallback to sum of top pages
+      if (data.totals?.[0]?.metricValues?.[0]?.value) {
+        activeUsers = parseInt(data.totals[0].metricValues[0].value, 10) || 0;
+      } else if (topPages.length > 0) {
         activeUsers = topPages.reduce((sum, p) => sum + p.users, 0);
       }
 
