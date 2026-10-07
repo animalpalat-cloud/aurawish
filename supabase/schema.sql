@@ -403,6 +403,18 @@ VALUES
   'specialized-pet-care',
   'Detailed care information for specific dog breeds, cat breeds, exotic pets, nutrition, training, grooming, and breed-specific health guidance.',
   '["Specific Dog Breeds", "Specific Cat Breeds", "Exotic Pets", "Specialized Pet Nutrition", "Breed-Specific Training", "Breed-Specific Health", "Grooming & Care", "Pet Products & Equipment"]'::jsonb
+),
+(
+  'Audio Birthday Card',
+  'audio-birthday-card',
+  'Tips, ideas, and guides for creating, personalising, and sharing audio birthday cards with music, voice messages, and custom soundtracks.',
+  '["Birthday Card Music Ideas", "Custom Audio Messages", "Voice Message Cards", "Music Choices for Cards", "Digital Card Sending Tips", "Personalised Audio Gifts", "Audio Card Platforms"]'::jsonb
+),
+(
+  'Audio Greeting Card',
+  'audio-greeting-card',
+  'Everything about audio greeting cards — how to create them, what music to choose, and how to make them memorable for any celebration.',
+  '["Greeting Card Music", "Occasion-Based Audio Cards", "Custom Voice Greetings", "Music for Every Occasion", "Digital Greeting Tips", "Animated Audio Cards", "Shareable Audio Greetings"]'::jsonb
 )
 ON CONFLICT (slug) DO UPDATE SET
   name = EXCLUDED.name,

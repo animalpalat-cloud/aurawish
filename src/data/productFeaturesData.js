@@ -105,6 +105,74 @@ export const PRODUCT_FEATURE_PAGES = [
         desc: 'Copy your unique share URL or scan a QR code to view the live card instantly on any phone.'
       }
     ]
+  },
+  {
+    slug: 'audio-birthday-card',
+    title: 'Audio Birthday Card',
+    h1: 'Send an Audio Birthday Card with Music & Your Personal Voice',
+    intro: 'Make your birthday wishes truly unforgettable. Birthday Wishes lets you attach celebration music, choose from lofi melodies and acoustic soundscapes, or upload your own audio track — all delivered inside a luxury animated birthday card your recipient can hear the moment they open it.',
+    seoTitle: 'Audio Birthday Card - Send Cards with Music & Sound | Birthday Wishes',
+    seoDescription: 'Create a personalized audio birthday card online. Add background music, choose celebration soundtracks, or upload custom audio. Share instantly via link.',
+    features: [
+      {
+        title: 'Curated Music Library',
+        desc: 'Choose from lofi birthday vibes, uplifting acoustic guitar, gentle orchestral tunes, and cinematic celebration soundscapes — all royalty-free.'
+      },
+      {
+        title: 'Upload Your Own Audio',
+        desc: 'Attach a personal voice message, a favourite song, or a custom audio clip (MP3, WAV, OGG, M4A — up to 25 MB) for a truly one-of-a-kind card.'
+      },
+      {
+        title: 'Auto-Play on Card Open',
+        desc: 'Music triggers automatically the moment the recipient unboxes the animated 3D envelope, creating an immersive celebration moment.'
+      },
+      {
+        title: 'Works on Every Device',
+        desc: 'Audio playback is engineered with a dual-layer HTML5 + Web Audio engine that works seamlessly on iPhone, Android, tablet, and desktop.'
+      },
+      {
+        title: 'Pair with Luxury Visuals',
+        desc: 'Combine your audio track with 250+ designer templates — velvet foil, botanical, cyberpunk neon — for a complete sensory experience.'
+      },
+      {
+        title: 'Instant Shareable Link',
+        desc: 'Generate a private share URL and send it via WhatsApp, SMS, or email. No app downloads required for the recipient.'
+      }
+    ]
+  },
+  {
+    slug: 'audio-greeting-card',
+    title: 'Audio Greeting Card',
+    h1: 'Create a Beautiful Audio Greeting Card for Any Occasion',
+    intro: 'Go beyond plain text messages. Birthday Wishes audio greeting cards combine premium animated designs with celebration music or your own uploaded audio — delivering a rich, multi-sensory experience your recipient will remember long after the occasion.',
+    seoTitle: 'Audio Greeting Card - Animated Cards with Music Online | Birthday Wishes',
+    seoDescription: 'Design and send personalised audio greeting cards online. Add celebration music or upload custom audio. Interactive animated cards — free to create and share.',
+    features: [
+      {
+        title: 'Music-Enhanced Greeting Experience',
+        desc: 'Select a background track from our curated library — lofi, acoustic, orchestral, or festive — to set the perfect emotional tone for your greeting.'
+      },
+      {
+        title: 'Custom Audio Upload',
+        desc: 'Upload your own MP3, WAV, OGG, or M4A file (up to 25 MB) to include a voice note, a meaningful song, or any personal audio clip.'
+      },
+      {
+        title: 'Animated 3D Envelope Unboxing',
+        desc: 'Recipients tap your link to watch a luxury envelope open in 3D — music plays, confetti flies, and your heartfelt greeting appears.'
+      },
+      {
+        title: 'Personalised Text & Photos',
+        desc: "Add the recipient's name, upload a cherished photo, write your message in 25+ languages including Urdu and Arabic."
+      },
+      {
+        title: 'No App Needed',
+        desc: 'Your audio greeting card plays instantly in any modern browser — zero installs, zero friction for the person you are celebrating.'
+      },
+      {
+        title: 'Export & Download',
+        desc: 'Save your card as a high-resolution PNG or animated MP4 video to keep as a digital keepsake or share across any platform.'
+      }
+    ]
   }
 ];
 
