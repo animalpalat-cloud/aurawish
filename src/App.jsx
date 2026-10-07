@@ -179,6 +179,8 @@ function App() {
                 <Route path="/shareable-birthday-cards" element={<CardMakerLandingPage explicitSlug="shareable-birthday-cards" />} />
                 <Route path="/audio-birthday-card" element={<CardMakerLandingPage explicitSlug="audio-birthday-card" />} />
                 <Route path="/audio-greeting-card" element={<CardMakerLandingPage explicitSlug="audio-greeting-card" />} />
+                <Route path="/photo-birthday-card" element={<CardMakerLandingPage explicitSlug="photo-birthday-card" />} />
+                <Route path="/surprise-birthday-card" element={<CardMakerLandingPage explicitSlug="surprise-birthday-card" />} />
 
                 {/* Birthday Ideas / Blog Hub & Article Routes */}
                 <Route path="/blog" element={<BirthdayIdeasHubPage />} />

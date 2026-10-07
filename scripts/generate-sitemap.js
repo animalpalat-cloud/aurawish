@@ -20,11 +20,15 @@ const STATIC_ROUTES = [
   { path: '/birthday-ideas', priority: '0.9', changefreq: 'daily' },
 
   // Feature Pages
-  { path: '/digital-birthday-cards', priority: '0.8', changefreq: 'weekly' },
-  { path: '/animated-birthday-cards', priority: '0.8', changefreq: 'weekly' },
+  { path: '/digital-birthday-cards',    priority: '0.8', changefreq: 'weekly' },
+  { path: '/animated-birthday-cards',   priority: '0.8', changefreq: 'weekly' },
   { path: '/birthday-cards-with-photos', priority: '0.8', changefreq: 'weekly' },
   { path: '/birthday-cards-with-music', priority: '0.8', changefreq: 'weekly' },
-  { path: '/shareable-birthday-cards', priority: '0.8', changefreq: 'weekly' },
+  { path: '/shareable-birthday-cards',  priority: '0.8', changefreq: 'weekly' },
+  { path: '/audio-birthday-card',       priority: '0.8', changefreq: 'weekly' },
+  { path: '/audio-greeting-card',       priority: '0.8', changefreq: 'weekly' },
+  { path: '/photo-birthday-card',       priority: '0.8', changefreq: 'weekly' },
+  { path: '/surprise-birthday-card',    priority: '0.8', changefreq: 'weekly' },
 
   // Relationship Pages
   { path: '/birthday-wishes-for-mom', priority: '0.8', changefreq: 'weekly' },

@@ -173,6 +173,74 @@ export const PRODUCT_FEATURE_PAGES = [
         desc: 'Save your card as a high-resolution PNG or animated MP4 video to keep as a digital keepsake or share across any platform.'
       }
     ]
+  },
+  {
+    slug: 'photo-birthday-card',
+    title: 'Photo Birthday Card',
+    h1: 'Create Personalized Photo Birthday Cards with Picture Upload',
+    intro: 'Turn a favourite photograph into an unforgettable birthday moment. Birthday Wishes lets you upload any portrait, snap a selfie, or drag in a treasured memory — then frames it inside a luxury animated card complete with heartfelt wishes, celebration music, and a 3D envelope unboxing experience your recipient will never forget.',
+    seoTitle: 'Photo Birthday Card - Create & Customize Cards with Pictures Online | Birthday Wishes',
+    seoDescription: 'Create a personalized photo birthday card online in minutes. Upload any picture, add a heartfelt birthday wish, choose celebration music, and share an interactive link instantly — free.',
+    features: [
+      {
+        title: 'Custom Photo Upload for Birthday Cards',
+        desc: 'Upload any portrait or memory straight from your device. Our birthday card with photo upload feature accepts JPEG, PNG, and WebP files and renders them in sharp Retina quality inside every template.'
+      },
+      {
+        title: 'Personalized Birthday Cards with Photos & Wishes',
+        desc: 'Combine a birthday card with picture and a heartfelt handwritten message. Type wishes in 25+ languages — including Urdu Nastaliq and Arabic — to create truly personalized birthday cards with photos that feel one-of-a-kind.'
+      },
+      {
+        title: 'Works on All Devices — Mobile Ready',
+        desc: 'Whether someone is searching for a bday card with photo on their phone or desktop, every card created here looks flawless on iPhone, Android, tablet, and PC screens — zero pinching or zooming required.'
+      },
+      {
+        title: 'Instant Shareable Link — No App Needed',
+        desc: 'Generate a private share link your recipient opens in any browser. No app download, no sign-up friction. Send birthday cards with pics via WhatsApp, SMS, email, or any messaging platform in seconds.'
+      },
+      {
+        title: '250+ Designer Templates for Photo Cards',
+        desc: 'Choose from velvet luxury foil, botanical watercolour, cyberpunk neon, and playful pastel designs — all built to complement your uploaded photo beautifully with rounded portrait frames and metallic accents.'
+      },
+      {
+        title: 'Celebration Audio Paired with Your Picture',
+        desc: 'Pair your birthday card with picture with curated celebration music — lofi birthday vibes, acoustic guitar, or orchestral soundscapes — so the moment your recipient opens the card, sight and sound combine for a magical surprise.'
+      }
+    ]
+  },
+  {
+    slug: 'surprise-birthday-card',
+    title: 'Surprise Birthday Card',
+    h1: 'Send a Digital Surprise Birthday Card & Interactive Wish Link',
+    intro: 'Make the moment feel genuinely special. Birthday Wishes generates an interactive birthday surprise link your recipient taps to experience a 3D animated envelope unboxing, complete with personalised wishes, celebration music, and sparkling effects — all without downloading a single app.',
+    seoTitle: 'Surprise Birthday Card - Create Interactive Birthday Surprise Links | Birthday Wishes',
+    seoDescription: 'Send a digital surprise birthday card with an interactive birthday surprise link. Create a happy birthday surprise link with music, photos, and animated effects — free and shareable instantly.',
+    features: [
+      {
+        title: 'Interactive Birthday Surprise Link',
+        desc: 'Every card generates a unique birthday surprise link your recipient taps to trigger a full 3D animated unboxing experience — sparkle effects, confetti burst, and personalised wishes revealed in real time.'
+      },
+      {
+        title: 'Animated 3D Envelope for Maximum Surprise',
+        desc: 'The happy birthday surprise link opens a luxury animated envelope that lifts, opens, and reveals your card with cinematic effects — far beyond a static image or plain text message.'
+      },
+      {
+        title: 'Add Music to Elevate the Surprise Moment',
+        desc: 'Choose from lofi birthday vibes, acoustic guitar, or uplifting orchestral tracks from our curated library. Music plays automatically when the recipient opens their surprise birthday card for a truly immersive moment.'
+      },
+      {
+        title: 'Personalise with Photos & Custom Birthday Wishes Surprise',
+        desc: "Upload a photo of the celebrator, write a heartfelt birthday wishes surprise message in 25+ languages, and choose from 250+ designer templates to make every interactive birthday card feel tailor-made."
+      },
+      {
+        title: 'Mobile-First — Works on Every Device Instantly',
+        desc: 'The birthday surprise link opens flawlessly on iPhone, Android, tablet, and desktop in any modern browser. Recipients experience the full interactive birthday card without any app downloads or sign-ups.'
+      },
+      {
+        title: 'Send in Seconds via WhatsApp, SMS, or Email',
+        desc: 'Copy your unique surprise birthday card link with one click and share it instantly on WhatsApp, iMessage, Messenger, email, or any platform. Perfect for last-minute birthday surprises that still feel premium.'
+      }
+    ]
   }
 ];
 
