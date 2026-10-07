@@ -8,6 +8,7 @@ import { getArticleBySlug, BIRTHDAY_IDEAS } from '../data/birthdayIdeasData';
 import { blogService } from '../services/blogService';
 import { SUPABASE_URL } from '../supabase/client';
 import { PenLine, Wand2, Gift, Laptop } from 'lucide-react';
+import { applyInternalLinks } from '../utils/richText.jsx';
 
 // ── Category visual config ────────────────────────────────────────────────────
 const CATEGORY_VISUALS = {
@@ -241,7 +242,7 @@ export const BirthdayArticlePage = () => {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 leading-relaxed border-b border-slate-800/70 pb-8">
-            {article.intro}
+            {applyInternalLinks(article.intro, Link)}
           </p>
         </div>
 
@@ -267,7 +268,7 @@ export const BirthdayArticlePage = () => {
                       {section.h2}
                     </h2>
                     <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                      {section.body}
+                      {applyInternalLinks(section.body, Link)}
                     </p>
                   </div>
                 </div>
