@@ -8,7 +8,8 @@ import { getArticleBySlug, BIRTHDAY_IDEAS } from '../data/birthdayIdeasData';
 import { blogService } from '../services/blogService';
 import { SUPABASE_URL } from '../supabase/client';
 import { PenLine, Wand2, Gift, Laptop } from 'lucide-react';
-import { applyInternalLinks } from '../utils/richText.jsx';
+import { applyInternalLinks, renderSectionBodyWithMedia } from '../utils/richText.jsx';
+import { BlogInlineImage, BlogInlineVideo } from '../components/blog/BlogInlineMedia';
 
 // ── Category visual config ────────────────────────────────────────────────────
 const CATEGORY_VISUALS = {
@@ -81,6 +82,14 @@ export function getBlogImageUrl(image) {
 // Map a Supabase blog_posts row to the article shape this page renders
 function mapSupabaseArticle(post) {
   const sections = Array.isArray(post.content) ? post.content : [];
+  const firstSectionMedia = (sections[0] && sections[0]._media) || {};
+  const mediaAssets = {
+    image1: post.image1 || post.image_1 || (post.media && post.media.image1) || firstSectionMedia.image1 || '',
+    image2: post.image2 || post.image_2 || (post.media && post.media.image2) || firstSectionMedia.image2 || '',
+    image3: post.image3 || post.image_3 || (post.media && post.media.image3) || firstSectionMedia.image3 || '',
+    video:  post.video  || (post.media && post.media.video) || firstSectionMedia.video  || '',
+  };
+
   return {
     slug:           post.slug,
     title:          post.title,
@@ -94,6 +103,7 @@ function mapSupabaseArticle(post) {
                       : '3 min read',
     intro:          post.excerpt || '',
     sections,
+    mediaAssets,
     seoTitle:       `${post.title} | Birthday Wishes`,
     seoDescription: post.excerpt || post.title,
     relatedSlugs:   [],
@@ -248,33 +258,48 @@ export const BirthdayArticlePage = () => {
 
         {/* ── ARTICLE CONTENT ──────────────────────────────── */}
         <article className="space-y-5 mb-12">
-          {article.sections.map((section, idx) => (
-            <section
-              key={idx}
-              className={`relative overflow-hidden rounded-2xl border ${vis.sectionAccent} bg-[#11141e]`}
-            >
-              <div
-                aria-hidden="true"
-                className="absolute top-0 left-0 bottom-0 w-0.5 rounded-l-2xl"
-                style={{ background: `linear-gradient(to bottom, ${vis.glow.replace('0.22', '0.6')}, transparent)` }}
-              />
-              <div className="p-6 sm:p-7">
-                <div className="flex items-start gap-4">
-                  <span className={`flex-shrink-0 text-4xl font-display font-black leading-none select-none ${vis.numberColor} opacity-30`}>
-                    {String(idx + 1).padStart(2, '0')}
-                  </span>
-                  <div className="space-y-2 min-w-0">
-                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
-                      {section.h2}
-                    </h2>
-                    <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                      {applyInternalLinks(section.body, Link)}
-                    </p>
+          {article.sections.map((section, idx) => {
+            const hasCustomMediaTokens = /\[\[(?:image-[1-3]|video|(?:image|img|video):)/i.test(section.body || '');
+
+            return (
+              <section
+                key={idx}
+                className={`relative overflow-hidden rounded-2xl border ${vis.sectionAccent} bg-[#11141e]`}
+              >
+                <div
+                  aria-hidden="true"
+                  className="absolute top-0 left-0 bottom-0 w-0.5 rounded-l-2xl"
+                  style={{ background: `linear-gradient(to bottom, ${vis.glow.replace('0.22', '0.6')}, transparent)` }}
+                />
+                <div className="p-6 sm:p-7">
+                  <div className="flex items-start gap-4">
+                    <span className={`flex-shrink-0 text-4xl font-display font-black leading-none select-none ${vis.numberColor} opacity-30`}>
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <div className="space-y-2 min-w-0 flex-1">
+                      {section.h2 && (
+                        <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
+                          {section.h2}
+                        </h2>
+                      )}
+
+                      <div className="text-slate-300">
+                        {renderSectionBodyWithMedia(section.body, article.mediaAssets, Link)}
+                      </div>
+
+                      {/* If the section has direct image or video attachments and no explicit inline token was used */}
+                      {section.image && !hasCustomMediaTokens && (
+                        <BlogInlineImage image={section.image} caption={section.imageCaption || ''} />
+                      )}
+                      {section.video && !hasCustomMediaTokens && (
+                        <BlogInlineVideo video={section.video} caption={section.videoCaption || ''} />
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
-          ))}
+              </section>
+            );
+          })}
         </article>
 
         {/* ── CTA BLOCK ────────────────────────────────────── */}

@@ -293,12 +293,15 @@ export const blogService = {
   /** Create a new post */
   // NOTE: subcategory is intentionally omitted from the payload until the migration
   // "ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS subcategory TEXT;" is applied.
-  async createPost({ title, slug, excerpt, content, featured_image, category_id, category, subcategory, author, status, published_at }) {
+  async createPost({ title, slug, excerpt, content, featured_image, image1, image2, image3, video, category_id, category, subcategory, author, status, published_at }) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
     const finalSlug = slug?.trim() || slugify(title);
 
+    // Build payload. Any extra inline media (image1..3, video) are also safely bundled
+    // inside the jsonb content array metadata if desired, while also attempting top-level
+    // columns if they exist.
     const payload = {
       title: title?.trim(),
       slug: finalSlug,
@@ -307,25 +310,52 @@ export const blogService = {
       featured_image: featured_image?.trim() || null,
       category_id: category_id || null,
       category: category?.trim() || null,
-      // subcategory omitted — column does not exist in live DB yet (run migration first)
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
     };
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .insert([payload])
-      .select()
-      .single();
+    // If explicit media columns or media jsonb are used:
+    if (image1) payload.image1 = image1.trim();
+    if (image2) payload.image2 = image2.trim();
+    if (image3) payload.image3 = image3.trim();
+    if (video)  payload.video = video.trim();
 
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (insertErr) {
+      // If error is column does not exist on blog_posts, strip top-level media columns
+      // and re-save embedding the media into the content metadata
+      if (insertErr.message && (insertErr.message.includes('column') || insertErr.code === '42703')) {
+        delete payload.image1;
+        delete payload.image2;
+        delete payload.image3;
+        delete payload.video;
+        // attach media metadata to first section or meta
+        if (Array.isArray(payload.content) && payload.content.length > 0) {
+          payload.content[0]._media = { image1, image2, image3, video };
+        }
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .insert([payload])
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      throw insertErr;
+    }
   },
 
   /** Update an existing post by id */
-  // NOTE: subcategory omitted from payload until migration is applied.
-  async updatePost(id, { title, slug, excerpt, content, featured_image, category_id, category, subcategory, author, status, published_at }) {
+  async updatePost(id, { title, slug, excerpt, content, featured_image, image1, image2, image3, video, category_id, category, subcategory, author, status, published_at }) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
@@ -337,22 +367,47 @@ export const blogService = {
       featured_image: featured_image?.trim() || null,
       category_id: category_id || null,
       category: category?.trim() || null,
-      // subcategory omitted — column does not exist in live DB yet (run migration first)
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .update(payload)
-      .eq('id', id)
-      .select()
-      .single();
+    if (image1 !== undefined) payload.image1 = image1?.trim() || null;
+    if (image2 !== undefined) payload.image2 = image2?.trim() || null;
+    if (image3 !== undefined) payload.image3 = image3?.trim() || null;
+    if (video !== undefined)  payload.video = video?.trim() || null;
 
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .update(payload)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (updateErr) {
+      if (updateErr.message && (updateErr.message.includes('column') || updateErr.code === '42703')) {
+        delete payload.image1;
+        delete payload.image2;
+        delete payload.image3;
+        delete payload.video;
+        if (Array.isArray(payload.content) && payload.content.length > 0) {
+          payload.content[0]._media = { image1, image2, image3, video };
+        }
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .update(payload)
+          .eq('id', id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      throw updateErr;
+    }
   },
 
   /** Delete a post by id */

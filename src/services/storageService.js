@@ -38,14 +38,39 @@ export const validateImageFile = (file) => {
     throw new Error('No file provided');
   }
 
-  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
   if (!allowedMimeTypes.includes(file.type.toLowerCase())) {
-    throw new Error('Invalid file format. Please upload a JPG, PNG, or WebP image.');
+    throw new Error('Invalid file format. Please upload a JPG, PNG, WebP, or GIF image.');
   }
 
   const maxSizeBytes = 10 * 1024 * 1024; // 10 MB
   if (file.size > maxSizeBytes) {
     throw new Error('File size exceeds the 10MB limit. Please select a smaller photo.');
+  }
+
+  return true;
+};
+
+/**
+ * Validates video file format and size (max 50MB)
+ */
+export const validateVideoFile = (file) => {
+  if (!file) {
+    throw new Error('No video file provided');
+  }
+
+  const allowedExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+  const fileName = file.name ? file.name.toLowerCase() : '';
+  const hasValidExt = allowedExtensions.some(ext => fileName.endsWith(ext));
+  const isVideoMime = file.type ? file.type.startsWith('video/') : false;
+
+  if (!hasValidExt && !isVideoMime) {
+    throw new Error('This video format is not supported. Please choose an MP4, WebM, OGG, or MOV video file.');
+  }
+
+  const maxVideoSizeBytes = 50 * 1024 * 1024; // 50MB limit
+  if (file.size > maxVideoSizeBytes) {
+    throw new Error('Video file size exceeds the 50MB limit. Please choose a smaller video.');
   }
 
   return true;
@@ -303,6 +328,66 @@ export const storageService = {
     }
   },
 
+  /**
+   * Uploads admin blog video file to Supabase Storage bucket 'blog-images'
+   * Path: videos/{timestamp}_{unique}_{sanitizedFileName}
+   */
+  uploadBlogVideo: async (file, onProgress = null) => {
+    validateVideoFile(file);
+
+    if (typeof onProgress === 'function') onProgress(15);
+
+    if (!supabase || !isSupabaseConfigured) {
+      console.warn('Supabase not configured, falling back to local object URL for preview');
+      if (typeof onProgress === 'function') onProgress(100);
+      return {
+        downloadUrl: URL.createObjectURL(file),
+        storagePath: `local_blog_video_${Date.now()}`
+      };
+    }
+
+    try {
+      const timestamp = Date.now();
+      const randomStr = Math.random().toString(36).substring(2, 8);
+      const sanitizedName = (file.name || 'blog-video.mp4')
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, '_');
+      const storagePath = `videos/${timestamp}_${randomStr}_${sanitizedName}`;
+
+      if (typeof onProgress === 'function') onProgress(40);
+
+      const { data, error } = await supabase.storage
+        .from(BLOG_BUCKET_NAME)
+        .upload(storagePath, file, {
+          contentType: file.type || 'video/mp4',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Supabase blog video upload error:', error);
+        throw new Error(error.message || 'Failed to upload video to storage');
+      }
+
+      if (typeof onProgress === 'function') onProgress(85);
+
+      const { data: publicUrlData } = supabase.storage
+        .from(BLOG_BUCKET_NAME)
+        .getPublicUrl(storagePath);
+
+      const downloadUrl = publicUrlData?.publicUrl || `${SUPABASE_URL}/storage/v1/object/public/${BLOG_BUCKET_NAME}/${storagePath}`;
+
+      if (typeof onProgress === 'function') onProgress(100);
+
+      return {
+        downloadUrl,
+        storagePath
+      };
+    } catch (err) {
+      console.error('Upload blog video error:', err);
+      throw new Error(err.message || 'Video upload is temporarily unavailable. Please try again.');
+    }
+  },
+
   deleteCardPhoto: async (storagePathOrUrl) => {
     if (!storagePathOrUrl || !supabase || !isSupabaseConfigured) return false;
 
@@ -361,6 +446,11 @@ export const storageService = {
       console.warn('Delete blog image failed gracefully:', e.message);
       return false;
     }
+  },
+
+  deleteBlogVideo: async (storagePathOrUrl) => {
+    // Both images and videos for blog live in BLOG_BUCKET_NAME
+    return storageService.deleteBlogImage(storagePathOrUrl);
   },
 
   // Fallback preset avatar images
