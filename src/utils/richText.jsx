@@ -287,7 +287,7 @@ function renderHtmlSectionWithMedia(htmlString, mediaAssets = {}, LinkCmp) {
     return (
       <div
         key={`html-${index}`}
-        className="rich-text-content text-slate-300 leading-relaxed space-y-3"
+        className="rich-text-content w-full max-w-full overflow-x-auto break-words-safe text-slate-300 leading-relaxed space-y-3"
         dangerouslySetInnerHTML={{ __html: part }}
       />
     );

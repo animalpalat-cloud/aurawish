@@ -192,7 +192,7 @@ export const BirthdayArticlePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#090B10]">
+    <div className="min-h-screen bg-[#090B10] w-full overflow-x-hidden">
       <SEOHead
         title={article.seoTitle}
         description={article.seoDescription}
@@ -200,7 +200,7 @@ export const BirthdayArticlePage = () => {
         schemaJson={articleSchema}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="w-full max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-10">
         <Breadcrumbs
           items={[
             { label: 'Birthday Ideas', href: '/birthday-ideas' },
@@ -209,9 +209,9 @@ export const BirthdayArticlePage = () => {
         />
 
         {/* ── ARTICLE HERO ─────────────────────────────────── */}
-        <div className="mt-8 mb-10">
+        <div className="mt-6 sm:mt-8 mb-8 sm:mb-10 w-full">
           <div
-            className="relative w-full h-52 sm:h-72 md:h-80 rounded-3xl overflow-hidden flex items-center justify-center mb-8 bg-slate-900 border border-slate-800/80"
+            className="relative w-full h-48 sm:h-72 md:h-80 rounded-2xl sm:rounded-3xl overflow-hidden flex items-center justify-center mb-6 sm:mb-8 bg-slate-900 border border-slate-800/80"
             style={{ background: !imageUrl ? vis.gradient : undefined }}
           >
             {imageUrl ? (
@@ -232,13 +232,13 @@ export const BirthdayArticlePage = () => {
                   style={{ backgroundImage: DOT_BG, backgroundSize: '22px 22px' }} />
                 <div aria-hidden="true" className="absolute inset-0"
                   style={{ background: `radial-gradient(ellipse at 50% 60%, ${vis.glow} 0%, transparent 65%)` }} />
-                <Icon className="relative w-20 h-20 text-white/15" strokeWidth={0.8} />
+                <Icon className="relative w-16 sm:w-20 h-16 sm:h-20 text-white/15" strokeWidth={0.8} />
               </>
             )}
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap mb-4">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full border text-xs font-semibold ${vis.pill}`}>
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-3 sm:mb-4">
+            <span className={`inline-flex items-center px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border text-[11px] sm:text-xs font-semibold ${vis.pill}`}>
               {article.category}
             </span>
             <span className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -247,43 +247,43 @@ export const BirthdayArticlePage = () => {
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-display font-extrabold text-white tracking-tight leading-snug sm:leading-tight mb-4 break-words">
             {article.h1}
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 leading-relaxed border-b border-slate-800/70 pb-8">
+          <p className="text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed border-b border-slate-800/70 pb-6 sm:pb-8 break-words">
             {applyInternalLinks(article.intro, Link)}
           </p>
         </div>
 
         {/* ── ARTICLE CONTENT ──────────────────────────────── */}
-        <article className="space-y-5 mb-12">
+        <article className="space-y-4 sm:space-y-5 mb-10 sm:mb-12 w-full">
           {article.sections.map((section, idx) => {
             const hasCustomMediaTokens = /\[\[(?:image-[1-3]|video|(?:image|img|video):)/i.test(section.body || '');
 
             return (
               <section
                 key={idx}
-                className={`relative overflow-hidden rounded-2xl border ${vis.sectionAccent} bg-[#11141e]`}
+                className={`relative w-full overflow-hidden rounded-xl sm:rounded-2xl border ${vis.sectionAccent} bg-[#11141e]`}
               >
                 <div
                   aria-hidden="true"
                   className="absolute top-0 left-0 bottom-0 w-0.5 rounded-l-2xl"
                   style={{ background: `linear-gradient(to bottom, ${vis.glow.replace('0.22', '0.6')}, transparent)` }}
                 />
-                <div className="p-6 sm:p-7">
-                  <div className="flex items-start gap-4">
-                    <span className={`flex-shrink-0 text-4xl font-display font-black leading-none select-none ${vis.numberColor} opacity-30`}>
+                <div className="p-4 sm:p-6 md:p-7">
+                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                    <span className={`flex-shrink-0 text-2xl sm:text-4xl font-display font-black leading-none select-none ${vis.numberColor} opacity-30`}>
                       {String(idx + 1).padStart(2, '0')}
                     </span>
-                    <div className="space-y-2 min-w-0 flex-1">
+                    <div className="space-y-2 min-w-0 w-full flex-1">
                       {section.h2 && (
-                        <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
+                        <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight leading-snug break-words">
                           {section.h2}
                         </h2>
                       )}
 
-                      <div className="text-slate-300">
+                      <div className="text-slate-300 w-full min-w-0 break-words">
                         {renderSectionBodyWithMedia(section.body, article.mediaAssets, Link)}
                       </div>
 
