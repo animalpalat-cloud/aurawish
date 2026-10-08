@@ -9,7 +9,7 @@ function getHtml(size, isApple = false) {
   // Border radius: For Apple Touch Icon, standard rounded rect. For favicons, clean rounded square.
   const borderRadius = isApple ? `${Math.round(size * 0.22)}px` : `${Math.round(size * 0.20)}px`;
   
-  // For small sizes (16, 32), we optimize contrast so the emblem pops inside dark or light browser tabs
+  // For small sizes (16, 32), optimize padding & contrast
   const isSmall = size <= 32;
   const padding = isSmall ? Math.round(size * 0.10) : Math.round(size * 0.13);
   const sparkSize = size - (padding * 2);
@@ -183,42 +183,46 @@ function generateSvgFavicon() {
   </g>
 </svg>
 `;
+  // Write both favicon.svg and icon.svg for full standard compatibility
   fs.writeFileSync(path.join(publicDir, 'favicon.svg'), svgContent, 'utf8');
-  console.log('Updated public/favicon.svg with sharp vector branding');
+  fs.writeFileSync(path.join(publicDir, 'icon.svg'), svgContent, 'utf8');
+  console.log('Saved public/favicon.svg and public/icon.svg');
 }
 
 function main() {
-  console.log('Generating ultra-crisp favicon assets...');
+  console.log('Generating Google Favicon compliant & multi-DPI assets...');
 
-  // 1. Generate PNGs
-  const p16 = path.join(publicDir, 'favicon-16x16.png');
-  const p32 = path.join(publicDir, 'favicon-32x32.png');
-  const p48 = path.join(publicDir, 'favicon-48x48.png');
-  const p180 = path.join(publicDir, 'apple-touch-icon.png');
-  const p192 = path.join(publicDir, 'android-chrome-192x192.png');
-  const p512 = path.join(publicDir, 'android-chrome-512x512.png');
+  // Standard sizes and Google Search multiples of 48px
+  const sizes = [
+    { size: 16, name: 'favicon-16x16.png' },
+    { size: 32, name: 'favicon-32x32.png' },
+    { size: 48, name: 'favicon-48x48.png' },
+    { size: 96, name: 'favicon-96x96.png' },
+    { size: 144, name: 'favicon-144x144.png' },
+    { size: 180, name: 'apple-touch-icon.png', isApple: true },
+    { size: 192, name: 'android-chrome-192x192.png' },
+    { size: 512, name: 'android-chrome-512x512.png' }
+  ];
 
-  capturePng(16, p16);
-  capturePng(32, p32);
-  capturePng(48, p48);
-  capturePng(180, p180, true);
-  capturePng(192, p192);
-  capturePng(512, p512);
+  for (const item of sizes) {
+    const outPath = path.join(publicDir, item.name);
+    capturePng(item.size, outPath, item.isApple);
+  }
 
-  // 2. Generate multi-resolution .ico containing 16x16, 32x32, and 48x48
+  // Generate multi-resolution .ico containing 16x16, 32x32, and 48x48
   const icoPath = path.join(publicDir, 'favicon.ico');
   const icoData = createIco([
-    { size: 16, buffer: fs.readFileSync(p16) },
-    { size: 32, buffer: fs.readFileSync(p32) },
-    { size: 48, buffer: fs.readFileSync(p48) }
+    { size: 16, buffer: fs.readFileSync(path.join(publicDir, 'favicon-16x16.png')) },
+    { size: 32, buffer: fs.readFileSync(path.join(publicDir, 'favicon-32x32.png')) },
+    { size: 48, buffer: fs.readFileSync(path.join(publicDir, 'favicon-48x48.png')) }
   ]);
   fs.writeFileSync(icoPath, icoData);
   console.log(`Generated favicon.ico with 16x16, 32x32, 48x48 embedded (${icoData.length} bytes)`);
 
-  // 3. Update public/favicon.svg
+  // SVG vectors
   generateSvgFavicon();
 
-  console.log('All favicon assets regenerated cleanly!');
+  console.log('All Google-compliant favicon assets generated successfully!');
 }
 
 main();
