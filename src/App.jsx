@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { ToastProvider } from './components/common/Toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -39,6 +39,7 @@ const BirthdayWishesDetailPage = lazy(() => import('./pages/BirthdayWishesDetail
 const BirthdayIdeasHubPage     = lazy(() => import('./pages/BirthdayIdeasHubPage'));
 const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'));
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
+const PuppyTrainingHubPage     = lazy(() => import('./pages/PuppyTrainingHubPage'));
 
 // Admin Panel — completely separate auth surface, loaded on demand
 const AdminLoginPage          = lazy(() => import('./pages/admin/AdminLoginPage'));
@@ -83,6 +84,21 @@ const PageLoader = () => (
     </div>
   </div>
 );
+
+// ── Puppy Training Route Resolver ──────────────────────────────────────────
+// Differentiates between subcategory hub slugs and article slugs under
+// /puppy-training/:param so both share the same URL structure.
+const PUPPY_SUBCATEGORY_SLUGS = new Set(['breed-guides', 'behavior-solutions', 'crate-potty-schedules']);
+
+function PuppyTrainingResolver() {
+  const { param } = useParams();
+  if (PUPPY_SUBCATEGORY_SLUGS.has(param)) {
+    // Render hub page with subcategory filter
+    return <PuppyTrainingHubPage />;
+  }
+  // Render article detail page (slug becomes the article slug)
+  return <BirthdayArticlePage />;
+}
 
 function App() {
   // Prefetch high-likelihood next routes after the homepage has rendered,
@@ -186,6 +202,10 @@ function App() {
                 <Route path="/blog" element={<BirthdayIdeasHubPage />} />
                 <Route path="/birthday-ideas" element={<BirthdayIdeasHubPage />} />
                 <Route path="/birthday-ideas/:slug" element={<BirthdayArticlePage />} />
+
+                {/* Puppy Training Hub, Sub-Category & Article Routes */}
+                <Route path="/puppy-training" element={<PuppyTrainingHubPage />} />
+                <Route path="/puppy-training/:param" element={<PuppyTrainingResolver />} />
 
                 {/* 404 Fallback */}
                 <Route path="*" element={<NotFoundPage />} />

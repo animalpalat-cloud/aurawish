@@ -41,6 +41,13 @@ const CATEGORY_VISUALS = {
     pill: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
     arrowColor: 'text-cyan-400 group-hover:text-cyan-300',
   },
+  'Puppy Training': {
+    icon: Sparkles,
+    gradient: 'linear-gradient(135deg, rgba(16,185,129,0.55) 0%, rgba(17,20,30,0.95) 100%)',
+    glow: 'rgba(52,211,153,0.25)',
+    pill: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
+    arrowColor: 'text-emerald-400 group-hover:text-emerald-300',
+  },
 };
 
 const DEFAULT_VISUAL = {

@@ -49,6 +49,15 @@ const CATEGORY_VISUALS = {
     sectionGlow: 'rgba(6,182,212,0.06)',
     numberColor: 'text-cyan-400',
   },
+  'Puppy Training': {
+    icon: Sparkles,
+    gradient: 'linear-gradient(135deg, rgba(16,185,129,0.55) 0%, rgba(17,20,30,0.95) 100%)',
+    glow: 'rgba(52,211,153,0.25)',
+    pill: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
+    sectionAccent: 'border-emerald-500/20',
+    sectionGlow: 'rgba(16,185,129,0.06)',
+    numberColor: 'text-emerald-400',
+  },
 };
 
 const DEFAULT_VISUAL = {
@@ -163,6 +172,11 @@ export const BirthdayArticlePage = () => {
     return <Navigate to="/birthday-ideas" replace />;
   }
 
+  const isPuppyTraining = article.category === 'Puppy Training';
+  const canonicalPath = isPuppyTraining ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
+  const parentCategoryHref = isPuppyTraining ? '/puppy-training' : '/birthday-ideas';
+  const parentCategoryLabel = isPuppyTraining ? 'Puppy Training' : 'Birthday Ideas';
+
   const vis = getVisual(article.category);
   const Icon = vis.icon;
 
@@ -182,7 +196,7 @@ export const BirthdayArticlePage = () => {
     ...(imageUrl ? { "image": [imageUrl] } : {}),
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://birthdaywishly.com/birthday-ideas/${article.slug}`
+      "@id": `https://birthdaywishly.com${canonicalPath}`
     },
     "publisher": {
       "@type": "Organization",
@@ -196,15 +210,16 @@ export const BirthdayArticlePage = () => {
       <SEOHead
         title={article.seoTitle}
         description={article.seoDescription}
-        canonicalUrl={`/birthday-ideas/${article.slug}`}
+        canonicalUrl={canonicalPath}
         schemaJson={articleSchema}
       />
 
       <div className="w-full max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-10">
         <Breadcrumbs
           items={[
-            { label: 'Birthday Ideas', href: '/birthday-ideas' },
-            { label: article.title, href: `/birthday-ideas/${article.slug}` }
+            { label: parentCategoryLabel, href: parentCategoryHref },
+            ...(article.subcategory ? [{ label: article.subcategory, href: isPuppyTraining ? `/puppy-training` : undefined }] : []),
+            { label: article.title, href: canonicalPath }
           ]}
         />
 
@@ -371,9 +386,9 @@ export const BirthdayArticlePage = () => {
 
         {/* Back to blog */}
         <div className="mt-10 pt-6 border-t border-slate-800/60">
-          <Link to="/birthday-ideas" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group">
+          <Link to={parentCategoryHref} className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" />
-            Back to all guides
+            Back to {parentCategoryLabel}
           </Link>
         </div>
       </div>

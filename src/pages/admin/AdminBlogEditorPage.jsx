@@ -445,7 +445,11 @@ export const AdminBlogEditorPage = () => {
                     Reset
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-600 mt-1">/birthday-ideas/{form.slug || '…'}</p>
+                <p className="text-[10px] text-slate-600 mt-1">
+                  {form.category === 'Puppy Training'
+                    ? `/puppy-training/${form.slug || '…'}`
+                    : `/birthday-ideas/${form.slug || '…'}`}
+                </p>
               </div>
 
               {/* Excerpt */}

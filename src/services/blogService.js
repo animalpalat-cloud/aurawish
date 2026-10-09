@@ -16,6 +16,18 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
+import { PUPPY_TRAINING_CATEGORY } from '../data/categoryConfig';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function sanitizeCategoryId(catId, catName) {
+  if (catId && UUID_REGEX.test(catId)) return catId;
+  if (catName && (catName.toLowerCase() === 'puppy training' || catName.toLowerCase() === 'puppy-training')) {
+    return PUPPY_TRAINING_CATEGORY.id;
+  }
+  return null;
+}
+
 export const blogService = {
   // ── Categories CRUD ───────────────────────────────────────────────────────
 
@@ -25,17 +37,25 @@ export const blogService = {
    */
   async getCategoriesSimple() {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
-    if (!supabase || !isSupabaseConfigured) return { data: [], error: null };
+    if (!supabase || !isSupabaseConfigured) {
+      return { data: [PUPPY_TRAINING_CATEGORY], error: null };
+    }
 
     const { data, error } = await supabase
       .from('blog_categories')
       .select('id, name, slug, description, subtopics')
       .order('name', { ascending: true });
 
-    const cats = (data || []).map(cat => ({
+    let cats = (data || []).map(cat => ({
       ...cat,
       subtopics: Array.isArray(cat.subtopics) ? cat.subtopics : [],
     }));
+
+    // Ensure Puppy Training is available even if not yet created via Admin/SQL
+    const hasPuppyTraining = cats.some(c => c.slug === PUPPY_TRAINING_CATEGORY.slug || c.name.toLowerCase() === PUPPY_TRAINING_CATEGORY.name.toLowerCase());
+    if (!hasPuppyTraining) {
+      cats = [...cats, PUPPY_TRAINING_CATEGORY];
+    }
 
     return { data: cats, error };
   },
@@ -43,7 +63,9 @@ export const blogService = {
   /** Fetch all categories with associated blog post count */
   async getCategories() {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
-    if (!supabase || !isSupabaseConfigured) return { data: [], error: null };
+    if (!supabase || !isSupabaseConfigured) {
+      return { data: [{ ...PUPPY_TRAINING_CATEGORY, post_count: 0 }], error: null };
+    }
 
     try {
       // 1. Fetch all categories
@@ -53,6 +75,12 @@ export const blogService = {
         .order('name', { ascending: true });
 
       if (catError) throw catError;
+
+      let allCats = categories || [];
+      const hasPuppyTraining = allCats.some(c => c.slug === PUPPY_TRAINING_CATEGORY.slug || c.name.toLowerCase() === PUPPY_TRAINING_CATEGORY.name.toLowerCase());
+      if (!hasPuppyTraining) {
+        allCats = [...allCats, PUPPY_TRAINING_CATEGORY];
+      }
 
       // 2. Fetch post counts grouped or calculate from posts
       const { data: posts, error: postError } = await supabase
@@ -66,7 +94,7 @@ export const blogService = {
             counts[p.category_id] = (counts[p.category_id] || 0) + 1;
           } else if (p.category) {
             // Match by name fallback
-            const matchingCat = categories?.find(c => c.name.toLowerCase() === p.category.toLowerCase());
+            const matchingCat = allCats?.find(c => c.name.toLowerCase() === p.category.toLowerCase());
             if (matchingCat) {
               counts[matchingCat.id] = (counts[matchingCat.id] || 0) + 1;
             }
@@ -74,7 +102,7 @@ export const blogService = {
         });
       }
 
-      const categoriesWithCount = (categories || []).map(cat => ({
+      const categoriesWithCount = allCats.map(cat => ({
         ...cat,
         subtopics: Array.isArray(cat.subtopics) ? cat.subtopics : [],
         post_count: counts[cat.id] || 0,
@@ -83,7 +111,7 @@ export const blogService = {
       return { data: categoriesWithCount, error: null };
     } catch (err) {
       console.warn('Error fetching categories from Supabase:', err.message);
-      return { data: [], error: err };
+      return { data: [{ ...PUPPY_TRAINING_CATEGORY, post_count: 0 }], error: err };
     }
   },
 
@@ -205,14 +233,14 @@ export const blogService = {
 
   // ── Public Blog Posts ─────────────────────────────────────────────────────
 
-  /** Fetch all published posts, optionally filtered strictly by category ID or slug */
-  async getPublishedPosts(categoryFilter = null) {
+  /** Fetch all published posts, optionally filtered strictly by category ID or slug, and optional subcategory */
+  async getPublishedPosts(categoryFilter = null, subcategoryFilter = null) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) return { data: null, error: null };
 
     let query = supabase
       .from('blog_posts')
-      .select('id, title, slug, excerpt, featured_image, category, category_id, author, published_at, content')
+      .select('id, title, slug, excerpt, featured_image, category, category_id, subcategory, author, published_at, content')
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
@@ -235,6 +263,10 @@ export const blogService = {
           query = query.eq('category', categoryFilter);
         }
       }
+    }
+
+    if (subcategoryFilter && subcategoryFilter !== 'all') {
+      query = query.eq('subcategory', subcategoryFilter);
     }
 
     const { data, error } = await query;
@@ -268,7 +300,7 @@ export const blogService = {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (categoryId) {
+    if (categoryId && UUID_REGEX.test(categoryId)) {
       query = query.eq('category_id', categoryId);
     }
 
@@ -291,13 +323,12 @@ export const blogService = {
   },
 
   /** Create a new post */
-  // NOTE: subcategory is intentionally omitted from the payload until the migration
-  // "ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS subcategory TEXT;" is applied.
   async createPost({ title, slug, excerpt, content, featured_image, image1, image2, image3, video, category_id, category, subcategory, author, status, published_at }) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
     const finalSlug = slug?.trim() || slugify(title);
+    const validCategoryId = sanitizeCategoryId(category_id, category);
 
     // Build payload. Any extra inline media (image1..3, video) are also safely bundled
     // inside the jsonb content array metadata if desired, while also attempting top-level
@@ -308,8 +339,9 @@ export const blogService = {
       excerpt: excerpt?.trim() || null,
       content: content || null,
       featured_image: featured_image?.trim() || null,
-      category_id: category_id || null,
+      category_id: validCategoryId,
       category: category?.trim() || null,
+      subcategory: subcategory?.trim() || null,
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
@@ -331,16 +363,20 @@ export const blogService = {
       if (error) throw error;
       return data;
     } catch (insertErr) {
-      // If error is column does not exist on blog_posts, strip top-level media columns
-      // and re-save embedding the media into the content metadata
+      // If error is column does not exist on blog_posts, strip top-level media or subcategory columns
+      // and re-save embedding the media/subcategory into the content metadata
       if (insertErr.message && (insertErr.message.includes('column') || insertErr.code === '42703')) {
         delete payload.image1;
         delete payload.image2;
         delete payload.image3;
         delete payload.video;
-        // attach media metadata to first section or meta
+        if (insertErr.message.includes('subcategory')) {
+          delete payload.subcategory;
+        }
+        // attach media and subcategory metadata to first section or meta
         if (Array.isArray(payload.content) && payload.content.length > 0) {
           payload.content[0]._media = { image1, image2, image3, video };
+          if (subcategory) payload.content[0]._subcategory = subcategory;
         }
         const { data, error } = await supabase
           .from('blog_posts')
@@ -359,19 +395,24 @@ export const blogService = {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) throw new Error('Supabase is not configured');
 
+    const validCategoryId = category_id !== undefined ? sanitizeCategoryId(category_id, category) : undefined;
+
     const payload = {
       title: title?.trim(),
       slug: slug?.trim() || slugify(title),
       excerpt: excerpt?.trim() || null,
       content: content || null,
       featured_image: featured_image?.trim() || null,
-      category_id: category_id || null,
       category: category?.trim() || null,
+      subcategory: subcategory !== undefined ? (subcategory?.trim() || null) : undefined,
       author: author?.trim() || 'Admin',
       status: status || 'draft',
       published_at: status === 'published' ? (published_at || new Date().toISOString()) : null,
       updated_at: new Date().toISOString(),
     };
+    if (validCategoryId !== undefined) {
+      payload.category_id = validCategoryId;
+    }
 
     if (image1 !== undefined) payload.image1 = image1?.trim() || null;
     if (image2 !== undefined) payload.image2 = image2?.trim() || null;
@@ -394,8 +435,12 @@ export const blogService = {
         delete payload.image2;
         delete payload.image3;
         delete payload.video;
+        if (updateErr.message.includes('subcategory')) {
+          delete payload.subcategory;
+        }
         if (Array.isArray(payload.content) && payload.content.length > 0) {
           payload.content[0]._media = { image1, image2, image3, video };
+          if (subcategory) payload.content[0]._subcategory = subcategory;
         }
         const { data, error } = await supabase
           .from('blog_posts')

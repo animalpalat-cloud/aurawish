@@ -177,12 +177,19 @@ export const AdminBlogPage = () => {
                         </div>
                         <div className="min-w-0">
                           <p className="font-medium text-white truncate max-w-xs">{post.title}</p>
-                          <p className="text-[11px] text-slate-500 truncate">/birthday-ideas/{post.slug}</p>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {post.category === 'Puppy Training' ? `/puppy-training/${post.slug}` : `/birthday-ideas/${post.slug}`}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <span className="text-xs text-slate-400">{post.category || '—'}</span>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-300">{post.category || '—'}</span>
+                        {post.subcategory && (
+                          <span className="text-[10px] text-indigo-400 truncate max-w-[140px]">{post.subcategory}</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${STATUS_BADGE[post.status] || STATUS_BADGE.draft}`}>
@@ -216,7 +223,7 @@ export const AdminBlogPage = () => {
                         {/* View live (if published) */}
                         {post.status === 'published' && (
                           <a
-                            href={`/birthday-ideas/${post.slug}`}
+                            href={post.category === 'Puppy Training' ? `/puppy-training/${post.slug}` : `/birthday-ideas/${post.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             title="View live"

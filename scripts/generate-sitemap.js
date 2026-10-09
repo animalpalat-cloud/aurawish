@@ -55,6 +55,12 @@ const STATIC_ROUTES = [
   { path: '/inspirational-birthday-wishes', priority: '0.8', changefreq: 'weekly' },
   { path: '/beautiful-birthday-wishes', priority: '0.8', changefreq: 'weekly' },
 
+  // Puppy Training
+  { path: '/puppy-training', priority: '0.9', changefreq: 'daily' },
+  { path: '/puppy-training/breed-guides', priority: '0.8', changefreq: 'weekly' },
+  { path: '/puppy-training/behavior-solutions', priority: '0.8', changefreq: 'weekly' },
+  { path: '/puppy-training/crate-potty-schedules', priority: '0.8', changefreq: 'weekly' },
+
   // Hardcoded Blog Articles (Fallbacks)
   { path: '/birthday-ideas/how-to-write-a-birthday-message', priority: '0.8', changefreq: 'weekly' },
   { path: '/birthday-ideas/what-to-write-in-a-birthday-card', priority: '0.8', changefreq: 'weekly' },
@@ -73,7 +79,7 @@ const STATIC_ROUTES = [
 
 async function fetchDynamicBlogPosts() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at,published_at&status=eq.published`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/blog_posts?select=slug,category,category_id,updated_at,published_at&status=eq.published`, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -106,7 +112,10 @@ async function generate() {
 
   for (const post of dynamicPosts) {
     if (post.slug) {
-      const postPath = `/birthday-ideas/${post.slug}`;
+      const isPuppy = post.category === 'Puppy Training' || 
+                      post.category === 'puppy-training' ||
+                      post.category_id === 'ce965e41-cd7b-45cc-8aa2-43d4ee22d5b0';
+      const postPath = isPuppy ? `/puppy-training/${post.slug}` : `/birthday-ideas/${post.slug}`;
       const postDate = (post.updated_at || post.published_at || today).slice(0, 10);
       urlMap.set(postPath, {
         loc: `${BASE_URL}${postPath}`,
