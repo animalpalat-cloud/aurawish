@@ -39,6 +39,7 @@ const BirthdayWishesDetailPage = lazy(() => import('./pages/BirthdayWishesDetail
 const BirthdayIdeasHubPage     = lazy(() => import('./pages/BirthdayIdeasHubPage'));
 const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'));
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
+const CategoryLandingPage      = lazy(() => import('./pages/CategoryLandingPage'));
 const PuppyTrainingHubPage     = lazy(() => import('./pages/PuppyTrainingHubPage'));
 
 // Admin Panel — completely separate auth surface, loaded on demand
@@ -202,6 +203,10 @@ function App() {
                 <Route path="/blog" element={<BirthdayIdeasHubPage />} />
                 <Route path="/birthday-ideas" element={<BirthdayIdeasHubPage />} />
                 <Route path="/birthday-ideas/:slug" element={<BirthdayArticlePage />} />
+
+                {/* Dedicated Category Landing Pages */}
+                <Route path="/category/:slug" element={<CategoryLandingPage />} />
+                <Route path="/categories/:slug" element={<CategoryLandingPage />} />
 
                 {/* Puppy Training Hub, Sub-Category & Article Routes */}
                 <Route path="/puppy-training" element={<PuppyTrainingHubPage />} />

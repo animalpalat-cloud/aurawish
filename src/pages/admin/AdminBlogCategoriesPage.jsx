@@ -293,12 +293,12 @@ export const AdminBlogCategoriesPage = () => {
               {/* Action Buttons */}
               <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
                 <Link
-                  to={`/birthday-ideas?category=${encodeURIComponent(cat.slug)}`}
+                  to={`/category/${cat.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1 font-medium"
                 >
-                  <span>View on Blog</span>
+                  <span>View Category Page</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
 

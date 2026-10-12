@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Lightbulb, BookOpen, Sparkles, Clock, ArrowRight,
-  PenLine, Wand2, Gift, Laptop, Search, X, Loader2
+  Search, X, Loader2, FolderTree, Tag, ChevronRight, Layers
 } from 'lucide-react';
 import { SEOHead } from '../components/common/SEOHead';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
@@ -10,57 +10,13 @@ import { Button } from '../components/common/Button';
 import { BIRTHDAY_IDEAS } from '../data/birthdayIdeasData';
 import { blogService } from '../services/blogService';
 import { SUPABASE_URL } from '../supabase/client';
+import {
+  getCategoryVisual,
+  FALLBACK_CATEGORIES,
+  slugifyCategory
+} from '../data/categoryConfig';
 
-// ── Category visual config ───────────────────────────────────────────────────
-const CATEGORY_VISUALS = {
-  'Writing Guides': {
-    icon: PenLine,
-    gradient: 'linear-gradient(135deg, rgba(109,40,217,0.55) 0%, rgba(17,20,30,0.95) 100%)',
-    glow: 'rgba(217,70,239,0.22)',
-    pill: 'bg-brand-500/15 border-brand-500/30 text-brand-300',
-    arrowColor: 'text-brand-400 group-hover:text-brand-300',
-  },
-  'Creative Ideas': {
-    icon: Wand2,
-    gradient: 'linear-gradient(135deg, rgba(180,83,9,0.55) 0%, rgba(17,20,30,0.95) 100%)',
-    glow: 'rgba(245,158,11,0.22)',
-    pill: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
-    arrowColor: 'text-amber-400 group-hover:text-amber-300',
-  },
-  'Surprises': {
-    icon: Gift,
-    gradient: 'linear-gradient(135deg, rgba(159,18,57,0.55) 0%, rgba(17,20,30,0.95) 100%)',
-    glow: 'rgba(244,63,94,0.22)',
-    pill: 'bg-rose-500/15 border-rose-500/30 text-rose-300',
-    arrowColor: 'text-rose-400 group-hover:text-rose-300',
-  },
-  'Tutorials': {
-    icon: Laptop,
-    gradient: 'linear-gradient(135deg, rgba(8,70,100,0.65) 0%, rgba(17,20,30,0.95) 100%)',
-    glow: 'rgba(6,182,212,0.22)',
-    pill: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
-    arrowColor: 'text-cyan-400 group-hover:text-cyan-300',
-  },
-  'Puppy Training': {
-    icon: Sparkles,
-    gradient: 'linear-gradient(135deg, rgba(16,185,129,0.55) 0%, rgba(17,20,30,0.95) 100%)',
-    glow: 'rgba(52,211,153,0.25)',
-    pill: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
-    arrowColor: 'text-emerald-400 group-hover:text-emerald-300',
-  },
-};
-
-const DEFAULT_VISUAL = {
-  icon: BookOpen,
-  gradient: 'linear-gradient(135deg, rgba(51,65,85,0.55) 0%, rgba(17,20,30,0.95) 100%)',
-  glow: 'rgba(100,116,139,0.2)',
-  pill: 'bg-slate-500/15 border-slate-500/30 text-slate-300',
-  arrowColor: 'text-slate-400 group-hover:text-slate-300',
-};
-
-function getVisual(category) {
-  return CATEGORY_VISUALS[category] || DEFAULT_VISUAL;
-}
+const DOT_BG = 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)';
 
 export function getBlogImageUrl(image) {
   if (!image || typeof image !== 'string') return '';
@@ -76,14 +32,18 @@ export function getBlogImageUrl(image) {
   return `${SUPABASE_URL}/storage/v1/object/public/blog-images/${cleanPath}`;
 }
 
-// Map a Supabase blog_posts row to the shape the card components expect
+// Map a Supabase blog_posts row to the shape card components expect
 function mapSupabasePost(post) {
   return {
+    id:             post.id,
     slug:           post.slug,
     title:          post.title,
     excerpt:        post.excerpt || '',
     category:       post.category || 'General',
+    category_id:    post.category_id || null,
+    subcategory:    post.subcategory || '',
     featured_image: post.featured_image || '',
+    published_at:   post.published_at || '',
     readTime: post.content && Array.isArray(post.content)
       ? `${Math.max(1, Math.ceil(post.content.reduce((acc, s) => acc + (s.body?.length || 0), 0) / 1000))} min read`
       : '3 min read',
@@ -91,75 +51,154 @@ function mapSupabasePost(post) {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 export const BirthdayIdeasHubPage = () => {
   const [search, setSearch] = useState('');
-  const [articles, setArticles] = useState(BIRTHDAY_IDEAS); // start with hardcoded
+  const [articles, setArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [fetchLoading, setFetchLoading] = useState(true);
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
 
-  // Fetch published posts from Supabase; fall back to hardcoded if none returned
+  // Fetch categories and published posts
   useEffect(() => {
     let cancelled = false;
     setFetchLoading(true);
-    blogService.getPublishedPosts()
-      .then(({ data, error }) => {
+
+    Promise.all([
+      blogService.getCategoriesSimple(),
+      blogService.getPublishedPosts(),
+    ])
+      .then(([catsRes, postsRes]) => {
         if (cancelled) return;
-        if (!error && data && data.length > 0) {
-          setArticles(data.map(mapSupabasePost));
+
+        // Categories
+        let fetchedCats = catsRes.data || [];
+        if (fetchedCats.length === 0) {
+          fetchedCats = FALLBACK_CATEGORIES;
         }
-        // If Supabase returns empty or errors, keep hardcoded BIRTHDAY_IDEAS
+        setCategories(fetchedCats);
+
+        // Posts
+        let fetchedPosts = [];
+        if (postsRes.data && postsRes.data.length > 0) {
+          fetchedPosts = postsRes.data.map(mapSupabasePost);
+        } else {
+          fetchedPosts = BIRTHDAY_IDEAS.map(a => ({
+            ...a,
+            _fromSupabase: false,
+          }));
+        }
+        setArticles(fetchedPosts);
       })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setFetchLoading(false); });
+      .catch((err) => {
+        if (cancelled) return;
+        console.warn('Error fetching blog data:', err);
+        setCategories(FALLBACK_CATEGORIES);
+        setArticles(BIRTHDAY_IDEAS.map(a => ({ ...a, _fromSupabase: false })));
+      })
+      .finally(() => {
+        if (!cancelled) setFetchLoading(false);
+      });
+
     return () => { cancelled = true; };
   }, []);
 
-  const filtered = search.trim()
-    ? articles.filter(a =>
-        a.title.toLowerCase().includes(search.toLowerCase()) ||
-        a.category.toLowerCase().includes(search.toLowerCase()) ||
-        a.excerpt.toLowerCase().includes(search.toLowerCase())
-      )
-    : articles;
+  // Filtered by text search
+  const filteredArticles = useMemo(() => {
+    if (!search.trim()) return articles;
+    const q = search.toLowerCase();
+    return articles.filter(a =>
+      a.title?.toLowerCase().includes(q) ||
+      a.category?.toLowerCase().includes(q) ||
+      a.excerpt?.toLowerCase().includes(q) ||
+      (a.subcategory && a.subcategory.toLowerCase().includes(q))
+    );
+  }, [articles, search]);
 
-  const [featured, ...rest] = filtered;
+  // Group articles by category
+  const categoryGroups = useMemo(() => {
+    if (categories.length === 0 || articles.length === 0) return [];
+
+    const groups = [];
+    const assignedPostIds = new Set();
+
+    categories.forEach(cat => {
+      const catNameNorm = cat.name?.toLowerCase().trim();
+      const catSlugNorm = cat.slug?.toLowerCase().trim();
+
+      const matchingPosts = articles.filter(post => {
+        if (post.category_id && post.category_id === cat.id) return true;
+        const postCatNorm = post.category?.toLowerCase().trim();
+        return postCatNorm === catNameNorm || postCatNorm === catSlugNorm;
+      });
+
+      if (matchingPosts.length > 0) {
+        matchingPosts.forEach(p => assignedPostIds.add(p.slug || p.id));
+        groups.push({
+          category: cat,
+          posts: matchingPosts,
+        });
+      }
+    });
+
+    // Unassigned posts fallback group if any exist
+    const unassigned = articles.filter(p => !assignedPostIds.has(p.slug || p.id));
+    if (unassigned.length > 0) {
+      groups.push({
+        category: {
+          id: 'general-editorial',
+          name: 'General Editorial & Celebration Guides',
+          slug: 'birthday-ideas',
+          description: 'Timeless advice, emotional frameworks, and creative greeting ideas for memorable celebrations.',
+          subtopics: ['Celebrations', 'Writing Advice', 'Greeting Tips'],
+        },
+        posts: unassigned,
+      });
+    }
+
+    return groups;
+  }, [categories, articles]);
+
   const showSearch = search.trim().length > 0;
+  const [featuredPost] = articles;
 
-  // Unique categories for stats
-  const categoryCount = new Set(articles.map(a => a.category)).size;
+  // Filtered category groups if user clicked a quick filter pill
+  const displayedGroups = useMemo(() => {
+    if (activeCategoryFilter === 'all') return categoryGroups;
+    return categoryGroups.filter(g => g.category.slug === activeCategoryFilter);
+  }, [categoryGroups, activeCategoryFilter]);
 
   return (
-    <div className="min-h-screen bg-[#090B10]">
+    <div className="min-h-screen bg-[#090B10] w-full overflow-x-hidden">
       <SEOHead
-        title="Birthday Ideas - Message Inspiration, Surprises & Guides | Birthday Wishes"
-        description="Explore curated editorial guides on how to write meaningful birthday cards, creative surprise ideas, digital card tips, and etiquette."
-        canonicalUrl="/birthday-ideas"
+        title="Birthday Ideas & Editorial Guides - Message Inspiration, Surprises & Care | Birthday Wishes"
+        description="Explore curated editorial guides on how to write meaningful birthday cards, creative surprise ideas, digital card tips, audio greetings, and etiquette."
+        canonicalUrl="/blog"
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20">
-        <Breadcrumbs items={[{ label: 'Birthday Ideas', href: '/birthday-ideas' }]} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24">
+        <Breadcrumbs items={[{ label: 'Blog', href: '/blog' }]} />
 
         {/* ── HERO HEADER ─────────────────────────────────────────── */}
-        <div className="relative text-center max-w-3xl mx-auto mt-8 mb-14 space-y-5">
+        <div className="relative text-center max-w-3xl mx-auto mt-8 mb-12 space-y-5">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-[500px] h-[200px] rounded-full opacity-20 blur-3xl"
+            className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-[540px] h-[220px] rounded-full opacity-20 blur-3xl"
             style={{ background: 'radial-gradient(ellipse, #d946ef 0%, #7c3aed 60%, transparent 100%)' }}
           />
 
           <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/25 text-amber-300 text-xs font-semibold tracking-wide">
             <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-            Celebration Editorial &amp; Guides
+            <span>Celebration Editorial &amp; Guides</span>
           </div>
 
           <h1 className="relative text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-tight">
             Birthday Message{' '}
-            <span className="text-gold-foil">Inspiration</span> &amp; Ideas
+            <span className="text-gold-foil">Inspiration</span> &amp; Guides
           </h1>
 
           <p className="relative text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            Practical advice, step-by-step writing frameworks, and creative long-distance
-            celebration ideas to help you craft heartfelt moments.
+            Practical advice, audio card guides, pet care insights, and step-by-step
+            writing frameworks organized by category to help you craft heartfelt moments.
           </p>
 
           {/* Search bar */}
@@ -170,7 +209,7 @@ export const BirthdayIdeasHubPage = () => {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search guides (e.g. writing, surprise, card)..."
+              placeholder="Search across all categories (e.g. audio, dog, writing, card)..."
               className="w-full pl-11 pr-10 py-3 rounded-2xl bg-[#11141e] border border-slate-800 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-brand-500/70 focus:ring-2 focus:ring-brand-500/20 transition-all"
             />
             {search && (
@@ -186,7 +225,7 @@ export const BirthdayIdeasHubPage = () => {
 
           {/* Stats strip */}
           {!showSearch && (
-            <div className="relative flex items-center justify-center gap-8 sm:gap-12 pt-1">
+            <div className="relative flex items-center justify-center gap-8 sm:gap-12 pt-2">
               <div className="text-center">
                 <p className="text-xl font-bold text-white">
                   {fetchLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : articles.length}
@@ -195,83 +234,281 @@ export const BirthdayIdeasHubPage = () => {
               </div>
               <div className="w-px h-8 bg-slate-800" aria-hidden="true" />
               <div className="text-center">
-                <p className="text-xl font-bold text-white">{categoryCount}</p>
-                <p className="text-[11px] text-slate-500 tracking-wide">Categories</p>
+                <p className="text-xl font-bold text-white">
+                  {fetchLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : categoryGroups.length}
+                </p>
+                <p className="text-[11px] text-slate-500 tracking-wide">Main Categories</p>
               </div>
               <div className="w-px h-8 bg-slate-800" aria-hidden="true" />
               <div className="text-center">
-                <p className="text-xl font-bold text-white">~20 min</p>
+                <p className="text-xl font-bold text-white">~{Math.max(15, articles.length * 3)} min</p>
                 <p className="text-[11px] text-slate-500 tracking-wide">Combined Reading</p>
               </div>
             </div>
           )}
         </div>
 
+        {/* ── QUICK CATEGORY JUMP / FILTER BAR ────────────────────── */}
+        {!showSearch && categoryGroups.length > 0 && (
+          <div className="mb-14 overflow-x-auto pb-2 scrollbar-thin">
+            <div className="flex items-center gap-2 justify-start sm:justify-center min-w-max px-2">
+              <button
+                onClick={() => setActiveCategoryFilter('all')}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+                  activeCategoryFilter === 'all'
+                    ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25'
+                    : 'bg-[#11141e] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>All Categories ({articles.length})</span>
+              </button>
+
+              {categoryGroups.map(({ category: cat, posts: catPosts }) => {
+                const vis = getCategoryVisual(cat.name || cat.slug);
+                const Icon = vis.icon;
+                const isActive = activeCategoryFilter === cat.slug;
+                return (
+                  <button
+                    key={cat.id || cat.slug}
+                    onClick={() => setActiveCategoryFilter(isActive ? 'all' : cat.slug)}
+                    className={`px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 ${
+                      isActive
+                        ? 'bg-brand-500 text-white font-semibold shadow-md shadow-brand-500/25'
+                        : 'bg-[#11141e] border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{cat.name}</span>
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-slate-300">
+                      {catPosts.length}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ── LOADING SKELETON ─────────────────────────────────────── */}
-        {fetchLoading && articles.length === 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[1,2,3].map(i => (
-              <div key={i} className="rounded-2xl bg-[#11141e] border border-slate-800 overflow-hidden animate-pulse">
-                <div className="h-36 bg-slate-800/50" />
-                <div className="p-5 space-y-3">
-                  <div className="h-3 bg-slate-800 rounded w-1/3" />
-                  <div className="h-4 bg-slate-800 rounded w-3/4" />
-                  <div className="h-3 bg-slate-800 rounded" />
-                  <div className="h-3 bg-slate-800 rounded w-2/3" />
+        {fetchLoading && (
+          <div className="space-y-12">
+            {[1, 2].map(block => (
+              <div key={block} className="space-y-4">
+                <div className="h-8 bg-slate-800/40 rounded-xl w-64 animate-pulse" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="rounded-2xl bg-[#11141e] border border-slate-800 overflow-hidden animate-pulse">
+                      <div className="h-44 bg-slate-800/50" />
+                      <div className="p-5 space-y-3">
+                        <div className="h-3 bg-slate-800 rounded w-1/3" />
+                        <div className="h-4 bg-slate-800 rounded w-3/4" />
+                        <div className="h-3 bg-slate-800 rounded" />
+                        <div className="h-3 bg-slate-800 rounded w-2/3" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* ── RESULTS ──────────────────────────────────────────────── */}
-        {!fetchLoading && (
-          filtered.length === 0 ? (
-            <div className="text-center py-24 space-y-4">
-              <p className="text-3xl">🔍</p>
-              <p className="text-slate-400 text-sm">No guides match &ldquo;{search}&rdquo;</p>
+        {/* ── SEARCH RESULTS VIEW ──────────────────────────────────── */}
+        {!fetchLoading && showSearch && (
+          <div>
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-white tracking-tight">
+                  Search Results for &ldquo;{search}&rdquo;
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Found {filteredArticles.length} matching {filteredArticles.length === 1 ? 'guide' : 'guides'}
+                </p>
+              </div>
               <button
                 onClick={() => setSearch('')}
-                className="text-brand-400 text-xs hover:text-brand-300 transition-colors underline underline-offset-2"
+                className="text-xs text-brand-400 hover:text-brand-300 transition-colors font-medium underline underline-offset-2"
               >
-                Clear search &amp; browse all
+                Clear search
               </button>
             </div>
-          ) : (
-            <>
-              {/* Featured article */}
-              {!showSearch && featured && (
-                <div className="mb-10">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-4">
-                    Featured Guide
-                  </p>
-                  <FeaturedCard article={featured} />
-                </div>
-              )}
 
-              {/* Grid of articles */}
-              {(showSearch ? filtered : rest).length > 0 && (
-                <div>
-                  {!showSearch && (
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-5">
-                      All Guides
-                    </p>
-                  )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {(showSearch ? filtered : rest).map((article, idx) => (
-                      <ArticleCard key={article.slug} article={article} index={idx} />
-                    ))}
+            {filteredArticles.length === 0 ? (
+              <div className="text-center py-20 space-y-4 bg-[#11141e]/50 border border-slate-800/80 rounded-2xl p-10">
+                <p className="text-4xl">🔍</p>
+                <p className="text-slate-300 font-semibold">No guides match &ldquo;{search}&rdquo;</p>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Try searching for general keywords like writing, surprise, audio, pet, or dog.
+                </p>
+                <button
+                  onClick={() => setSearch('')}
+                  className="px-4 py-2 rounded-xl bg-brand-500 text-white text-xs font-semibold hover:bg-brand-400 transition-colors"
+                >
+                  Clear search &amp; browse categories
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredArticles.map((article, idx) => (
+                  <ArticleCard key={article.slug || idx} article={article} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── DYNAMIC CATEGORY BLOCKS ──────────────────────────────── */}
+        {!fetchLoading && !showSearch && (
+          <div className="space-y-16">
+            {/* Top Featured Guide Banner (if all categories active) */}
+            {activeCategoryFilter === 'all' && featuredPost && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">
+                  Editor&apos;s Highlight
+                </p>
+                <FeaturedCard article={featuredPost} />
+              </div>
+            )}
+
+            {/* Render a dedicated block for each Main Category */}
+            {displayedGroups.map(({ category: cat, posts: catPosts }) => {
+              const vis = getCategoryVisual(cat.name || cat.slug);
+              const Icon = vis.icon;
+              const categoryUrl = `/category/${cat.slug}`;
+              const subtopics = Array.isArray(cat.subtopics) ? cat.subtopics : [];
+
+              return (
+                <section
+                  key={cat.id || cat.slug}
+                  id={`category-${cat.slug}`}
+                  className="space-y-6 pt-4 border-t border-slate-800/80 first:border-t-0"
+                >
+                  {/* Category Block Header */}
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{
+                            backgroundColor: 'rgba(255,255,255,0.05)',
+                            color: vis.accentColor || '#ffffff',
+                          }}
+                        >
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <Link
+                              to={categoryUrl}
+                              className="text-xl sm:text-2xl font-bold text-white hover:text-brand-300 transition-colors tracking-tight flex items-center gap-2 group"
+                            >
+                              <span>{cat.name}</span>
+                              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-brand-400 group-hover:translate-x-1 transition-all" />
+                            </Link>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${vis.pill}`}>
+                              {catPosts.length} {catPosts.length === 1 ? 'guide' : 'guides'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Category Description */}
+                      {cat.description && (
+                        <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+                          {cat.description}
+                        </p>
+                      )}
+
+                      {/* Subtopics Preview */}
+                      {subtopics.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mr-1 flex items-center gap-1">
+                            <Tag className="w-3 h-3" />
+                            Topics:
+                          </span>
+                          {subtopics.slice(0, 4).map(st => (
+                            <span
+                              key={st}
+                              className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[10px] text-slate-400 font-medium"
+                            >
+                              {st}
+                            </span>
+                          ))}
+                          {subtopics.length > 4 && (
+                            <span className="text-[10px] text-slate-500">
+                              +{subtopics.length - 4} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Dedicated "View All" Button leading to Category Landing Page */}
+                    <div className="flex-shrink-0">
+                      <Link
+                        to={categoryUrl}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-slate-900 border border-slate-700 hover:border-brand-500/50 hover:bg-slate-800 transition-all shadow-sm group"
+                      >
+                        <span>View All {cat.name} Guides</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-brand-400 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              )}
-            </>
-          )
+
+                  {/* Under each Main Category block, display only the blog posts that belong to that specific category */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {catPosts.slice(0, 3).map((article) => (
+                      <ArticleCard
+                        key={article.slug}
+                        article={article}
+                        categoryVisual={vis}
+                      />
+                    ))}
+
+                    {/* Extra "View All" Card if more than 3 posts */}
+                    {catPosts.length > 3 && (
+                      <Link
+                        to={categoryUrl}
+                        className="group flex flex-col justify-center items-center text-center p-8 rounded-2xl border border-dashed border-slate-800 hover:border-brand-500/40 bg-[#11141e]/40 hover:bg-[#11141e] transition-all duration-300 min-h-[280px]"
+                      >
+                        <div
+                          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                          style={{
+                            backgroundColor: 'rgba(255,255,255,0.06)',
+                            color: vis.accentColor || '#ffffff',
+                          }}
+                        >
+                          <Icon className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-base font-bold text-white group-hover:text-brand-300 transition-colors">
+                          +{catPosts.length - 3} More {cat.name} Guides
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1.5 max-w-xs leading-relaxed">
+                          Discover all in-depth articles, schedules, and tips in this category.
+                        </p>
+                        <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-400 group-hover:text-brand-300">
+                          <span>Browse all {catPosts.length} articles</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </span>
+                      </Link>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         )}
 
         {/* ── CTA BANNER ───────────────────────────────────────────── */}
         <div className="mt-20 relative overflow-hidden rounded-3xl border border-brand-500/20 text-center p-10 sm:p-14">
-          <div aria-hidden="true" className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(135deg, rgba(113,29,138,0.28) 0%, rgba(17,20,30,1) 50%, rgba(120,80,10,0.18) 100%)' }} />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(113,29,138,0.28) 0%, rgba(17,20,30,1) 50%, rgba(120,80,10,0.18) 100%)',
+            }}
+          />
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-noise opacity-30" />
           <div className="relative space-y-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
@@ -299,13 +536,15 @@ export const BirthdayIdeasHubPage = () => {
 // FEATURED CARD
 // ─────────────────────────────────────────────────────────────────────────────
 function FeaturedCard({ article }) {
-  const vis = getVisual(article.category);
+  const vis = getCategoryVisual(article.category);
   const Icon = vis.icon;
   const imageUrl = getBlogImageUrl(article.featured_image);
+  const isPuppy = article.category === 'Puppy Training' || article.category === 'puppy-training';
+  const postUrl = isPuppy ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
 
   return (
     <Link
-      to={`/birthday-ideas/${article.slug}`}
+      to={postUrl}
       id={`blog-featured-${article.slug}`}
       className="group flex flex-col sm:flex-row rounded-3xl overflow-hidden border border-slate-800 hover:border-brand-500/40 transition-all duration-300 hover:shadow-[0_0_40px_-8px_rgba(217,70,239,0.28)] hover:-translate-y-0.5 bg-[#11141e]"
     >
@@ -327,10 +566,16 @@ function FeaturedCard({ article }) {
           </>
         ) : (
           <>
-            <div aria-hidden="true" className="absolute inset-0 opacity-40"
-              style={{ backgroundImage: DOT_BG, backgroundSize: '22px 22px' }} />
-            <div aria-hidden="true" className="absolute inset-0"
-              style={{ background: `radial-gradient(ellipse at 40% 50%, ${vis.glow} 0%, transparent 70%)` }} />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 opacity-40"
+              style={{ backgroundImage: DOT_BG, backgroundSize: '22px 22px' }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{ background: `radial-gradient(ellipse at 40% 50%, ${vis.glow} 0%, transparent 70%)` }}
+            />
             <Icon className="relative w-16 h-16 text-white/20 group-hover:text-white/30 transition-colors duration-300" strokeWidth={1} />
           </>
         )}
@@ -344,10 +589,12 @@ function FeaturedCard({ article }) {
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${vis.pill}`}>
               {article.category}
             </span>
-            <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <Clock className="w-3 h-3" />
-              {article.readTime}
-            </span>
+            {article.readTime && (
+              <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Clock className="w-3 h-3" />
+                {article.readTime}
+              </span>
+            )}
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white group-hover:text-brand-200 transition-colors leading-snug line-clamp-2">
             {article.title}
@@ -368,14 +615,16 @@ function FeaturedCard({ article }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // ARTICLE CARD
 // ─────────────────────────────────────────────────────────────────────────────
-function ArticleCard({ article }) {
-  const vis = getVisual(article.category);
+function ArticleCard({ article, categoryVisual }) {
+  const vis = categoryVisual || getCategoryVisual(article.category);
   const Icon = vis.icon;
   const imageUrl = getBlogImageUrl(article.featured_image);
+  const isPuppy = article.category === 'Puppy Training' || article.category === 'puppy-training';
+  const postUrl = isPuppy ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
 
   return (
     <Link
-      to={`/birthday-ideas/${article.slug}`}
+      to={postUrl}
       id={`blog-card-${article.slug}`}
       className="group flex flex-col rounded-2xl overflow-hidden border border-slate-800 hover:border-brand-500/35 bg-[#11141e] transition-all duration-300 hover:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.7)] hover:-translate-y-1"
     >
@@ -388,6 +637,7 @@ function ArticleCard({ article }) {
             <img
               src={imageUrl}
               alt={article.title}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
@@ -397,25 +647,38 @@ function ArticleCard({ article }) {
           </>
         ) : (
           <>
-            <div aria-hidden="true" className="absolute inset-0 opacity-35"
-              style={{ backgroundImage: DOT_BG, backgroundSize: '20px 20px' }} />
-            <div aria-hidden="true" className="absolute inset-0"
-              style={{ background: `radial-gradient(ellipse at 60% 40%, ${vis.glow} 0%, transparent 65%)` }} />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 opacity-35"
+              style={{ backgroundImage: DOT_BG, backgroundSize: '20px 20px' }}
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{ background: `radial-gradient(ellipse at 60% 40%, ${vis.glow} 0%, transparent 65%)` }}
+            />
             <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <Icon className="relative w-12 h-12 text-white/18 group-hover:text-white/28 transition-colors duration-300" strokeWidth={1} />
           </>
         )}
       </div>
       <div className="flex flex-col flex-1 p-5 space-y-3">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-[10px] font-semibold ${vis.pill}`}>
             {article.category}
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-slate-600 flex-shrink-0">
-            <Clock className="w-3 h-3" />
-            {article.readTime}
-          </span>
+          {article.readTime && (
+            <span className="flex items-center gap-1 text-[10px] text-slate-500 flex-shrink-0">
+              <Clock className="w-3 h-3" />
+              {article.readTime}
+            </span>
+          )}
         </div>
+        {article.subcategory && (
+          <span className="text-[10px] text-indigo-400 font-medium">
+            {article.subcategory}
+          </span>
+        )}
         <h2 className="text-[15px] font-bold text-white group-hover:text-brand-200 transition-colors leading-snug line-clamp-2">
           {article.title}
         </h2>

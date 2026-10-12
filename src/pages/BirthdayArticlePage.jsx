@@ -10,6 +10,7 @@ import { SUPABASE_URL } from '../supabase/client';
 import { PenLine, Wand2, Gift, Laptop } from 'lucide-react';
 import { applyInternalLinks, renderSectionBodyWithMedia } from '../utils/richText.jsx';
 import { BlogInlineImage, BlogInlineVideo } from '../components/blog/BlogInlineMedia';
+import { getCategoryVisual, slugifyCategory } from '../data/categoryConfig';
 
 // ── Category visual config ────────────────────────────────────────────────────
 const CATEGORY_VISUALS = {
@@ -71,7 +72,7 @@ const DEFAULT_VISUAL = {
 };
 
 function getVisual(category) {
-  return CATEGORY_VISUALS[category] || DEFAULT_VISUAL;
+  return CATEGORY_VISUALS[category] || getCategoryVisual(category) || DEFAULT_VISUAL;
 }
 
 export function getBlogImageUrl(image) {
@@ -172,10 +173,11 @@ export const BirthdayArticlePage = () => {
     return <Navigate to="/birthday-ideas" replace />;
   }
 
-  const isPuppyTraining = article.category === 'Puppy Training';
+  const isPuppyTraining = article.category === 'Puppy Training' || article.category === 'puppy-training';
   const canonicalPath = isPuppyTraining ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
-  const parentCategoryHref = isPuppyTraining ? '/puppy-training' : '/birthday-ideas';
-  const parentCategoryLabel = isPuppyTraining ? 'Puppy Training' : 'Birthday Ideas';
+  const catSlug = slugifyCategory(article.category || '');
+  const categoryHref = isPuppyTraining ? '/puppy-training' : (catSlug ? `/category/${catSlug}` : '/blog');
+  const categoryLabel = article.category || 'Blog';
 
   const vis = getVisual(article.category);
   const Icon = vis.icon;
@@ -217,7 +219,8 @@ export const BirthdayArticlePage = () => {
       <div className="w-full max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-10">
         <Breadcrumbs
           items={[
-            { label: parentCategoryLabel, href: parentCategoryHref },
+            { label: 'Blog', href: '/blog' },
+            ...(categoryLabel && categoryLabel !== 'Blog' ? [{ label: categoryLabel, href: categoryHref }] : []),
             ...(article.subcategory ? [{ label: article.subcategory, href: isPuppyTraining ? `/puppy-training` : undefined }] : []),
             { label: article.title, href: canonicalPath }
           ]}

@@ -16,7 +16,7 @@ function slugify(text) {
     .replace(/-+/g, '-');
 }
 
-import { PUPPY_TRAINING_CATEGORY } from '../data/categoryConfig';
+import { PUPPY_TRAINING_CATEGORY, FALLBACK_CATEGORIES } from '../data/categoryConfig';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -136,7 +136,10 @@ export const blogService = {
   /** Fetch single category by Slug */
   async getCategoryBySlug(slug) {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
-    if (!supabase || !isSupabaseConfigured) return { data: null, error: null };
+    if (!supabase || !isSupabaseConfigured) {
+      const fb = FALLBACK_CATEGORIES.find(c => c.slug === slug || slugify(c.name) === slug);
+      return { data: fb || null, error: null };
+    }
 
     const { data, error } = await supabase
       .from('blog_categories')
@@ -144,8 +147,17 @@ export const blogService = {
       .eq('slug', slug)
       .maybeSingle();
 
-    if (data && !Array.isArray(data.subtopics)) {
-      data.subtopics = [];
+    if (data) {
+      if (!Array.isArray(data.subtopics)) {
+        data.subtopics = [];
+      }
+      return { data, error };
+    }
+
+    // Fallback: check FALLBACK_CATEGORIES
+    const fb = FALLBACK_CATEGORIES.find(c => c.slug === slug || slugify(c.name) === slug);
+    if (fb) {
+      return { data: fb, error: null };
     }
 
     return { data, error };
@@ -258,9 +270,14 @@ export const blogService = {
           .maybeSingle();
 
         if (cat) {
-          query = query.or(`category_id.eq.${cat.id},category.eq.${cat.name}`);
+          query = query.or(`category_id.eq.${cat.id},category.eq."${cat.name}"`);
         } else {
-          query = query.eq('category', categoryFilter);
+          const fb = FALLBACK_CATEGORIES.find(c => c.slug === categoryFilter || slugify(c.name) === categoryFilter);
+          if (fb) {
+            query = query.or(`category.eq."${fb.name}",category.eq."${fb.slug}"`);
+          } else {
+            query = query.eq('category', categoryFilter);
+          }
         }
       }
     }
