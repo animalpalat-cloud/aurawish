@@ -302,20 +302,21 @@ function renderMediaToken(token, mediaAssets = {}) {
   if (imgNumMatch) {
     const num = imgNumMatch[1];
     const asset = mediaAssets[`image${num}`] || mediaAssets[`image_${num}`];
+    const altText = mediaAssets[`image${num}_alt`] || (typeof asset === 'object' ? asset?.alt : '') || `Article Image ${num}`;
+    const captionText = mediaAssets[`image${num}_caption`] || (typeof asset === 'object' ? asset?.caption : '') || '';
     if (asset) {
       const url = typeof asset === 'string' ? asset : asset.url;
-      const caption = typeof asset === 'object' ? (asset.caption || '') : '';
-      if (url) return <BlogInlineImage image={url} caption={caption} alt={`Article Image ${num}`} />;
+      if (url) return <BlogInlineImage image={url} caption={captionText} alt={altText} />;
     }
     return null;
   }
 
   if (norm.toLowerCase() === '[[video]]') {
     const asset = mediaAssets.video;
+    const captionText = mediaAssets.video_caption || (typeof asset === 'object' ? (asset?.caption || '') : '') || '';
     if (asset) {
       const url = typeof asset === 'string' ? asset : (asset.url || asset.src);
-      const caption = typeof asset === 'object' ? (asset.caption || '') : '';
-      if (url) return <BlogInlineVideo video={url} caption={caption} />;
+      if (url) return <BlogInlineVideo video={url} caption={captionText} />;
     }
     return null;
   }

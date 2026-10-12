@@ -201,6 +201,7 @@ function App() {
 
                 {/* Birthday Ideas / Blog Hub & Article Routes */}
                 <Route path="/blog" element={<BirthdayIdeasHubPage />} />
+                <Route path="/blog/:slug" element={<BirthdayArticlePage />} />
                 <Route path="/birthday-ideas" element={<BirthdayIdeasHubPage />} />
                 <Route path="/birthday-ideas/:slug" element={<BirthdayArticlePage />} />
 

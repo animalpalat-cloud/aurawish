@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, BarChart3, Settings, FileText, Bell, ChevronRight, Activity, PenLine } from 'lucide-react';
+import { Users, BarChart3, Settings, FileText, Bell, ChevronRight, Activity, PenLine, Clock, CheckCircle2 } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { blogService } from '../../services/blogService';
@@ -13,6 +13,7 @@ const colorMap = {
   indigo:  'from-indigo-600 to-indigo-700 shadow-indigo-500/25',
   emerald: 'from-emerald-600 to-emerald-700 shadow-emerald-500/25',
   amber:   'from-amber-500 to-amber-600 shadow-amber-500/25',
+  blue:    'from-blue-600 to-blue-700 shadow-blue-500/25',
   rose:    'from-rose-600 to-rose-700 shadow-rose-500/25',
 };
 
@@ -25,12 +26,12 @@ const QUICK_LINKS = [
 
 export const AdminDashboardPage = () => {
   const { adminUser } = useAdminAuth();
-  const [blogCount, setBlogCount] = useState(null);
+  const [blogStats, setBlogStats] = useState({ total: 0, published: 0, draft: 0, scheduled: 0 });
   const [liveUsers, setLiveUsers] = useState(null);
 
   useEffect(() => {
-    blogService.getAllPostsAdmin().then(({ data }) => {
-      if (data) setBlogCount(data.length);
+    blogService.getBlogStats().then(stats => {
+      setBlogStats(stats);
     }).catch(() => {});
 
     // Fetch real-time active users from GA4 proxy endpoint
@@ -49,10 +50,10 @@ export const AdminDashboardPage = () => {
     : (adminUser?.email?.[0] || 'A').toUpperCase();
 
   const STAT_CARDS = [
-    { label: 'Total Users',    value: '—',                                   icon: Users,    color: 'indigo' },
-    { label: 'Live Visitors',  value: liveUsers !== null ? String(liveUsers) : '—', icon: Activity, color: 'emerald' },
-    { label: 'Blog Posts',     value: blogCount !== null ? String(blogCount) : '—', icon: FileText, color: 'amber' },
-    { label: 'Notifications',  value: '—',                                   icon: Bell,     color: 'rose' },
+    { label: 'Published Posts', value: String(blogStats.published), icon: CheckCircle2, color: 'emerald' },
+    { label: 'Draft Posts',     value: String(blogStats.draft),     icon: FileText,     color: 'amber' },
+    { label: 'Scheduled Posts', value: String(blogStats.scheduled), icon: Clock,        color: 'blue' },
+    { label: 'Live Visitors',   value: liveUsers !== null ? String(liveUsers) : '—', icon: Activity, color: 'indigo' },
   ];
 
   return (

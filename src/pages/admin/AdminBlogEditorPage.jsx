@@ -2,11 +2,14 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
   Save, ArrowLeft, Plus, Trash2, AlertCircle,
-  Loader2, Eye, EyeOff, GripVertical, ImageIcon, CheckCircle2,
-  Upload, X, ExternalLink, FolderTree, Video, Film, Check, Copy, HelpCircle
+  Loader2, Eye, EyeOff, ImageIcon, CheckCircle2,
+  Upload, X, ExternalLink, FolderTree, Video, Film, Check, Copy,
+  Clock, Search, FileText
 } from 'lucide-react';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { RichTextEditor } from '../../components/admin/RichTextEditor';
+import { SEOManagementSection } from '../../components/admin/SEOManagementSection';
+import { SEOAnalyzerPanel } from '../../components/admin/SEOAnalyzerPanel';
 import { blogService } from '../../services/blogService';
 import { storageService } from '../../services/storageService';
 
@@ -17,10 +20,19 @@ import { storageService } from '../../services/storageService';
 
 const BLANK_SECTION = () => ({ h2: '', body: '' });
 const BLANK_FORM = {
-  title: '', slug: '', excerpt: '', featured_image: '',
-  image1: '', image2: '', image3: '', video: '',
+  title: '', slug: '', excerpt: '',
+  featured_image: '', featured_image_alt: '', featured_image_caption: '',
+  image1: '', image1_alt: '', image1_caption: '',
+  image2: '', image2_alt: '', image2_caption: '',
+  image3: '', image3_alt: '', image3_caption: '',
+  video: '', video_caption: '',
   category_id: '', category: '', subcategory: '', author: 'Admin', status: 'draft',
   published_at: '', sections: [BLANK_SECTION()],
+  // SEO fields
+  primary_focus_keyword: '', secondary_keywords: [], related_keywords: [],
+  seo_title: '', meta_description: '', canonical_url: '', robots_directive: 'index, follow',
+  og_title: '', og_description: '', og_image: '',
+  twitter_title: '', twitter_description: '', twitter_image: '',
 };
 
 function toInputDate(iso) {
@@ -47,6 +59,16 @@ export const AdminBlogEditorPage = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Unsaved-changes tracking
+  const [isDirty, setIsDirty] = useState(false);
+  const savedFormRef = useRef(null);
+
+  // Active tab: 'content' | 'seo'
+  const [activeTab, setActiveTab] = useState('content');
+
+  // Duplicate in progress
+  const [duplicating, setDuplicating] = useState(false);
 
   // Image upload state (Featured Image)
   const fileInputRef = useRef(null);
@@ -184,16 +206,24 @@ export const AdminBlogEditorPage = () => {
       if (err || !data) {
         setError(err?.message || 'Post not found.');
       } else {
-        const mediaObj = data.media || {};
-        setForm({
+        const loaded = {
           title:          data.title || '',
           slug:           data.slug || '',
           excerpt:        data.excerpt || '',
           featured_image: data.featured_image || '',
-          image1:         data.image1 || data.image_1 || mediaObj.image1 || '',
-          image2:         data.image2 || data.image_2 || mediaObj.image2 || '',
-          image3:         data.image3 || data.image_3 || mediaObj.image3 || '',
-          video:          data.video  || mediaObj.video || '',
+          featured_image_alt:     data.featured_image_alt || '',
+          featured_image_caption: data.featured_image_caption || '',
+          image1:         data.image1 || '',
+          image1_alt:     data.image1_alt || '',
+          image1_caption: data.image1_caption || '',
+          image2:         data.image2 || '',
+          image2_alt:     data.image2_alt || '',
+          image2_caption: data.image2_caption || '',
+          image3:         data.image3 || '',
+          image3_alt:     data.image3_alt || '',
+          image3_caption: data.image3_caption || '',
+          video:          data.video || '',
+          video_caption:  data.video_caption || '',
           category_id:    data.category_id || '',
           category:       data.category || '',
           subcategory:    data.subcategory || '',
@@ -201,10 +231,27 @@ export const AdminBlogEditorPage = () => {
           status:         data.status || 'draft',
           published_at:   toInputDate(data.published_at),
           sections:       Array.isArray(data.content) && data.content.length > 0
-                            ? data.content
+                            ? data.content.map(s => ({ h2: s.h2 || '', body: s.body || '' }))
                             : [BLANK_SECTION()],
-        });
-        setSlugManual(true); // don't auto-overwrite existing slug
+          // SEO
+          primary_focus_keyword: data.primary_focus_keyword || '',
+          secondary_keywords:    Array.isArray(data.secondary_keywords) ? data.secondary_keywords : [],
+          related_keywords:      Array.isArray(data.related_keywords)   ? data.related_keywords   : [],
+          seo_title:          data.seo_title || '',
+          meta_description:   data.meta_description || '',
+          canonical_url:      data.canonical_url || '',
+          robots_directive:   data.robots_directive || 'index, follow',
+          og_title:           data.og_title || '',
+          og_description:     data.og_description || '',
+          og_image:           data.og_image || '',
+          twitter_title:      data.twitter_title || '',
+          twitter_description:data.twitter_description || '',
+          twitter_image:      data.twitter_image || '',
+        };
+        setForm(loaded);
+        savedFormRef.current = JSON.stringify(loaded);
+        setIsDirty(false);
+        setSlugManual(true);
       }
       setLoading(false);
     });
@@ -217,8 +264,17 @@ export const AdminBlogEditorPage = () => {
     }
   }, [form.title, slugManual]);
 
-  const setField = useCallback((key, value) =>
-    setForm(prev => ({ ...prev, [key]: value })), []);
+  const setField = useCallback((key, value) => {
+    setForm(prev => {
+      const next = { ...prev, [key]: value };
+      if (savedFormRef.current) {
+        setIsDirty(JSON.stringify(next) !== savedFormRef.current);
+      } else {
+        setIsDirty(true);
+      }
+      return next;
+    });
+  }, []);
 
   // Category change handler — always resolves to a UUID category_id
   // Resets subcategory whenever the main category changes.
@@ -298,6 +354,15 @@ export const AdminBlogEditorPage = () => {
     }
   };
 
+  // ── Unsaved changes warning ──────────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (isDirty) { e.preventDefault(); e.returnValue = 'You have unsaved changes.'; }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
+
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleSave = async (targetStatus) => {
     setError('');
@@ -316,10 +381,19 @@ export const AdminBlogEditorPage = () => {
         slug:           form.slug.trim(),
         excerpt:        form.excerpt.trim(),
         featured_image: form.featured_image.trim(),
+        featured_image_alt:     form.featured_image_alt?.trim() || null,
+        featured_image_caption: form.featured_image_caption?.trim() || null,
         image1:         form.image1?.trim() || null,
+        image1_alt:     form.image1_alt?.trim() || null,
+        image1_caption: form.image1_caption?.trim() || null,
         image2:         form.image2?.trim() || null,
+        image2_alt:     form.image2_alt?.trim() || null,
+        image2_caption: form.image2_caption?.trim() || null,
         image3:         form.image3?.trim() || null,
+        image3_alt:     form.image3_alt?.trim() || null,
+        image3_caption: form.image3_caption?.trim() || null,
         video:          form.video?.trim() || null,
+        video_caption:  form.video_caption?.trim() || null,
         category_id:    form.category_id || null,
         category:       form.category || null,
         subcategory:    form.subcategory || null,
@@ -327,8 +401,24 @@ export const AdminBlogEditorPage = () => {
         status:         targetStatus,
         published_at:   targetStatus === 'published'
                           ? (form.published_at ? toISO(form.published_at) : new Date().toISOString())
-                          : null,
+                          : targetStatus === 'scheduled'
+                            ? (form.published_at ? toISO(form.published_at) : null)
+                            : null,
         content:        form.sections.filter(s => s.h2 || s.body),
+        // SEO fields
+        primary_focus_keyword: form.primary_focus_keyword?.trim() || null,
+        secondary_keywords:    form.secondary_keywords || [],
+        related_keywords:      form.related_keywords || [],
+        seo_title:             form.seo_title?.trim() || null,
+        meta_description:      form.meta_description?.trim() || null,
+        canonical_url:         form.canonical_url?.trim() || null,
+        robots_directive:      form.robots_directive?.trim() || 'index, follow',
+        og_title:              form.og_title?.trim() || null,
+        og_description:        form.og_description?.trim() || null,
+        og_image:              form.og_image?.trim() || null,
+        twitter_title:         form.twitter_title?.trim() || null,
+        twitter_description:   form.twitter_description?.trim() || null,
+        twitter_image:         form.twitter_image?.trim() || null,
       };
 
       if (isEditing) {
@@ -340,10 +430,26 @@ export const AdminBlogEditorPage = () => {
         setSuccess('Post created! Redirecting…');
         setTimeout(() => navigate(`/admin/blog/${created.id}/edit`, { replace: true }), 1000);
       }
+      savedFormRef.current = JSON.stringify(form);
+      setIsDirty(false);
     } catch (e) {
       setError(e.message || 'Failed to save post.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // ── Duplicate ────────────────────────────────────────────────────────────
+  const handleDuplicate = async () => {
+    if (!isEditing || !id) return;
+    setDuplicating(true);
+    try {
+      const dup = await blogService.duplicatePost(id);
+      navigate(`/admin/blog/${dup.id}/edit`);
+    } catch (e) {
+      setError(e.message || 'Failed to duplicate post.');
+    } finally {
+      setDuplicating(false);
     }
   };
 
@@ -358,11 +464,37 @@ export const AdminBlogEditorPage = () => {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h2 className="text-xl font-bold text-white">{pageTitle}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-white">{pageTitle}</h2>
+              {isDirty && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300">Unsaved</span>
+              )}
+            </div>
             {isEditing && <p className="text-[11px] text-slate-500 mt-0.5">ID: {id}</p>}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {isEditing && (
+            <button
+              onClick={handleDuplicate}
+              disabled={duplicating || saving || loading}
+              title="Duplicate this post as a new draft"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all disabled:opacity-50"
+            >
+              {duplicating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
+              Duplicate
+            </button>
+          )}
+          {form.status === 'published' && isEditing && form.slug && (
+            <a
+              href={form.category === 'Puppy Training' ? `/puppy-training/${form.slug}` : `/birthday-ideas/${form.slug}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              View Live
+            </a>
+          )}
           <button
             onClick={() => handleSave('draft')}
             disabled={saving || loading}
@@ -370,6 +502,15 @@ export const AdminBlogEditorPage = () => {
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Draft
+          </button>
+          <button
+            onClick={() => handleSave('scheduled')}
+            disabled={saving || loading || !form.published_at}
+            title={!form.published_at ? 'Set a publish date to schedule' : 'Schedule post'}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 text-sm font-medium transition-all disabled:opacity-40"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
+            Schedule
           </button>
           <button
             onClick={() => handleSave('published')}
@@ -402,6 +543,32 @@ export const AdminBlogEditorPage = () => {
           <span className="text-sm">Loading post…</span>
         </div>
       ) : (
+        <>
+          {/* ── Content / SEO Tabs ────────────────────────── */}
+          <div className="flex items-center gap-1 border-b border-slate-800 mb-6">
+            <button
+              onClick={() => setActiveTab('content')}
+              className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all ${
+                activeTab === 'content' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Content
+            </button>
+            <button
+              onClick={() => setActiveTab('seo')}
+              className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all ${
+                activeTab === 'seo' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              SEO &amp; Meta
+            </button>
+          </div>
+
+          {activeTab === 'seo' ? (
+            <SEOManagementSection form={form} setField={setField} featuredImage={form.featured_image} />
+          ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* ── Main fields ──────────────────────────────── */}
           <div className="xl:col-span-2 space-y-5">
@@ -671,9 +838,9 @@ export const AdminBlogEditorPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { key: 'image1', label: 'Image 1', token: '[[image-1]]' },
-                    { key: 'image2', label: 'Image 2', token: '[[image-2]]' },
-                    { key: 'image3', label: 'Image 3', token: '[[image-3]]' },
+                    { key: 'image1', label: 'Image 1', token: '[[image-1]]', altKey: 'image1_alt', capKey: 'image1_caption' },
+                    { key: 'image2', label: 'Image 2', token: '[[image-2]]', altKey: 'image2_alt', capKey: 'image2_caption' },
+                    { key: 'image3', label: 'Image 3', token: '[[image-3]]', altKey: 'image3_alt', capKey: 'image3_caption' },
                   ].map((item) => {
                     const value = form[item.key];
                     const isUploading = mediaUploading[item.key];
@@ -721,7 +888,7 @@ export const AdminBlogEditorPage = () => {
                           <div className="relative rounded-lg overflow-hidden border border-slate-700/80 bg-slate-950 aspect-video group">
                             <img
                               src={value}
-                              alt={item.label}
+                              alt={form[item.altKey] || item.label}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               onError={(e) => { e.currentTarget.src = ''; }}
                             />
@@ -769,14 +936,41 @@ export const AdminBlogEditorPage = () => {
                         )}
 
                         {/* URL input fallback */}
-                        <div>
-                          <input
-                            type="url"
-                            value={value}
-                            onChange={(e) => setField(item.key, e.target.value)}
-                            placeholder="Or paste URL https://..."
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-white text-[11px] placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 font-mono transition-all"
-                          />
+                        <div className="space-y-2">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Image URL</label>
+                            <input
+                              type="url"
+                              value={value}
+                              onChange={(e) => setField(item.key, e.target.value)}
+                              placeholder="Or paste URL https://..."
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-white text-[11px] placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 font-mono transition-all"
+                            />
+                          </div>
+
+                          {/* Alt Text */}
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Alt Text</label>
+                            <input
+                              type="text"
+                              value={form[item.altKey] || ''}
+                              onChange={(e) => setField(item.altKey, e.target.value)}
+                              placeholder="Describe image for accessibility & SEO…"
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-white text-[11px] placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+                            />
+                          </div>
+
+                          {/* Caption */}
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Caption (optional)</label>
+                            <input
+                              type="text"
+                              value={form[item.capKey] || ''}
+                              onChange={(e) => setField(item.capKey, e.target.value)}
+                              placeholder="Image caption shown below image…"
+                              className="w-full px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-white text-[11px] placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+                            />
+                          </div>
                         </div>
 
                         {/* Quick Insert into Section buttons */}
@@ -862,6 +1056,19 @@ export const AdminBlogEditorPage = () => {
                       <p className="text-[10px] text-slate-500 mt-1">
                         Supports YouTube, Vimeo, iframe embed code, or direct MP4/WebM URLs.
                       </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                        Video Caption (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={form.video_caption || ''}
+                        onChange={(e) => setField('video_caption', e.target.value)}
+                        placeholder="Caption displayed below the video…"
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+                      />
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -989,24 +1196,27 @@ export const AdminBlogEditorPage = () => {
 
               <div>
                 <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Status</label>
-                <div className="flex gap-2">
-                  {['draft', 'published'].map(s => (
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { key: 'draft',     label: 'Draft',     cls: 'bg-amber-500/15 border-amber-500/30 text-amber-300' },
+                    { key: 'published', label: 'Published', cls: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' },
+                    { key: 'scheduled', label: 'Scheduled', cls: 'bg-blue-500/15 border-blue-500/30 text-blue-300' },
+                  ].map(s => (
                     <button
-                      key={s}
+                      key={s.key}
                       type="button"
-                      onClick={() => setField('status', s)}
+                      onClick={() => setField('status', s.key)}
                       className={`flex-1 py-2 rounded-xl border text-xs font-semibold transition-all capitalize ${
-                        form.status === s
-                          ? s === 'published'
-                            ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                            : 'bg-amber-500/15 border-amber-500/30 text-amber-300'
-                          : 'border-slate-700 text-slate-500 hover:text-slate-300 hover:bg-slate-800'
+                        form.status === s.key ? s.cls : 'border-slate-700 text-slate-500 hover:text-slate-300 hover:bg-slate-800'
                       }`}
                     >
-                      {s}
+                      {s.label}
                     </button>
                   ))}
                 </div>
+                {form.status === 'scheduled' && (
+                  <p className="mt-1.5 text-[11px] text-blue-400">Set a future publish date below to schedule.</p>
+                )}
               </div>
 
               <div>
@@ -1026,12 +1236,18 @@ export const AdminBlogEditorPage = () => {
                 <button onClick={() => handleSave('published')} disabled={saving}
                   className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
-                  Save & Publish
+                  Save &amp; Publish
                 </button>
                 <button onClick={() => handleSave('draft')} disabled={saving}
                   className="w-full py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm font-medium hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <EyeOff className="w-4 h-4" />}
                   Save as Draft
+                </button>
+                <button onClick={() => handleSave('scheduled')} disabled={saving || !form.published_at}
+                  title={!form.published_at ? 'Set a publish date first' : undefined}
+                  className="w-full py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-sm font-medium hover:bg-amber-500/20 transition-all disabled:opacity-40 flex items-center justify-center gap-2">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clock className="w-4 h-4" />}
+                  Schedule
                 </button>
               </div>
             </div>
@@ -1313,9 +1529,58 @@ export const AdminBlogEditorPage = () => {
                   className="w-full px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all font-mono"
                 />
               </div>
+
+              {/* Alt text & Caption */}
+              <div className="space-y-3 pt-2 border-t border-slate-800/80">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Image Alt Text
+                  </label>
+                  <input
+                    type="text"
+                    value={form.featured_image_alt}
+                    onChange={e => setField('featured_image_alt', e.target.value)}
+                    placeholder="Describe the featured image for accessibility & SEO…"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Image Caption (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={form.featured_image_caption}
+                    onChange={e => setField('featured_image_caption', e.target.value)}
+                    placeholder="Caption displayed below the featured image…"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 transition-all"
+                  />
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* SEO Analyzer Panel - visible in Content tab */}
+          <div className="xl:col-span-2 mt-0">
+            <SEOAnalyzerPanel
+              title={form.title}
+              slug={form.slug}
+              sections={form.sections}
+              excerpt={form.excerpt}
+              primaryKeyword={form.primary_focus_keyword}
+              secondaryKeywords={form.secondary_keywords}
+              relatedKeywords={form.related_keywords}
+              seoTitle={form.seo_title}
+              metaDescription={form.meta_description}
+              canonicalUrl={form.canonical_url}
+              featuredImage={form.featured_image}
+              featuredImageAlt={form.featured_image_alt}
+              currentPostId={id || null}
+            />
+          </div>
         </div>
+        )}
+        </>
       )}
     </AdminShell>
   );

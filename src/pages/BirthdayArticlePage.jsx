@@ -13,6 +13,8 @@ import { BlogInlineImage, BlogInlineVideo } from '../components/blog/BlogInlineM
 import { getCategoryVisual, slugifyCategory } from '../data/categoryConfig';
 
 // ── Category visual config ────────────────────────────────────────────────────
+const DOT_BG = 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)';
+
 const CATEGORY_VISUALS = {
   'Writing Guides': {
     icon: PenLine,
@@ -72,7 +74,17 @@ const DEFAULT_VISUAL = {
 };
 
 function getVisual(category) {
-  return CATEGORY_VISUALS[category] || getCategoryVisual(category) || DEFAULT_VISUAL;
+  const vis = CATEGORY_VISUALS[category] || getCategoryVisual(category) || DEFAULT_VISUAL;
+  return {
+    ...vis,
+    sectionAccent: vis.sectionAccent || 'border-slate-700/40',
+    sectionGlow: vis.sectionGlow || 'rgba(100,116,139,0.04)',
+    numberColor: vis.numberColor || 'text-slate-400',
+    pill: vis.pill || 'bg-slate-500/15 border-slate-500/30 text-slate-300',
+    glow: vis.glow || 'rgba(100,116,139,0.2)',
+    icon: vis.icon || BookOpen,
+    gradient: vis.gradient || DEFAULT_VISUAL.gradient,
+  };
 }
 
 export function getBlogImageUrl(image) {
@@ -93,11 +105,20 @@ export function getBlogImageUrl(image) {
 function mapSupabaseArticle(post) {
   const sections = Array.isArray(post.content) ? post.content : [];
   const firstSectionMedia = (sections[0] && sections[0]._media) || {};
+  const firstSectionSeo = (sections[0] && sections[0]._seo) || {};
+
   const mediaAssets = {
     image1: post.image1 || post.image_1 || (post.media && post.media.image1) || firstSectionMedia.image1 || '',
+    image1_alt: post.image1_alt || (post.media && post.media.image1_alt) || firstSectionMedia.image1_alt || '',
+    image1_caption: post.image1_caption || (post.media && post.media.image1_caption) || firstSectionMedia.image1_caption || '',
     image2: post.image2 || post.image_2 || (post.media && post.media.image2) || firstSectionMedia.image2 || '',
+    image2_alt: post.image2_alt || (post.media && post.media.image2_alt) || firstSectionMedia.image2_alt || '',
+    image2_caption: post.image2_caption || (post.media && post.media.image2_caption) || firstSectionMedia.image2_caption || '',
     image3: post.image3 || post.image_3 || (post.media && post.media.image3) || firstSectionMedia.image3 || '',
+    image3_alt: post.image3_alt || (post.media && post.media.image3_alt) || firstSectionMedia.image3_alt || '',
+    image3_caption: post.image3_caption || (post.media && post.media.image3_caption) || firstSectionMedia.image3_caption || '',
     video:  post.video  || (post.media && post.media.video) || firstSectionMedia.video  || '',
+    video_caption: post.video_caption || (post.media && post.media.video_caption) || firstSectionMedia.video_caption || '',
   };
 
   return {
@@ -106,24 +127,36 @@ function mapSupabaseArticle(post) {
     h1:             post.title,
     excerpt:        post.excerpt || '',
     category:       post.category || 'General',
+    subcategory:    post.subcategory || '',
     author:         post.author || 'Admin',
     featured_image: post.featured_image || '',
+    featured_image_alt: post.featured_image_alt || firstSectionMedia.featured_image_alt || '',
+    featured_image_caption: post.featured_image_caption || firstSectionMedia.featured_image_caption || '',
     readTime:       sections.length > 0
                       ? `${Math.max(1, Math.ceil(sections.reduce((a, s) => a + (s.body?.length || 0), 0) / 1000))} min read`
                       : '3 min read',
     intro:          post.excerpt || '',
     sections,
     mediaAssets,
-    seoTitle:       `${post.title} | Birthday Wishes`,
-    seoDescription: post.excerpt || post.title,
+    seoTitle:       post.seo_title || firstSectionSeo.seo_title || `${post.title} | Birthday Wishes`,
+    seoDescription: post.meta_description || firstSectionSeo.meta_description || post.excerpt || post.title,
+    canonicalUrl:   post.canonical_url || firstSectionSeo.canonical_url || '',
+    robotsDirective: post.robots_directive || firstSectionSeo.robots_directive || '',
+    ogTitle:        post.og_title || firstSectionSeo.og_title || '',
+    ogDescription:  post.og_description || firstSectionSeo.og_description || '',
+    ogImage:        post.og_image || firstSectionSeo.og_image || '',
+    twitterTitle:   post.twitter_title || firstSectionSeo.twitter_title || '',
+    twitterDescription: post.twitter_description || firstSectionSeo.twitter_description || '',
+    twitterImage:   post.twitter_image || firstSectionSeo.twitter_image || '',
     relatedSlugs:   [],
     _fromSupabase:  true,
   };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-export const BirthdayArticlePage = () => {
-  const { slug } = useParams();
+export const BirthdayArticlePage = ({ explicitSlug }) => {
+  const { slug, param } = useParams();
+  const effectiveSlug = explicitSlug || slug || param;
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -133,7 +166,13 @@ export const BirthdayArticlePage = () => {
     setLoading(true);
     setNotFound(false);
 
-    blogService.getPostBySlug(slug)
+    if (!effectiveSlug) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
+
+    blogService.getPostBySlug(effectiveSlug)
       .then(({ data, error }) => {
         if (cancelled) return;
         if (!error && data) {
@@ -141,7 +180,7 @@ export const BirthdayArticlePage = () => {
           setArticle(mapSupabaseArticle(data));
         } else {
           // Fall back to hardcoded data
-          const hardcoded = getArticleBySlug(slug);
+          const hardcoded = getArticleBySlug(effectiveSlug);
           if (hardcoded) {
             setArticle(hardcoded);
           } else {
@@ -152,14 +191,14 @@ export const BirthdayArticlePage = () => {
       .catch(() => {
         if (cancelled) return;
         // Network error — try hardcoded
-        const hardcoded = getArticleBySlug(slug);
+        const hardcoded = getArticleBySlug(effectiveSlug);
         if (hardcoded) setArticle(hardcoded);
         else setNotFound(true);
       })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [effectiveSlug]);
 
   if (loading) {
     return (
@@ -178,6 +217,8 @@ export const BirthdayArticlePage = () => {
   const catSlug = slugifyCategory(article.category || '');
   const categoryHref = isPuppyTraining ? '/puppy-training' : (catSlug ? `/category/${catSlug}` : '/blog');
   const categoryLabel = article.category || 'Blog';
+  const parentCategoryHref = categoryHref;
+  const parentCategoryLabel = categoryLabel;
 
   const vis = getVisual(article.category);
   const Icon = vis.icon;
@@ -212,7 +253,14 @@ export const BirthdayArticlePage = () => {
       <SEOHead
         title={article.seoTitle}
         description={article.seoDescription}
-        canonicalUrl={canonicalPath}
+        canonicalUrl={article.canonicalUrl || canonicalPath}
+        robotsDirective={article.robotsDirective}
+        ogTitle={article.ogTitle}
+        ogDescription={article.ogDescription}
+        ogImage={article.ogImage || imageUrl}
+        twitterTitle={article.twitterTitle}
+        twitterDescription={article.twitterDescription}
+        twitterImage={article.twitterImage || imageUrl}
         schemaJson={articleSchema}
       />
 
@@ -236,13 +284,20 @@ export const BirthdayArticlePage = () => {
               <>
                 <img
                   src={imageUrl}
-                  alt={article.h1 || article.title}
+                  alt={article.featured_image_alt || article.h1 || article.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                {article.featured_image_caption && (
+                  <div className="absolute bottom-2.5 left-3 right-3 text-center pointer-events-none">
+                    <span className="text-[11px] text-white/90 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-md">
+                      {article.featured_image_caption}
+                    </span>
+                  </div>
+                )}
               </>
             ) : (
               <>

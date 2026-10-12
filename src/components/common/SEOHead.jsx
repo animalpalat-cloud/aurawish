@@ -6,8 +6,14 @@ export const SEOHead = ({
   canonicalUrl,
   ogType = 'website',
   ogImage = 'https://birthdaywishly.com/og-cover.jpg',
+  ogTitle,
+  ogDescription,
+  twitterTitle,
+  twitterDescription,
+  twitterImage,
   schemaJson,
-  noIndex = false
+  noIndex = false,
+  robotsDirective,
 }) => {
   // Single source of truth for the production domain.
   // All canonical URLs and og:url values are built from this constant.
@@ -15,7 +21,7 @@ export const SEOHead = ({
 
   useEffect(() => {
     // 1. Title Tag
-    const formattedTitle = title.includes('Birthday Wishes') ? title : `${title} | Birthday Wishes`;
+    const formattedTitle = title?.includes('Birthday Wishes') ? title : `${title || 'Birthday Wishes'} | Birthday Wishes`;
     document.title = formattedTitle;
 
     // Helper to upsert meta tag
@@ -32,33 +38,50 @@ export const SEOHead = ({
 
     // 2. Standard Meta Tags
     setMeta('name', 'description', description);
-    if (noIndex) {
+    
+    // Robots directive handling
+    if (robotsDirective) {
+      setMeta('name', 'robots', robotsDirective);
+    } else if (noIndex) {
       setMeta('name', 'robots', 'noindex, nofollow');
     } else {
       setMeta('name', 'robots', 'index, follow');
     }
 
     // 3. Open Graph Tags
-    setMeta('property', 'og:title', formattedTitle);
-    setMeta('property', 'og:description', description);
+    const finalOgTitle = ogTitle || formattedTitle;
+    const finalOgDesc = ogDescription || description;
+    const finalOgImage = ogImage || 'https://birthdaywishly.com/og-cover.jpg';
+
+    setMeta('property', 'og:title', finalOgTitle);
+    setMeta('property', 'og:description', finalOgDesc);
     setMeta('property', 'og:type', ogType);
-    if (ogImage) setMeta('property', 'og:image', ogImage);
+    if (finalOgImage) setMeta('property', 'og:image', finalOgImage);
 
     // Canonical is always the clean path on the production domain —
     // no query parameters, no fragments, consistent trailing-slash handling.
-    const cleanPath = canonicalUrl
-      ? canonicalUrl.split('?')[0].split('#')[0]   // strip ?query and #hash
-      : window.location.pathname;                   // current path as fallback
-    const fullCanonical = `${SITE_URL}${cleanPath}`;
+    let fullCanonical;
+    if (canonicalUrl?.startsWith('http://') || canonicalUrl?.startsWith('https://')) {
+      fullCanonical = canonicalUrl;
+    } else {
+      const cleanPath = canonicalUrl
+        ? canonicalUrl.split('?')[0].split('#')[0]   // strip ?query and #hash
+        : window.location.pathname;                   // current path as fallback
+      fullCanonical = `${SITE_URL}${cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`;
+    }
 
     setMeta('property', 'og:url', fullCanonical);
     setMeta('property', 'og:site_name', 'Birthday Wishes');
 
     // 4. Twitter Cards
+    const finalTwTitle = twitterTitle || finalOgTitle;
+    const finalTwDesc = twitterDescription || finalOgDesc;
+    const finalTwImage = twitterImage || finalOgImage;
+
     setMeta('name', 'twitter:card', 'summary_large_image');
-    setMeta('name', 'twitter:title', formattedTitle);
-    setMeta('name', 'twitter:description', description);
-    if (ogImage) setMeta('name', 'twitter:image', ogImage);
+    setMeta('name', 'twitter:title', finalTwTitle);
+    setMeta('name', 'twitter:description', finalTwDesc);
+    if (finalTwImage) setMeta('name', 'twitter:image', finalTwImage);
 
     // 5. Canonical Link — exactly one per page, always pointing to the clean URL
     let canonicalElem = document.querySelector('link[rel="canonical"]');
@@ -82,7 +105,10 @@ export const SEOHead = ({
     } else if (schemaScript) {
       schemaScript.remove();
     }
-  }, [title, description, canonicalUrl, ogType, ogImage, schemaJson, noIndex, SITE_URL]);
+  }, [
+    title, description, canonicalUrl, ogType, ogImage, ogTitle, ogDescription,
+    twitterTitle, twitterDescription, twitterImage, schemaJson, noIndex, robotsDirective, SITE_URL
+  ]);
 
   return null;
 };

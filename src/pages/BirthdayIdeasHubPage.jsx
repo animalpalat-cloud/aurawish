@@ -53,54 +53,55 @@ function mapSupabasePost(post) {
 
 export const BirthdayIdeasHubPage = () => {
   const [search, setSearch] = useState('');
-  const [articles, setArticles] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [fetchLoading, setFetchLoading] = useState(true);
+  // Independent states so Main Categories and Editorial Guides display immediately
+  const [categories, setCategories] = useState(() => FALLBACK_CATEGORIES);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [articles, setArticles] = useState(() => BIRTHDAY_IDEAS.map(a => ({ ...a, _fromSupabase: false })));
+  const [articlesLoading, setArticlesLoading] = useState(true);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
 
-  // Fetch categories and published posts
+  // 1. Fetch categories independently
   useEffect(() => {
     let cancelled = false;
-    setFetchLoading(true);
-
-    Promise.all([
-      blogService.getCategoriesSimple(),
-      blogService.getPublishedPosts(),
-    ])
-      .then(([catsRes, postsRes]) => {
+    blogService.getCategoriesSimple()
+      .then((catsRes) => {
         if (cancelled) return;
-
-        // Categories
         let fetchedCats = catsRes.data || [];
-        if (fetchedCats.length === 0) {
-          fetchedCats = FALLBACK_CATEGORIES;
+        if (fetchedCats.length > 0) {
+          setCategories(fetchedCats);
         }
-        setCategories(fetchedCats);
-
-        // Posts
-        let fetchedPosts = [];
-        if (postsRes.data && postsRes.data.length > 0) {
-          fetchedPosts = postsRes.data.map(mapSupabasePost);
-        } else {
-          fetchedPosts = BIRTHDAY_IDEAS.map(a => ({
-            ...a,
-            _fromSupabase: false,
-          }));
-        }
-        setArticles(fetchedPosts);
       })
       .catch((err) => {
-        if (cancelled) return;
-        console.warn('Error fetching blog data:', err);
-        setCategories(FALLBACK_CATEGORIES);
-        setArticles(BIRTHDAY_IDEAS.map(a => ({ ...a, _fromSupabase: false })));
+        console.warn('Error fetching categories:', err);
       })
       .finally(() => {
-        if (!cancelled) setFetchLoading(false);
+        if (!cancelled) setCategoriesLoading(false);
       });
 
     return () => { cancelled = true; };
   }, []);
+
+  // 2. Fetch published articles independently
+  useEffect(() => {
+    let cancelled = false;
+    blogService.getPublishedPosts()
+      .then((postsRes) => {
+        if (cancelled) return;
+        if (postsRes.data && postsRes.data.length > 0) {
+          setArticles(postsRes.data.map(mapSupabasePost));
+        }
+      })
+      .catch((err) => {
+        console.warn('Error fetching articles:', err);
+      })
+      .finally(() => {
+        if (!cancelled) setArticlesLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  const fetchLoading = categoriesLoading && articlesLoading;
 
   // Filtered by text search
   const filteredArticles = useMemo(() => {
@@ -228,14 +229,14 @@ export const BirthdayIdeasHubPage = () => {
             <div className="relative flex items-center justify-center gap-8 sm:gap-12 pt-2">
               <div className="text-center">
                 <p className="text-xl font-bold text-white">
-                  {fetchLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : articles.length}
+                  {articlesLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : articles.length}
                 </p>
                 <p className="text-[11px] text-slate-500 tracking-wide">Editorial Guides</p>
               </div>
               <div className="w-px h-8 bg-slate-800" aria-hidden="true" />
               <div className="text-center">
                 <p className="text-xl font-bold text-white">
-                  {fetchLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : categoryGroups.length}
+                  {categoriesLoading ? <Loader2 className="w-5 h-5 animate-spin inline text-slate-500" /> : categoryGroups.length}
                 </p>
                 <p className="text-[11px] text-slate-500 tracking-wide">Main Categories</p>
               </div>
