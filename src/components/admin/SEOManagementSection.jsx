@@ -63,7 +63,7 @@ export const SEOManagementSection = ({
     if (form.slug) {
       const isPuppy = form.category === 'Puppy Training' || form.category === 'puppy-training';
       const path = isPuppy ? `/puppy-training/${form.slug}` : `/birthday-ideas/${form.slug}`;
-      setField('canonical_url', `https://birthdaywishly.com${path}`);
+      setField('canonical_url', `https://www.birthdaywishly.com${path}`);
     }
   };
 
@@ -306,7 +306,7 @@ export const SEOManagementSection = ({
               type="text"
               value={form.canonical_url || ''}
               onChange={e => setField('canonical_url', e.target.value)}
-              placeholder="https://birthdaywishly.com/birthday-ideas/…"
+              placeholder="https://www.birthdaywishly.com/birthday-ideas/…"
               className="w-full px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-700 text-white text-xs placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all font-mono"
             />
           </div>
@@ -393,7 +393,7 @@ export const SEOManagementSection = ({
                 BW
               </div>
               <div className="text-[11px] text-slate-400 font-mono truncate">
-                https://birthdaywishly.com › birthday-ideas › {previewSlug}
+                https://www.birthdaywishly.com › birthday-ideas › {previewSlug}
               </div>
             </div>
             <h5 className="text-[16px] text-[#8ab4f8] hover:underline cursor-pointer leading-snug font-medium line-clamp-2">

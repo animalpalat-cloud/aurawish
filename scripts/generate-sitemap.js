@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://birthdaywishly.com';
+const BASE_URL = 'https://www.birthdaywishly.com';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://xwpnxzfnlxhghmefvhpv.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DhA4Zmv2wco650SwKFwR4A_z5tqlxsG';
 

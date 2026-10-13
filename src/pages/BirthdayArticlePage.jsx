@@ -239,12 +239,12 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
     ...(imageUrl ? { "image": [imageUrl] } : {}),
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://birthdaywishly.com${canonicalPath}`
+      "@id": `https://www.birthdaywishly.com${canonicalPath}`
     },
     "publisher": {
       "@type": "Organization",
       "name": "Birthday Wishes",
-      "logo": { "@type": "ImageObject", "url": "https://birthdaywishly.com/logo.png" }
+      "logo": { "@type": "ImageObject", "url": "https://www.birthdaywishly.com/logo.png" }
     }
   };
 

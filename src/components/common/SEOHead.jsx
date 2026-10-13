@@ -5,7 +5,7 @@ export const SEOHead = ({
   description,
   canonicalUrl,
   ogType = 'website',
-  ogImage = 'https://birthdaywishly.com/og-cover.jpg',
+  ogImage = 'https://www.birthdaywishly.com/og-cover.jpg',
   ogTitle,
   ogDescription,
   twitterTitle,
@@ -17,7 +17,7 @@ export const SEOHead = ({
 }) => {
   // Single source of truth for the production domain.
   // All canonical URLs and og:url values are built from this constant.
-  const SITE_URL = 'https://birthdaywishly.com';
+  const SITE_URL = 'https://www.birthdaywishly.com';
 
   useEffect(() => {
     // 1. Title Tag
@@ -51,7 +51,7 @@ export const SEOHead = ({
     // 3. Open Graph Tags
     const finalOgTitle = ogTitle || formattedTitle;
     const finalOgDesc = ogDescription || description;
-    const finalOgImage = ogImage || 'https://birthdaywishly.com/og-cover.jpg';
+    const finalOgImage = ogImage || 'https://www.birthdaywishly.com/og-cover.jpg';
 
     setMeta('property', 'og:title', finalOgTitle);
     setMeta('property', 'og:description', finalOgDesc);
@@ -62,12 +62,19 @@ export const SEOHead = ({
     // no query parameters, no fragments, consistent trailing-slash handling.
     let fullCanonical;
     if (canonicalUrl?.startsWith('http://') || canonicalUrl?.startsWith('https://')) {
-      fullCanonical = canonicalUrl;
+      // Normalize any non-www or http domain to the single preferred HTTPS www domain
+      try {
+        const parsed = new URL(canonicalUrl);
+        fullCanonical = `${SITE_URL}${parsed.pathname === '/' ? '/' : parsed.pathname.replace(/\/$/, '')}`;
+      } catch (e) {
+        fullCanonical = canonicalUrl.replace(/^https?:\/\/(?:www\.)?birthdaywishly\.com/, SITE_URL);
+      }
     } else {
       const cleanPath = canonicalUrl
         ? canonicalUrl.split('?')[0].split('#')[0]   // strip ?query and #hash
         : window.location.pathname;                   // current path as fallback
-      fullCanonical = `${SITE_URL}${cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`;
+      const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`).replace(/\/$/, '');
+      fullCanonical = `${SITE_URL}${normalizedPath}`;
     }
 
     setMeta('property', 'og:url', fullCanonical);

@@ -181,14 +181,14 @@ export const PuppyTrainingHubPage = () => {
     "@type": "CollectionPage",
     "name": pageTitle,
     "description": pageDescription,
-    "url": `https://birthdaywishly.com${canonicalUrl}`,
+    "url": `https://www.birthdaywishly.com${canonicalUrl}`,
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": filtered.slice(0, 10).map((post, idx) => ({
         "@type": "ListItem",
         "position": idx + 1,
         "name": post.title,
-        "url": `https://birthdaywishly.com/puppy-training/${post.slug}`
+        "url": `https://www.birthdaywishly.com/puppy-training/${post.slug}`
       }))
     }
   };
