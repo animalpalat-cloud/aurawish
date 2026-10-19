@@ -197,11 +197,11 @@ export const CategoryLandingPage = () => {
     '@type': 'CollectionPage',
     'name': `${category.name} - Blog & Editorial Guides`,
     'description': category.description || `Guides, articles, and ideas in ${category.name}.`,
-    'url': `https://www.birthdaywishly.com${canonicalUrl}`,
+    'url': `https://birthdaywishly.com${canonicalUrl}`,
     'publisher': {
       '@type': 'Organization',
       'name': 'Birthday Wishes',
-      'logo': { '@type': 'ImageObject', 'url': 'https://www.birthdaywishly.com/logo.png' }
+      'logo': { '@type': 'ImageObject', 'url': 'https://birthdaywishly.com/logo.png' }
     }
   };
 

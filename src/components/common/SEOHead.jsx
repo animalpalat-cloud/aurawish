@@ -5,7 +5,7 @@ export const SEOHead = ({
   description,
   canonicalUrl,
   ogType = 'website',
-  ogImage = 'https://www.birthdaywishly.com/og-cover.jpg',
+  ogImage = 'https://birthdaywishly.com/og-cover.jpg',
   ogTitle,
   ogDescription,
   twitterTitle,
@@ -17,7 +17,7 @@ export const SEOHead = ({
 }) => {
   // Single source of truth for the production domain.
   // All canonical URLs and og:url values are built from this constant.
-  const SITE_URL = 'https://www.birthdaywishly.com';
+  const SITE_URL = 'https://birthdaywishly.com';
 
   useEffect(() => {
     // 1. Title Tag
@@ -51,7 +51,7 @@ export const SEOHead = ({
     // 3. Open Graph Tags
     const finalOgTitle = ogTitle || formattedTitle;
     const finalOgDesc = ogDescription || description;
-    const finalOgImage = ogImage || 'https://www.birthdaywishly.com/og-cover.jpg';
+    const finalOgImage = ogImage || 'https://birthdaywishly.com/og-cover.jpg';
 
     setMeta('property', 'og:title', finalOgTitle);
     setMeta('property', 'og:description', finalOgDesc);
