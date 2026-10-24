@@ -16,13 +16,13 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
       <SEOHead
         title={pageData.seoTitle}
         description={pageData.seoDescription}
-        canonicalUrl={`/${slug}`}
+        canonicalUrl={`/${slug}/`}
       />
 
       <Breadcrumbs
         items={[
-          { label: 'Card Maker', href: '/birthday-card-maker' },
-          { label: pageData.title, href: `/${slug}` }
+          { label: 'Card Maker', href: '/birthday-card-maker/' },
+          { label: pageData.title, href: `/${slug}/` }
         ]}
       />
 
@@ -42,12 +42,12 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
         </p>
 
         <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
-          <Link to="/templates">
+          <Link to="/templates/">
             <Button variant="gold" size="lg" icon={Sparkles}>
               Start Creating Now — Free
             </Button>
           </Link>
-          <Link to="/birthday-wishes">
+          <Link to="/birthday-wishes/">
             <Button variant="secondary" size="lg">
               Browse Birthday Wishes
             </Button>
@@ -126,7 +126,7 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
         </div>
 
         <div className="text-center pt-4">
-          <Link to="/templates">
+          <Link to="/templates/">
             <Button variant="primary" size="lg" icon={Sparkles}>
               Launch Card Studio
             </Button>

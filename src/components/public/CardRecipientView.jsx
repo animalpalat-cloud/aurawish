@@ -81,7 +81,7 @@ export const CardRecipientView = ({ cardData, template }) => {
           >
             Share
           </Button>
-          <Link to="/templates">
+          <Link to="/templates/">
             <Button
               variant="primary"
               size="sm"
@@ -132,7 +132,7 @@ export const CardRecipientView = ({ cardData, template }) => {
         <p className="text-xs text-slate-400 mb-3">
           Want to surprise your friends, family, or partner with a custom digital card?
         </p>
-        <Link to="/templates">
+        <Link to="/templates/">
           <Button variant="outline" size="sm" icon={Sparkles}>
             Explore 100+ Free Birthday Templates
           </Button>

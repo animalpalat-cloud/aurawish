@@ -13,7 +13,7 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
   const category = getWishCategoryBySlug(slug);
 
   if (!category) {
-    return <Navigate to="/birthday-wishes" replace />;
+    return <Navigate to="/birthday-wishes/" replace />;
   }
 
   const otherCategories = ALL_WISH_CATEGORIES
@@ -39,14 +39,14 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
       <SEOHead
         title={category.seoTitle}
         description={category.seoDescription}
-        canonicalUrl={`/${category.slug}`}
+        canonicalUrl={`/${category.slug}/`}
         schemaJson={faqSchema}
       />
 
       <Breadcrumbs
         items={[
-          { label: 'Birthday Wishes', href: '/birthday-wishes' },
-          { label: category.title, href: `/${category.slug}` }
+          { label: 'Birthday Wishes', href: '/birthday-wishes/' },
+          { label: category.title, href: `/${category.slug}/` }
         ]}
       />
 
@@ -66,12 +66,12 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
         </p>
 
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
-          <Link to={`/create/${category.recommendedTemplate || 'velvet-luxury'}`} className="w-full sm:w-auto">
+          <Link to={`/create/${category.recommendedTemplate || 'velvet-luxury'}/`} className="w-full sm:w-auto">
             <Button variant="gold" size="md" icon={Sparkles} className="w-full sm:w-auto">
               Create a Card with These Wishes
             </Button>
           </Link>
-          <Link to="/templates" className="w-full sm:w-auto">
+          <Link to="/templates/" className="w-full sm:w-auto">
             <Button variant="secondary" size="md" className="w-full sm:w-auto">
               View Recommended Templates
             </Button>
@@ -151,7 +151,7 @@ export const BirthdayWishesDetailPage = ({ explicitSlug }) => {
           {otherCategories.map((other) => (
             <Link
               key={other.slug}
-              to={`/${other.slug}`}
+              to={`/${other.slug}/`}
               className="p-4 rounded-xl bg-[#11141e] border border-slate-800 hover:border-brand-500/40 transition-all text-center group"
             >
               <h3 className="text-xs sm:text-sm font-semibold text-white group-hover:text-brand-300 transition-colors">

@@ -62,7 +62,7 @@ export const HomePage = () => {
                 icon={Sparkles}
                 iconPosition="right"
                 className="w-full sm:w-auto shadow-2xl"
-                onClick={() => navigate('/templates')}
+                onClick={() => navigate('/templates/')}
               >
                 Create Free Birthday Card Now
               </Button>
@@ -71,7 +71,7 @@ export const HomePage = () => {
                 variant="secondary"
                 size="xl"
                 className="w-full sm:w-auto"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/dashboard/')}
               >
                 View My Saved Cards
               </Button>

@@ -60,7 +60,7 @@ export const LoginPage = () => {
       <SEOHead
         title="Sign In | Birthday Wishes"
         description="Sign in to your Birthday Wishes account to manage saved cards and access your studio."
-        canonicalUrl="/login"
+        canonicalUrl="/login/"
         noIndex={true}
       />
       {/* Dynamic ambient backdrop glow */}
@@ -157,7 +157,7 @@ export const LoginPage = () => {
                 Password
               </label>
               <Link
-                to="/forgot-password"
+                to="/forgot-password/"
                 className="text-xs text-brand-400 hover:text-brand-300 transition-colors"
               >
                 Forgot password?
@@ -194,7 +194,7 @@ export const LoginPage = () => {
           <p className="text-xs text-slate-400">
             Don't have an account?{' '}
             <Link
-              to={returnTo !== '/dashboard' ? `/signup?returnTo=${encodeURIComponent(returnTo)}` : '/signup'}
+              to={returnTo !== '/dashboard' ? `/signup/?returnTo=${encodeURIComponent(returnTo)}` : '/signup/'}
               className="text-brand-400 hover:text-brand-300 font-medium transition-colors"
             >
               Create one now

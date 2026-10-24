@@ -132,14 +132,14 @@ export const TemplatesPage = () => {
       <SEOHead
         title={selectedCategory !== 'all' ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Birthday Card Templates | Birthday Wishes` : 'Digital Birthday Card Templates - Luxury & Animated Designs | Birthday Wishes'}
         description="Browse 250+ luxury digital birthday card templates. Personalize photos, celebration music, and heartfelt messages with instant 3D unboxing."
-        canonicalUrl={selectedCategory !== 'all' ? `/birthday-card-templates/${selectedCategory}` : '/templates'}
+        canonicalUrl={selectedCategory !== 'all' ? `/birthday-card-templates/${selectedCategory}/` : '/templates/'}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <Breadcrumbs
           items={[
-            { label: 'Card Templates', href: '/templates' },
-            ...(selectedCategory !== 'all' ? [{ label: selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1), href: `/birthday-card-templates/${selectedCategory}` }] : [])
+            { label: 'Card Templates', href: '/templates/' },
+            ...(selectedCategory !== 'all' ? [{ label: selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1), href: `/birthday-card-templates/${selectedCategory}/` }] : [])
           ]}
         />
         
@@ -301,7 +301,7 @@ export const TemplatesPage = () => {
                   onClick={() => {
                     const id = previewTemplate.templateId;
                     setPreviewTemplate(null);
-                    navigate(`/create/${id}`);
+                    navigate(`/create/${id}/`);
                   }}
                   className="w-full sm:w-auto"
                 >

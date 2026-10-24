@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to={`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`} replace />;
+    return <Navigate to={`/login/?returnTo=${encodeURIComponent(location.pathname + location.search)}`} replace />;
   }
 
   return children;

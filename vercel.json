@@ -1,29 +1,50 @@
 {
+  "trailingSlash": true,
   "redirects": [
     {
       "source": "/create-birthday-card",
-      "destination": "/birthday-card-maker",
+      "destination": "/birthday-card-maker/",
+      "permanent": true
+    },
+    {
+      "source": "/create-birthday-card/",
+      "destination": "/birthday-card-maker/",
       "permanent": true
     },
     {
       "source": "/online-birthday-card-maker",
-      "destination": "/birthday-card-maker",
+      "destination": "/birthday-card-maker/",
+      "permanent": true
+    },
+    {
+      "source": "/online-birthday-card-maker/",
+      "destination": "/birthday-card-maker/",
       "permanent": true
     },
     {
       "source": "/personalized-birthday-cards",
-      "destination": "/birthday-card-maker",
+      "destination": "/birthday-card-maker/",
+      "permanent": true
+    },
+    {
+      "source": "/personalized-birthday-cards/",
+      "destination": "/birthday-card-maker/",
       "permanent": true
     },
     {
       "source": "/categories/:slug",
-      "destination": "/category/:slug",
+      "destination": "/category/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/categories/:slug/",
+      "destination": "/category/:slug/",
       "permanent": true
     }
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|api/|.*\\.(?:ico|png|svg|xml|txt|webmanifest)$).*)",
+      "source": "/((?!assets/|api/|.*\\.(?:ico|png|svg|xml|txt|webmanifest|jpg|jpeg|webp|gif|mp3|mp4|json)$).*)",
       "destination": "/index.html"
     }
   ]

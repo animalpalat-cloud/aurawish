@@ -185,12 +185,12 @@ export const CategoryLandingPage = () => {
   }
 
   if (notFound || !category) {
-    return <Navigate to="/blog" replace />;
+    return <Navigate to="/blog/" replace />;
   }
 
   const vis = getCategoryVisual(category.name || category.slug);
   const Icon = vis.icon;
-  const canonicalUrl = `/category/${category.slug}`;
+  const canonicalUrl = `/category/${category.slug}/`;
 
   const categorySchema = {
     '@context': 'https://schema.org',
@@ -220,7 +220,7 @@ export const CategoryLandingPage = () => {
         {/* Breadcrumbs: Home -> Blog -> Category Name */}
         <Breadcrumbs
           items={[
-            { label: 'Blog', href: '/blog' },
+            { label: 'Blog', href: '/blog/' },
             { label: category.name, href: canonicalUrl },
           ]}
         />
@@ -308,7 +308,7 @@ export const CategoryLandingPage = () => {
 
             {/* Back to all categories link */}
             <Link
-              to="/blog"
+              to="/blog/"
               className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors self-start md:self-center font-medium"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -457,7 +457,7 @@ export const CategoryLandingPage = () => {
                 </p>
               </div>
               <Link
-                to="/blog"
+                to="/blog/"
                 className="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1"
               >
                 <span>View all</span>
@@ -472,7 +472,7 @@ export const CategoryLandingPage = () => {
                 return (
                   <Link
                     key={otherCat.id || otherCat.slug}
-                    to={`/category/${otherCat.slug}`}
+                    to={`/category/${otherCat.slug}/`}
                     className="group bg-[#11141e] border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col justify-between transition-all hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <div className="space-y-3">
@@ -519,7 +519,7 @@ export const CategoryLandingPage = () => {
               Explore luxury card templates, customize custom soundtracks, and deliver an unforgettable digital unboxing experience.
             </p>
             <div className="pt-2">
-              <Link to="/templates">
+              <Link to="/templates/">
                 <Button variant="gold" size="lg" icon={Sparkles}>
                   Explore Card Templates
                 </Button>
@@ -536,8 +536,8 @@ export const CategoryLandingPage = () => {
 function CategoryArticleCard({ article, categoryVisual }) {
   const isPuppy = article.category === 'Puppy Training' || article.category === 'puppy-training';
   const postUrl = isPuppy
-    ? `/puppy-training/${article.slug}`
-    : `/birthday-ideas/${article.slug}`;
+    ? `/puppy-training/${article.slug}/`
+    : `/birthday-ideas/${article.slug}/`;
 
   const imageUrl = getBlogImageUrl(article.featured_image);
   const Icon = categoryVisual.icon;

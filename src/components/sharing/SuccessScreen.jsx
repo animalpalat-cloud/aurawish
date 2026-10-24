@@ -126,11 +126,11 @@ export const SuccessScreen = ({ card, onShareAgain }) => {
 
         {/* Footer links */}
         <div className="pt-6 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <Link to="/dashboard" className="hover:text-white flex items-center gap-1 transition-colors">
+          <Link to="/dashboard/" className="hover:text-white flex items-center gap-1 transition-colors">
             <LayoutGrid className="w-3.5 h-3.5" />
             Go to Dashboard
           </Link>
-          <Link to="/templates" className="hover:text-white flex items-center gap-1 text-brand-400 transition-colors">
+          <Link to="/templates/" className="hover:text-white flex items-center gap-1 text-brand-400 transition-colors">
             <PlusCircle className="w-3.5 h-3.5" />
             Create Another Card
           </Link>

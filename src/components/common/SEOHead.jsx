@@ -58,23 +58,30 @@ export const SEOHead = ({
     setMeta('property', 'og:type', ogType);
     if (finalOgImage) setMeta('property', 'og:image', finalOgImage);
 
+    // Helper to ensure path always ends with a trailing slash
+    const ensureTrailingSlash = (path) => {
+      if (!path || path === '/') return '/';
+      const clean = path.startsWith('/') ? path : `/${path}`;
+      return clean.endsWith('/') ? clean : `${clean}/`;
+    };
+
     // Canonical is always the clean path on the production domain —
     // no query parameters, no fragments, consistent trailing-slash handling.
     let fullCanonical;
     if (canonicalUrl?.startsWith('http://') || canonicalUrl?.startsWith('https://')) {
-      // Normalize any non-www or http domain to the single preferred HTTPS www domain
+      // Normalize domain to single preferred HTTPS domain
       try {
         const parsed = new URL(canonicalUrl);
-        fullCanonical = `${SITE_URL}${parsed.pathname === '/' ? '/' : parsed.pathname.replace(/\/$/, '')}`;
+        fullCanonical = `${SITE_URL}${ensureTrailingSlash(parsed.pathname)}`;
       } catch (e) {
-        fullCanonical = canonicalUrl.replace(/^https?:\/\/(?:www\.)?birthdaywishly\.com/, SITE_URL);
+        const pathPart = canonicalUrl.replace(/^https?:\/\/(?:www\.)?birthdaywishly\.com/, '');
+        fullCanonical = `${SITE_URL}${ensureTrailingSlash(pathPart)}`;
       }
     } else {
       const cleanPath = canonicalUrl
         ? canonicalUrl.split('?')[0].split('#')[0]   // strip ?query and #hash
         : window.location.pathname;                   // current path as fallback
-      const normalizedPath = cleanPath === '/' ? '/' : (cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`).replace(/\/$/, '');
-      fullCanonical = `${SITE_URL}${normalizedPath}`;
+      fullCanonical = `${SITE_URL}${ensureTrailingSlash(cleanPath)}`;
     }
 
     setMeta('property', 'og:url', fullCanonical);

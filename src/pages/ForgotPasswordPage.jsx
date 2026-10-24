@@ -39,7 +39,7 @@ export const ForgotPasswordPage = () => {
       <SEOHead
         title="Reset Password | Birthday Wishes"
         description="Reset your Birthday Wishes account password and regain access to your saved cards and studio."
-        canonicalUrl="/forgot-password"
+        canonicalUrl="/forgot-password/"
         noIndex={true}
       />
       {/* Ambient glow */}
@@ -80,7 +80,7 @@ export const ForgotPasswordPage = () => {
                 We sent a password reset link to <span className="text-brand-300 font-medium">{email}</span>. Check your spam folder if it doesn't appear shortly.
               </p>
             </div>
-            <Link to="/login">
+            <Link to="/login/">
               <Button variant="secondary" size="md" className="w-full">
                 Back to Sign In
               </Button>
@@ -117,7 +117,7 @@ export const ForgotPasswordPage = () => {
 
             <div className="text-center pt-2">
               <Link
-                to="/login"
+                to="/login/"
                 className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />

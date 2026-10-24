@@ -34,10 +34,10 @@ export const BirthdayWishesHubPage = () => {
       <SEOHead
         title="Birthday Wishes - Heartfelt, Funny & Romantic Messages | Birthday Wishes"
         description="Discover genuinely heartfelt, funny, romantic, and sweet birthday wishes for mom, dad, best friends, and partners. Turn any message into a digital birthday card."
-        canonicalUrl="/birthday-wishes"
+        canonicalUrl="/birthday-wishes/"
       />
 
-      <Breadcrumbs items={[{ label: 'Birthday Wishes', href: '/birthday-wishes' }]} />
+      <Breadcrumbs items={[{ label: 'Birthday Wishes', href: '/birthday-wishes/' }]} />
 
       {/* Hero Header */}
       <div className="text-center max-w-3xl mx-auto my-8 sm:my-12 space-y-4">
@@ -87,7 +87,7 @@ export const BirthdayWishesHubPage = () => {
           {filteredRelationships.map((cat) => (
             <Link
               key={cat.slug}
-              to={`/${cat.slug}`}
+              to={`/${cat.slug}/`}
               className="group p-5 rounded-2xl bg-[#11141e] border border-slate-800 hover:border-brand-500/50 transition-all duration-200 hover:-translate-y-0.5 shadow-md flex flex-col justify-between"
             >
               <div>
@@ -126,7 +126,7 @@ export const BirthdayWishesHubPage = () => {
           {filteredStyles.map((cat) => (
             <Link
               key={cat.slug}
-              to={`/${cat.slug}`}
+              to={`/${cat.slug}/`}
               className="group p-5 rounded-2xl bg-[#11141e] border border-slate-800 hover:border-amber-500/50 transition-all duration-200 hover:-translate-y-0.5 shadow-md flex flex-col justify-between"
             >
               <div>
@@ -172,7 +172,7 @@ export const BirthdayWishesHubPage = () => {
         <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
           Take your favorite birthday wish and bring it to life with animated confetti, ambient background music, and customized typography.
         </p>
-        <Link to="/templates">
+        <Link to="/templates/">
           <Button variant="gold" size="lg" icon={Sparkles}>
             Choose a Luxury Card Template
           </Button>

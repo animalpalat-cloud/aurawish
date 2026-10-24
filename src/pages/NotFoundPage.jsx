@@ -29,7 +29,7 @@ export const NotFoundPage = () => {
             Back to Home
           </Button>
         </Link>
-        <Link to="/templates">
+        <Link to="/templates/">
           <Button variant="primary" size="md" icon={Compass}>
             Explore Templates
           </Button>

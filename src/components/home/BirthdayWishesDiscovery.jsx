@@ -174,7 +174,7 @@ export const BirthdayWishesDiscovery = () => {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
-                to={`/create/${selectedRelationship.templateSlug}`}
+                to={`/create/${selectedRelationship.templateSlug}/`}
                 className="flex-1 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-lg shadow-brand-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
               >
                 <Sparkles className="w-4 h-4" />
@@ -218,7 +218,7 @@ export const BirthdayWishesDiscovery = () => {
                   </p>
                 </div>
                 <Link
-                  to="/templates"
+                  to="/templates/"
                   aria-label={`Browse matching cards: ${item.style}`}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-400 hover:text-brand-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10] rounded-sm"
                 >

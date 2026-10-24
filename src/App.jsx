@@ -8,6 +8,8 @@ import { PublicLayout } from './layouts/PublicLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 import { AdminProtectedRoute } from './components/admin/AdminProtectedRoute';
 
+import { TrailingSlashRedirect } from './components/common/TrailingSlashRedirect';
+
 // ── Lazy-loaded Page Chunks ────────────────────────────────────────────────
 // Each page is split into its own JS chunk and only loaded when the user
 // navigates to that route. This keeps the initial homepage bundle tiny.
@@ -112,6 +114,7 @@ function App() {
     <ToastProvider>
       <AuthProvider>
         <BrowserRouter>
+          <TrailingSlashRedirect />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Main App Layout Routes (with studio Navbar & Footer) */}
@@ -125,7 +128,8 @@ function App() {
                 <Route path="/birthday-card-templates/:category" element={<TemplatesPage />} />
 
                 {/* Editor & Creation Flows */}
-                <Route path="/create" element={<Navigate to="/create/velvet-luxury" replace />} />
+                <Route path="/create" element={<Navigate to="/create/velvet-luxury/" replace />} />
+                <Route path="/create/" element={<Navigate to="/create/velvet-luxury/" replace />} />
                 <Route
                   path="/create/:templateId"
                   element={

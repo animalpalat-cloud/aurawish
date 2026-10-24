@@ -22,7 +22,7 @@ export const TemplateCard = React.memo(({ template, onQuickPreview }) => {
   const recipientName = defaultData.recipientName || 'Someone Special';
   const previewGradient = template.previewGradient || 'from-[#11141e] via-[#1a1f2e] to-[#0c0e14]';
 
-  const openEditor = () => navigate(`/create/${template.templateId}`);
+  const openEditor = () => navigate(`/create/${template.templateId}/`);
   const openPreview = () => {
     if (onQuickPreview) onQuickPreview(template);
     else openEditor();

@@ -60,7 +60,7 @@ export const DashboardCard = ({
       {/* Action Toolbar */}
       <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-1">
         <Link
-          to={`/card/${card.shareId}`}
+          to={`/card/${card.shareId}/`}
           target="_blank"
           className="p-2 rounded-xl text-slate-400 hover:text-brand-300 hover:bg-brand-500/10 transition-colors"
           title="Open public recipient link"
@@ -69,7 +69,7 @@ export const DashboardCard = ({
         </Link>
 
         <Link
-          to={`/create/${card.templateId}?edit=${card.id}`}
+          to={`/create/${card.templateId}/?edit=${card.id}`}
           className="p-2 rounded-xl text-slate-400 hover:text-amber-300 hover:bg-amber-400/10 transition-colors"
           title="Edit card"
         >

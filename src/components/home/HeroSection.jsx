@@ -59,7 +59,7 @@ export const HeroSection = () => {
                 variant="primary"
                 size="xl"
                 icon={PlusCircle}
-                onClick={() => navigate('/templates')}
+                onClick={() => navigate('/templates/')}
                 className="w-full sm:w-auto shadow-2xl"
               >
                 Create a Birthday Card
@@ -69,7 +69,7 @@ export const HeroSection = () => {
                 variant="secondary"
                 size="xl"
                 icon={Compass}
-                onClick={() => navigate('/templates')}
+                onClick={() => navigate('/templates/')}
                 className="w-full sm:w-auto"
               >
                 Explore Templates

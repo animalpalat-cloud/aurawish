@@ -101,7 +101,7 @@ export const DashboardPage = () => {
 
           </div>
 
-          <Link to="/templates" className="w-full sm:w-auto">
+          <Link to="/templates/" className="w-full sm:w-auto">
             <Button variant="primary" size="md" icon={PlusCircle} className="w-full sm:w-auto shadow-lg shadow-brand-500/20">
               Create New Card
             </Button>

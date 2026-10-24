@@ -83,13 +83,14 @@ export const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
-    { name: 'About', path: '/about', icon: Info },
-    { name: 'Blog', path: '/blog', icon: BookOpen },
+    { name: 'About', path: '/about/', icon: Info },
+    { name: 'Blog', path: '/blog/', icon: BookOpen },
   ];
 
   const isLinkActive = (path) => {
     if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
+    const clean = path.replace(/\/$/, '');
+    return location.pathname.startsWith(clean);
   };
 
   return (
@@ -156,7 +157,7 @@ export const Navbar = () => {
             {/* Primary Action: Create Card */}
             <button
               type="button"
-              onClick={() => navigate('/templates')}
+              onClick={() => navigate('/templates/')}
               className="inline-flex items-center justify-center gap-1.5 xl:gap-2 h-9 px-3 xl:px-4 rounded-xl text-xs xl:text-sm font-medium text-white bg-gradient-to-r from-brand-600 via-brand-500 to-pink-500 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/35 hover:brightness-105 active:scale-[0.98] border border-brand-400/30 transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
             >
               <Sparkles className="w-3.5 h-3.5 xl:w-4 xl:h-4 flex-shrink-0 text-amber-200" aria-hidden="true" />
@@ -203,7 +204,7 @@ export const Navbar = () => {
                     <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
                   </div>
                   <Link
-                    to="/dashboard"
+                    to="/dashboard/"
                     onClick={() => setUserDropdown(false)}
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-200 hover:text-white hover:bg-white/[0.06] transition-colors"
                   >
@@ -224,7 +225,7 @@ export const Navbar = () => {
               <div className="flex items-center gap-1.5 xl:gap-2">
                 {/* Secondary CTA: Sign In */}
                 <Link
-                  to="/login"
+                  to="/login/"
                   className="inline-flex items-center justify-center gap-1.5 h-9 px-2.5 xl:px-3 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all duration-150 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
                 >
                   <LogIn className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
@@ -233,7 +234,7 @@ export const Navbar = () => {
 
                 {/* Secondary CTA: Sign Up */}
                 <Link
-                  to="/signup"
+                  to="/signup/"
                   className="inline-flex items-center justify-center gap-1.5 h-9 px-3 xl:px-3.5 text-xs sm:text-sm font-medium text-slate-100 bg-white/[0.06] hover:bg-white/[0.12] hover:text-white border border-white/15 hover:border-white/25 rounded-xl transition-all duration-150 whitespace-nowrap shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#090b10]"
                 >
                   <UserPlus className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
@@ -248,7 +249,7 @@ export const Navbar = () => {
             {/* Quick Create shortcut for mobile only */}
             <button
               type="button"
-              onClick={() => navigate('/templates')}
+              onClick={() => navigate('/templates/')}
               className="sm:hidden inline-flex items-center justify-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium text-white bg-gradient-to-r from-brand-600 to-pink-500 shadow-sm border border-brand-400/30 active:scale-[0.97]"
               aria-label="Create Card"
             >
@@ -318,7 +319,7 @@ export const Navbar = () => {
 
                 {user && (
                   <Link
-                    to="/dashboard"
+                    to="/dashboard/"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-amber-300 hover:text-amber-200 hover:bg-white/[0.04] transition-colors"
                   >
@@ -338,7 +339,7 @@ export const Navbar = () => {
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    navigate('/templates');
+                    navigate('/templates/');
                   }}
                   className="w-full flex items-center justify-center gap-2 h-10 px-4 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-brand-600 via-brand-500 to-pink-500 shadow-md shadow-brand-500/25 border border-brand-400/30 active:scale-[0.98] transition-all"
                 >
@@ -373,7 +374,7 @@ export const Navbar = () => {
                 ) : (
                   <div className="grid grid-cols-2 gap-2 pt-1">
                     <Link
-                      to="/login"
+                      to="/login/"
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center justify-center gap-1.5 h-10 px-3 rounded-xl text-sm font-medium text-slate-200 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition-colors"
                     >
@@ -381,7 +382,7 @@ export const Navbar = () => {
                       <span>Sign In</span>
                     </Link>
                     <Link
-                      to="/signup"
+                      to="/signup/"
                       onClick={() => setMobileMenuOpen(false)}
                       className="flex items-center justify-center gap-1.5 h-10 px-3 rounded-xl text-sm font-medium text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/20 transition-colors shadow-sm"
                     >

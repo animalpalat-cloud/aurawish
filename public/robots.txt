@@ -1,9 +1,12 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard
+Disallow: /dashboard/
 Disallow: /create/
-Disallow: /login
-Disallow: /signup
-Disallow: /forgot-password
+Disallow: /login/
+Disallow: /signup/
+Disallow: /forgot-password/
+Disallow: /admin/
+Disallow: /card/
+Disallow: /view/
 
 Sitemap: https://birthdaywishly.com/sitemap.xml

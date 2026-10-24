@@ -44,13 +44,13 @@ export const Footer = () => {
               Explore Birthday Wishes
             </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/birthday-wishes" className="hover:text-white transition-colors">Birthday Wishes Hub</Link></li>
-              <li><Link to="/templates" className="hover:text-white transition-colors">Card Templates Gallery</Link></li>
-              <li><Link to="/birthday-card-maker" className="hover:text-white transition-colors">Birthday Card Maker</Link></li>
-              <li><Link to="/digital-birthday-cards" className="hover:text-white transition-colors">Digital Birthday Cards</Link></li>
-              <li><Link to="/birthday-cards-with-music" className="hover:text-white transition-colors">Birthday Cards with Music</Link></li>
-              <li><Link to="/birthday-cards-with-photos" className="hover:text-white transition-colors">Birthday Cards with Photos</Link></li>
-              <li><Link to="/birthday-ideas" className="hover:text-white transition-colors">Birthday Ideas & Guides</Link></li>
+              <li><Link to="/birthday-wishes/" className="hover:text-white transition-colors">Birthday Wishes Hub</Link></li>
+              <li><Link to="/templates/" className="hover:text-white transition-colors">Card Templates Gallery</Link></li>
+              <li><Link to="/birthday-card-maker/" className="hover:text-white transition-colors">Birthday Card Maker</Link></li>
+              <li><Link to="/digital-birthday-cards/" className="hover:text-white transition-colors">Digital Birthday Cards</Link></li>
+              <li><Link to="/birthday-cards-with-music/" className="hover:text-white transition-colors">Birthday Cards with Music</Link></li>
+              <li><Link to="/birthday-cards-with-photos/" className="hover:text-white transition-colors">Birthday Cards with Photos</Link></li>
+              <li><Link to="/birthday-ideas/" className="hover:text-white transition-colors">Birthday Ideas & Guides</Link></li>
             </ul>
           </div>
 
@@ -60,12 +60,12 @@ export const Footer = () => {
               Trust & Company
             </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
-              <li><Link to="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-              <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
+              <li><Link to="/about/" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact/" className="hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link to="/privacy-policy/" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms/" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/cookie-policy/" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/disclaimer/" className="hover:text-white transition-colors">Disclaimer</Link></li>
             </ul>
           </div>
 
@@ -75,12 +75,12 @@ export const Footer = () => {
               Popular Categories
             </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/birthday-wishes-for-mom" className="hover:text-white transition-colors">Birthday Wishes for Mom</Link></li>
-              <li><Link to="/birthday-wishes-for-dad" className="hover:text-white transition-colors">Birthday Wishes for Dad</Link></li>
-              <li><Link to="/birthday-wishes-for-best-friend" className="hover:text-white transition-colors">Wishes for Best Friend</Link></li>
-              <li><Link to="/romantic-birthday-wishes" className="hover:text-white transition-colors">Romantic Birthday Wishes</Link></li>
-              <li><Link to="/funny-birthday-wishes" className="hover:text-white transition-colors">Funny Birthday Wishes</Link></li>
-              <li><Link to="/heartfelt-birthday-wishes" className="hover:text-white transition-colors">Heartfelt Birthday Wishes</Link></li>
+              <li><Link to="/birthday-wishes-for-mom/" className="hover:text-white transition-colors">Birthday Wishes for Mom</Link></li>
+              <li><Link to="/birthday-wishes-for-dad/" className="hover:text-white transition-colors">Birthday Wishes for Dad</Link></li>
+              <li><Link to="/birthday-wishes-for-best-friend/" className="hover:text-white transition-colors">Wishes for Best Friend</Link></li>
+              <li><Link to="/romantic-birthday-wishes/" className="hover:text-white transition-colors">Romantic Birthday Wishes</Link></li>
+              <li><Link to="/funny-birthday-wishes/" className="hover:text-white transition-colors">Funny Birthday Wishes</Link></li>
+              <li><Link to="/heartfelt-birthday-wishes/" className="hover:text-white transition-colors">Heartfelt Birthday Wishes</Link></li>
             </ul>
           </div>
 
@@ -90,13 +90,13 @@ export const Footer = () => {
         <div className="pt-8 mt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Birthday Wishes Studio. All rights reserved. Crafted for unforgettable celebrations.</p>
           <div className="flex items-center gap-4 text-[11px]">
-            <Link to="/privacy-policy" className="hover:text-slate-400 transition-colors">Privacy</Link>
+            <Link to="/privacy-policy/" className="hover:text-slate-400 transition-colors">Privacy</Link>
             <span>•</span>
-            <Link to="/terms" className="hover:text-slate-400 transition-colors">Terms</Link>
+            <Link to="/terms/" className="hover:text-slate-400 transition-colors">Terms</Link>
             <span>•</span>
-            <Link to="/cookie-policy" className="hover:text-slate-400 transition-colors">Cookies</Link>
+            <Link to="/cookie-policy/" className="hover:text-slate-400 transition-colors">Cookies</Link>
             <span>•</span>
-            <Link to="/disclaimer" className="hover:text-slate-400 transition-colors">Disclaimer</Link>
+            <Link to="/disclaimer/" className="hover:text-slate-400 transition-colors">Disclaimer</Link>
           </div>
         </div>
       </div>

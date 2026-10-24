@@ -209,13 +209,13 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
   }
 
   if (notFound || !article) {
-    return <Navigate to="/birthday-ideas" replace />;
+    return <Navigate to="/birthday-ideas/" replace />;
   }
 
   const isPuppyTraining = article.category === 'Puppy Training' || article.category === 'puppy-training';
-  const canonicalPath = isPuppyTraining ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
+  const canonicalPath = isPuppyTraining ? `/puppy-training/${article.slug}/` : `/birthday-ideas/${article.slug}/`;
   const catSlug = slugifyCategory(article.category || '');
-  const categoryHref = isPuppyTraining ? '/puppy-training' : (catSlug ? `/category/${catSlug}` : '/blog');
+  const categoryHref = isPuppyTraining ? '/puppy-training/' : (catSlug ? `/category/${catSlug}/` : '/blog/');
   const categoryLabel = article.category || 'Blog';
   const parentCategoryHref = categoryHref;
   const parentCategoryLabel = categoryLabel;
@@ -267,9 +267,9 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
       <div className="w-full max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-10">
         <Breadcrumbs
           items={[
-            { label: 'Blog', href: '/blog' },
+            { label: 'Blog', href: '/blog/' },
             ...(categoryLabel && categoryLabel !== 'Blog' ? [{ label: categoryLabel, href: categoryHref }] : []),
-            ...(article.subcategory ? [{ label: article.subcategory, href: isPuppyTraining ? `/puppy-training` : undefined }] : []),
+            ...(article.subcategory ? [{ label: article.subcategory, href: isPuppyTraining ? `/puppy-training/` : undefined }] : []),
             { label: article.title, href: canonicalPath }
           ]}
         />
@@ -389,7 +389,7 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
               and share an unboxing moment.
             </p>
             <div className="pt-1">
-              <Link to="/templates">
+              <Link to="/templates/">
                 <Button variant="gold" size="md" icon={Sparkles}>
                   Create a Card Now
                 </Button>
@@ -403,7 +403,7 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
           <div className="border-t border-slate-800/60 pt-10 space-y-5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white">Recommended Guides</h3>
-              <Link to="/birthday-ideas" className="text-xs text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1">
+              <Link to="/birthday-ideas/" className="text-xs text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1">
                 View all <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -414,7 +414,7 @@ export const BirthdayArticlePage = ({ explicitSlug }) => {
                 return (
                   <Link
                     key={rel.slug}
-                    to={`/birthday-ideas/${rel.slug}`}
+                    to={`/birthday-ideas/${rel.slug}/`}
                     className="group flex gap-4 items-start p-5 rounded-2xl bg-[#11141e] border border-slate-800 hover:border-brand-500/35 transition-all hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <div className="relative flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden"

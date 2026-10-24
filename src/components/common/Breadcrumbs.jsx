@@ -2,6 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
+const normalizeHref = (href) => {
+  if (!href) return '';
+  if (href === '/') return '/';
+  const clean = href.startsWith('/') ? href : `/${href}`;
+  return clean.endsWith('/') ? clean : `${clean}/`;
+};
+
 export const Breadcrumbs = ({ items = [] }) => {
   if (!items || items.length === 0) return null;
 
@@ -15,12 +22,15 @@ export const Breadcrumbs = ({ items = [] }) => {
         "name": "Home",
         "item": "https://birthdaywishly.com/"
       },
-      ...items.map((item, index) => ({
-        "@type": "ListItem",
-        "position": index + 2,
-        "name": item.label,
-        "item": item.href ? `https://birthdaywishly.com${item.href}` : undefined
-      }))
+      ...items.map((item, index) => {
+        const cleanHref = normalizeHref(item.href);
+        return {
+          "@type": "ListItem",
+          "position": index + 2,
+          "name": item.label,
+          "item": cleanHref ? `https://birthdaywishly.com${cleanHref}` : undefined
+        };
+      })
     ]
   };
 
@@ -44,16 +54,17 @@ export const Breadcrumbs = ({ items = [] }) => {
 
           {items.map((item, idx) => {
             const isLast = idx === items.length - 1;
+            const cleanHref = normalizeHref(item.href);
             return (
               <li key={idx} className="flex items-center gap-1.5">
                 <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                {isLast || !item.href ? (
+                {isLast || !cleanHref ? (
                   <span className="text-slate-200 font-medium truncate max-w-[200px] sm:max-w-none" aria-current="page">
                     {item.label}
                   </span>
                 ) : (
                   <Link
-                    to={item.href}
+                    to={cleanHref}
                     className="hover:text-white transition-colors"
                   >
                     {item.label}

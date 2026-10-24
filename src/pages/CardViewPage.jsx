@@ -102,7 +102,7 @@ export const CardViewPage = () => {
         <p className="text-sm text-slate-400 max-w-sm mb-6">
           This card link may have expired or was removed by its creator.
         </p>
-        <Link to="/templates">
+        <Link to="/templates/">
           <Button variant="primary" size="md" icon={Sparkles}>
             Explore Birthday Templates
           </Button>

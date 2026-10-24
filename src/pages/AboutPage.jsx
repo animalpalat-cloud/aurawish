@@ -11,10 +11,10 @@ export const AboutPage = () => {
       <SEOHead
         title="About Birthday Wishes - Beautiful Birthday Wishes & Digital Cards"
         description="Learn about Birthday Wishes's mission to transform birthdays into cinematic celebration moments through handcrafted digital cards, heartfelt wishes, and music."
-        canonicalUrl="/about"
+        canonicalUrl="/about/"
       />
 
-      <Breadcrumbs items={[{ label: 'About Us', href: '/about' }]} />
+      <Breadcrumbs items={[{ label: 'About Us', href: '/about/' }]} />
 
       {/* Hero Header */}
       <div className="text-center max-w-3xl mx-auto my-8 sm:my-12">
@@ -81,12 +81,12 @@ export const AboutPage = () => {
           Explore our hand-crafted card templates or find the perfect birthday wish for someone special today.
         </p>
         <div className="pt-2 flex flex-wrap justify-center gap-3">
-          <Link to="/templates">
+          <Link to="/templates/">
             <Button variant="gold" size="lg" icon={Sparkles}>
               Explore Card Templates
             </Button>
           </Link>
-          <Link to="/birthday-wishes">
+          <Link to="/birthday-wishes/">
             <Button variant="secondary" size="lg">
               Browse Birthday Wishes
             </Button>

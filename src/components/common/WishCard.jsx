@@ -18,7 +18,7 @@ export const WishCard = ({ wish, templateId = 'velvet-luxury' }) => {
   const handleCreateCard = () => {
     // Store selected wish in sessionStorage so editor can prefill message
     sessionStorage.setItem('aurawish_prefill_message', wish);
-    navigate(`/create/${templateId}`);
+    navigate(`/create/${templateId}/`);
   };
 
   return (

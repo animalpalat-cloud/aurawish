@@ -55,7 +55,7 @@ export const FeaturedTemplates = () => {
             size="md"
             icon={Compass}
             iconPosition="right"
-            onClick={() => navigate('/templates')}
+            onClick={() => navigate('/templates/')}
           >
             View All 12+ Templates
           </Button>
@@ -85,7 +85,7 @@ export const FeaturedTemplates = () => {
             icon={ArrowRight}
             iconPosition="right"
             className="shadow-xl"
-            onClick={() => navigate('/templates')}
+            onClick={() => navigate('/templates/')}
           >
             Browse Complete Template Gallery
           </Button>

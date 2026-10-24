@@ -173,11 +173,11 @@ export const BirthdayIdeasHubPage = () => {
       <SEOHead
         title="Birthday Ideas & Editorial Guides - Message Inspiration, Surprises & Care | Birthday Wishes"
         description="Explore curated editorial guides on how to write meaningful birthday cards, creative surprise ideas, digital card tips, audio greetings, and etiquette."
-        canonicalUrl="/blog"
+        canonicalUrl="/blog/"
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24">
-        <Breadcrumbs items={[{ label: 'Blog', href: '/blog' }]} />
+        <Breadcrumbs items={[{ label: 'Blog', href: '/blog/' }]} />
 
         {/* ── HERO HEADER ─────────────────────────────────────────── */}
         <div className="relative text-center max-w-3xl mx-auto mt-8 mb-12 space-y-5">
@@ -376,7 +376,7 @@ export const BirthdayIdeasHubPage = () => {
             {displayedGroups.map(({ category: cat, posts: catPosts }) => {
               const vis = getCategoryVisual(cat.name || cat.slug);
               const Icon = vis.icon;
-              const categoryUrl = `/category/${cat.slug}`;
+              const categoryUrl = `/category/${cat.slug}/`;
               const subtopics = Array.isArray(cat.subtopics) ? cat.subtopics : [];
 
               return (
@@ -520,7 +520,7 @@ export const BirthdayIdeasHubPage = () => {
               and music, and share an unboxing moment.
             </p>
             <div className="pt-2">
-              <Link to="/templates">
+              <Link to="/templates/">
                 <Button variant="gold" size="lg" icon={Sparkles}>
                   Explore Card Templates
                 </Button>
@@ -541,7 +541,7 @@ function FeaturedCard({ article }) {
   const Icon = vis.icon;
   const imageUrl = getBlogImageUrl(article.featured_image);
   const isPuppy = article.category === 'Puppy Training' || article.category === 'puppy-training';
-  const postUrl = isPuppy ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
+  const postUrl = isPuppy ? `/puppy-training/${article.slug}/` : `/birthday-ideas/${article.slug}/`;
 
   return (
     <Link
@@ -621,7 +621,7 @@ function ArticleCard({ article, categoryVisual }) {
   const Icon = vis.icon;
   const imageUrl = getBlogImageUrl(article.featured_image);
   const isPuppy = article.category === 'Puppy Training' || article.category === 'puppy-training';
-  const postUrl = isPuppy ? `/puppy-training/${article.slug}` : `/birthday-ideas/${article.slug}`;
+  const postUrl = isPuppy ? `/puppy-training/${article.slug}/` : `/birthday-ideas/${article.slug}/`;
 
   return (
     <Link
