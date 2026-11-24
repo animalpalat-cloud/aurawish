@@ -777,6 +777,14 @@ export const FONT_MAP = {};
 ALL_FONTS.forEach(f => {
   FONT_MAP[f.id] = f;
   FONT_MAP[f.family] = f;
+  if (f.name) {
+    FONT_MAP[f.name] = f;
+    FONT_MAP[f.name.toLowerCase()] = f;
+  }
+  if (f.nameEn) {
+    FONT_MAP[f.nameEn] = f;
+    FONT_MAP[f.nameEn.toLowerCase()] = f;
+  }
   FONT_MAP[f.id.toLowerCase()] = f;
 });
 
@@ -787,13 +795,23 @@ export const FONT_CATEGORIES = [
   { id: 'Naskh', label: '📖 Naskh (Arabic/Urdu)' },
   { id: 'Calligraphic', label: '✨ Calligraphic & Ruqaa' },
   { id: 'Modern Arabic', label: '💎 Modern Arabic & Persian' },
+  { id: 'Modern Persian', label: '📜 Persian / Farsi' },
   { id: 'Devanagari Display', label: '🌸 Devanagari (Hindi)' },
+  { id: 'Devanagari Serif', label: '📖 Devanagari Serif' },
+  { id: 'Devanagari Modern', label: '✨ Devanagari Modern' },
   { id: 'Bengali Modern', label: '🌊 Bengali Fonts' },
+  { id: 'Bengali Serif', label: '📖 Bengali Serif' },
   { id: 'Punjabi Gurmukhi', label: '🌾 Punjabi Gurmukhi' },
-  { id: 'Chinese Serif (Song)', label: '🏮 Chinese Fonts' },
-  { id: 'Japanese Mincho', label: '🏯 Japanese Fonts' },
-  { id: 'Korean Batang / Serif', label: '🇰🇷 Korean Fonts' },
-  { id: 'Thai Serif', label: '🇹🇭 Thai Fonts' },
+  { id: 'Chinese Serif (Song)', label: '🏮 Chinese Song' },
+  { id: 'Chinese Modern (Heiti)', label: '🏮 Chinese Modern' },
+  { id: 'Chinese Calligraphy', label: '🖌️ Chinese Calligraphy' },
+  { id: 'Japanese Mincho', label: '🏯 Japanese Mincho' },
+  { id: 'Japanese Modern', label: '🏯 Japanese Modern' },
+  { id: 'Japanese Calligraphy', label: '🖌️ Japanese Calligraphy' },
+  { id: 'Korean Batang / Serif', label: '🇰🇷 Korean Serif' },
+  { id: 'Korean Gothic / Modern', label: '🇰🇷 Korean Gothic' },
+  { id: 'Thai Serif', label: '🇹🇭 Thai Serif' },
+  { id: 'Thai Modern', label: '🇹🇭 Thai Modern' },
   { id: 'Elegant Serif', label: 'Elegant Serif' },
   { id: 'Modern Sans', label: 'Modern Sans' },
   { id: 'Script & Calligraphy', label: 'Script & Calligraphy' },
@@ -856,6 +874,15 @@ export function isUrduFont(fontId) {
 }
 
 /**
+ * Returns font category in lower case (e.g. 'nastaliq', 'naskh', 'modern sans')
+ */
+export function getFontCategory(fontId) {
+  if (!fontId) return '';
+  const f = FONT_MAP[fontId] || FONT_MAP[fontId.toLowerCase()];
+  return f?.category ? f.category.toLowerCase() : '';
+}
+
+/**
  * Dynamically loads a font from Google Fonts with caching
  */
 const loadedFonts = new Set();
@@ -886,11 +913,14 @@ export async function loadFont(fontId) {
 
   if (document.fonts && document.fonts.load) {
     try {
+      const loadPromises = [
+        document.fonts.load(`400 32px "${familyName}"`),
+      ];
+      if (font.weights && font.weights.includes('700')) {
+        loadPromises.push(document.fonts.load(`700 32px "${familyName}"`));
+      }
       await Promise.race([
-        Promise.all([
-          document.fonts.load(`400 32px "${familyName}"`),
-          document.fonts.load(`700 32px "${familyName}"`)
-        ]),
+        Promise.all(loadPromises),
         new Promise(resolve => setTimeout(resolve, 1500))
       ]);
     } catch (e) {}

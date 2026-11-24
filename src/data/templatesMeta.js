@@ -2,7 +2,10 @@
 // Contains only the essential data needed for template cards (no full config/defaultData)
 // Full template data is loaded lazily when needed
 
+import { CHRISTMAS_TEMPLATE_META } from './christmasTemplatesData.js';
+
 export const TEMPLATE_META = [
+  ...CHRISTMAS_TEMPLATE_META,
   {
     templateId: 'velvet-obsidian-gold',
     name: 'Velvet Obsidian Gold',
@@ -80,6 +83,11 @@ export const CATEGORIES = [
     "id": "all",
     "name": "All",
     "icon": "Sparkles"
+  },
+  {
+    "id": "christmas",
+    "name": "Christmas Cards",
+    "icon": "TreePine"
   },
   {
     "id": "elegant",

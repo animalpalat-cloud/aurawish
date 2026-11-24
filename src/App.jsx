@@ -41,6 +41,8 @@ const BirthdayWishesDetailPage = lazy(() => import('./pages/BirthdayWishesDetail
 const BirthdayIdeasHubPage     = lazy(() => import('./pages/BirthdayIdeasHubPage'));
 const BirthdayArticlePage      = lazy(() => import('./pages/BirthdayArticlePage'));
 const CardMakerLandingPage     = lazy(() => import('./pages/CardMakerLandingPage'));
+const PrintableBirthdayCardsPage = lazy(() => import('./pages/PrintableBirthdayCardsPage'));
+const ChristmasCardsPage       = lazy(() => import('./pages/ChristmasCardsPage'));
 const CategoryLandingPage      = lazy(() => import('./pages/CategoryLandingPage'));
 const PuppyTrainingHubPage     = lazy(() => import('./pages/PuppyTrainingHubPage'));
 
@@ -202,6 +204,8 @@ function App() {
                 <Route path="/audio-greeting-card" element={<CardMakerLandingPage explicitSlug="audio-greeting-card" />} />
                 <Route path="/photo-birthday-card" element={<CardMakerLandingPage explicitSlug="photo-birthday-card" />} />
                 <Route path="/surprise-birthday-card" element={<CardMakerLandingPage explicitSlug="surprise-birthday-card" />} />
+                <Route path="/printable-birthday-cards" element={<PrintableBirthdayCardsPage />} />
+                <Route path="/christmas-cards" element={<ChristmasCardsPage />} />
 
                 {/* Birthday Ideas / Blog Hub & Article Routes */}
                 <Route path="/blog" element={<BirthdayIdeasHubPage />} />

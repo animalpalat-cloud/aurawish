@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { Sparkles, Clock, BookOpen, ArrowLeft, ArrowRight, ChevronRight, Loader2 } from 'lucide-react';
+import { Sparkles, Clock, BookOpen, ArrowLeft, ArrowRight, ChevronRight, Loader2, Zap } from 'lucide-react';
 import { SEOHead } from '../components/common/SEOHead';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
@@ -16,6 +16,15 @@ import { getCategoryVisual, slugifyCategory } from '../data/categoryConfig';
 const DOT_BG = 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)';
 
 const CATEGORY_VISUALS = {
+  'EV Charger': {
+    icon: Zap,
+    gradient: 'linear-gradient(135deg, rgba(14,165,233,0.55) 0%, rgba(17,20,30,0.95) 100%)',
+    glow: 'rgba(56,189,248,0.25)',
+    pill: 'bg-sky-500/15 border-sky-500/30 text-sky-300',
+    sectionAccent: 'border-sky-500/20',
+    sectionGlow: 'rgba(56,189,248,0.06)',
+    numberColor: 'text-sky-400',
+  },
   'Writing Guides': {
     icon: PenLine,
     gradient: 'linear-gradient(135deg, rgba(109,40,217,0.55) 0%, rgba(17,20,30,0.95) 100%)',

@@ -2,7 +2,7 @@
 // Shared between Admin panel, Blog, SEO Routing, and Sitemap
 import {
   Sparkles, BookOpen, PenLine, Wand2, Gift, Laptop,
-  Headphones, Music, Trophy, Heart, FolderTree, Activity
+  Headphones, Music, Trophy, Heart, FolderTree, Activity, Zap
 } from 'lucide-react';
 
 export const PUPPY_TRAINING_CATEGORY = {
@@ -62,8 +62,24 @@ export const SUBCAT_SLUG_TO_NAME = {
   'crate-potty-schedules': 'Schedules & Potty/Crate Training',
 };
 
+export const EV_CHARGER_CATEGORY = {
+  id: '8fb8ffbf-1a0e-4cd8-a970-bb3d2e3dc0c6',
+  name: 'EV Charger',
+  slug: 'ev-charger',
+  description: 'Guides, reviews, installation advice, and charging tips for electric vehicle (EV) home and public chargers.',
+  subtopics: [
+    'Home EV Charging',
+    'Level 2 Chargers',
+    'Installation & Wiring',
+    'Charging Speeds & Range',
+    'Portable & Travel Chargers',
+    'Commercial & Public Charging'
+  ],
+};
+
 // ── Known Standard Categories for fallback & instant rendering ─────────────
 export const FALLBACK_CATEGORIES = [
+  EV_CHARGER_CATEGORY,
   {
     id: 'd0b498cd-43d7-4f47-ae01-5969ff85bd84',
     name: 'Trending Sports & Hobbies',
@@ -158,6 +174,14 @@ export const FALLBACK_CATEGORIES = [
 
 // ── Visual Presets for Category Blocks & Headers ───────────────────────────
 export const CATEGORY_VISUALS = {
+  'EV Charger': {
+    icon: Zap,
+    gradient: 'linear-gradient(135deg, rgba(14,165,233,0.55) 0%, rgba(17,20,30,0.95) 100%)',
+    glow: 'rgba(56,189,248,0.25)',
+    pill: 'bg-sky-500/15 border-sky-500/30 text-sky-300',
+    arrowColor: 'text-sky-400 group-hover:text-sky-300',
+    accentColor: '#38bdf8',
+  },
   'Trending Sports & Hobbies': {
     icon: Trophy,
     gradient: 'linear-gradient(135deg, rgba(234,88,12,0.55) 0%, rgba(17,20,30,0.95) 100%)',
@@ -255,6 +279,9 @@ export function getCategoryVisual(categoryNameOrSlug) {
   const normalized = categoryNameOrSlug.toLowerCase().trim();
 
   // Keyword-based fallback matching
+  if (normalized.includes('ev') || normalized.includes('charger') || normalized.includes('electric')) {
+    return CATEGORY_VISUALS['EV Charger'];
+  }
   if (normalized.includes('sport') || normalized.includes('hobbi') || normalized.includes('pickleball')) {
     return CATEGORY_VISUALS['Trending Sports & Hobbies'];
   }

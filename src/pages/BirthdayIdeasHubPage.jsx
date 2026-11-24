@@ -132,7 +132,7 @@ export const BirthdayIdeasHubPage = () => {
         return postCatNorm === catNameNorm || postCatNorm === catSlugNorm;
       });
 
-      if (matchingPosts.length > 0) {
+      if (matchingPosts.length > 0 || cat.slug === 'ev-charger') {
         matchingPosts.forEach(p => assignedPostIds.add(p.slug || p.id));
         groups.push({
           category: cat,
@@ -459,13 +459,22 @@ export const BirthdayIdeasHubPage = () => {
 
                   {/* Under each Main Category block, display only the blog posts that belong to that specific category */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {catPosts.slice(0, 3).map((article) => (
-                      <ArticleCard
-                        key={article.slug}
-                        article={article}
-                        categoryVisual={vis}
-                      />
-                    ))}
+                    {catPosts.length === 0 ? (
+                      <div className="col-span-full py-10 px-6 text-center rounded-2xl bg-[#11141e]/50 border border-dashed border-slate-800">
+                        <p className="text-slate-300 font-medium text-sm">New {cat.name} articles coming soon</p>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                          Stay tuned! We are crafting in-depth guides and reviews for this category.
+                        </p>
+                      </div>
+                    ) : (
+                      catPosts.slice(0, 3).map((article) => (
+                        <ArticleCard
+                          key={article.slug}
+                          article={article}
+                          categoryVisual={vis}
+                        />
+                      ))
+                    )}
 
                     {/* Extra "View All" Card if more than 3 posts */}
                     {catPosts.length > 3 && (

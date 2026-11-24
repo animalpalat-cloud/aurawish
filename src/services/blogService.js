@@ -114,7 +114,7 @@ export const blogService = {
       try {
         const { supabase, isSupabaseConfigured } = await getSupabaseClient();
         if (!supabase || !isSupabaseConfigured) {
-          return { data: [PUPPY_TRAINING_CATEGORY], error: null };
+          return { data: FALLBACK_CATEGORIES, error: null };
         }
 
         const { data, error } = await supabase
@@ -151,7 +151,7 @@ export const blogService = {
   async getCategories() {
     const { supabase, isSupabaseConfigured } = await getSupabaseClient();
     if (!supabase || !isSupabaseConfigured) {
-      return { data: [{ ...PUPPY_TRAINING_CATEGORY, post_count: 0 }], error: null };
+      return { data: FALLBACK_CATEGORIES.map(c => ({ ...c, post_count: 0 })), error: null };
     }
 
     try {
@@ -198,7 +198,7 @@ export const blogService = {
       return { data: categoriesWithCount, error: null };
     } catch (err) {
       console.warn('Error fetching categories from Supabase:', err.message);
-      return { data: [{ ...PUPPY_TRAINING_CATEGORY, post_count: 0 }], error: err };
+      return { data: FALLBACK_CATEGORIES.map(c => ({ ...c, post_count: 0 })), error: err };
     }
   },
 

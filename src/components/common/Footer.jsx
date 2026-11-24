@@ -45,6 +45,8 @@ export const Footer = () => {
             </h2>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li><Link to="/birthday-wishes/" className="hover:text-white transition-colors">Birthday Wishes Hub</Link></li>
+              <li><Link to="/christmas-cards/" className="hover:text-white transition-colors text-red-400 font-medium">Christmas Cards (100 Designs)</Link></li>
+              <li><Link to="/printable-birthday-cards/" className="hover:text-white transition-colors text-amber-300/90 font-medium">Printable Birthday Cards (PDF)</Link></li>
               <li><Link to="/templates/" className="hover:text-white transition-colors">Card Templates Gallery</Link></li>
               <li><Link to="/birthday-card-maker/" className="hover:text-white transition-colors">Birthday Card Maker</Link></li>
               <li><Link to="/digital-birthday-cards/" className="hover:text-white transition-colors">Digital Birthday Cards</Link></li>

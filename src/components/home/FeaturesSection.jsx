@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Palette, Share2, Music, Zap, Flame, Crown, Smartphone } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Sparkles, Palette, Share2, Music, Zap, Flame, Crown, Smartphone, Printer, ArrowRight } from 'lucide-react';
 
 const FEATURES = [
   {
@@ -80,6 +81,29 @@ export const FeaturesSection = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Printable Cards Feature Callout Banner */}
+        <div className="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-400/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-lg">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-300">
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              <span>New Studio Feature</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-display font-bold text-white tracking-tight">
+              Prefer a Physical Greeting Card? Try Free Printable Birthday Cards
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              Customize names, messages, and photos, choose foldable booklet or 5×7" flat card layouts, and download a 300 DPI print-ready PDF for US Letter or A4 paper.
+            </p>
+          </div>
+          <Link
+            to="/printable-birthday-cards/"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm transition-all shadow-md shadow-amber-400/20"
+          >
+            <span>Create Printable Card (PDF)</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
       </div>

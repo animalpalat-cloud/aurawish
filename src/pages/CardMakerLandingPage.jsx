@@ -47,6 +47,11 @@ export const CardMakerLandingPage = ({ explicitSlug }) => {
               Start Creating Now — Free
             </Button>
           </Link>
+          <Link to="/printable-birthday-cards/">
+            <Button variant="secondary" size="lg">
+              Printable Cards (PDF)
+            </Button>
+          </Link>
           <Link to="/birthday-wishes/">
             <Button variant="secondary" size="lg">
               Browse Birthday Wishes

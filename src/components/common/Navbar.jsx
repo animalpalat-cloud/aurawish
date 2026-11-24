@@ -16,7 +16,9 @@ import {
   Info,
   BookOpen,
   LogIn,
-  UserPlus
+  UserPlus,
+  Printer,
+  TreePine
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from './Toast';
@@ -83,6 +85,8 @@ export const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
+    { name: 'Christmas Cards', path: '/christmas-cards/', icon: TreePine },
+    { name: 'Printable Cards', path: '/printable-birthday-cards/', icon: Printer },
     { name: 'About', path: '/about/', icon: Info },
     { name: 'Blog', path: '/blog/', icon: BookOpen },
   ];

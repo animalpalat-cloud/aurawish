@@ -21,7 +21,7 @@ import {
 } from './TemplateDesigns';
 import { PhotoFrame } from './PhotoFrame';
 import { cn } from '../../utils/cn';
-import { getFontFamily, loadFont, isUrduFont, containsUrduText } from '../../data/fontsData';
+import { getFontFamily, getFontCategory, loadFont, isUrduFont, containsUrduText } from '../../data/fontsData';
 import { getLanguage, detectScriptAndDirection } from '../../data/languagesData';
 
 const UniversalCardRendererBase = ({
@@ -48,6 +48,7 @@ const UniversalCardRendererBase = ({
   const textContent = `${cardData.message || ''} ${cardData.title || ''} ${cardData.recipientName || ''} ${cardData.subtitle || ''}`;
   const scriptDetection = detectScriptAndDirection(textContent, cardData.language);
   const isRtl = (cardData.direction === 'rtl') || (currentLang.direction === 'rtl') || scriptDetection.isRtl || isUrduFont(selectedFont);
+  const fontCategory = getFontCategory(selectedFont);
 
   // Build inline font-family style with CSS variable --card-font
   const containerStyle = {
@@ -160,6 +161,7 @@ const UniversalCardRendererBase = ({
       style={containerStyle}
       dir={isRtl ? 'rtl' : undefined}
       data-card-export="true"
+      data-font-category={fontCategory || undefined}
     >
       {/* Particle Effect Layer */}
       <ParticleOverlay effect={cardData.effect || template?.defaultEffect || 'sparkles'} />

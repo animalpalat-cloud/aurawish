@@ -1,11 +1,17 @@
 // AuraWish Birthday Card Maker - 250+ Curated Premium Templates
 // Covers all 38 categories with unique visual identities, palettes, typography and layouts.
+import { CHRISTMAS_TEMPLATES } from './christmasTemplatesData.js';
 
 export const CATEGORIES = [
   {
     "id": "all",
     "name": "All",
     "icon": "Sparkles"
+  },
+  {
+    "id": "christmas",
+    "name": "Christmas Cards",
+    "icon": "TreePine"
   },
   {
     "id": "elegant",
@@ -270,6 +276,7 @@ export const CATEGORIES = [
 ];
 
 export const TEMPLATES = [
+  ...CHRISTMAS_TEMPLATES,
   {
     "templateId": "velvet-obsidian-gold",
     "name": "Velvet Obsidian & Gold",

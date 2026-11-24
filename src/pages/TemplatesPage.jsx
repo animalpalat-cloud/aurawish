@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
-import { Sparkles, Compass, Eye, ArrowRight, ArrowLeft, X, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSearchParams, useNavigate, useParams, Link } from 'react-router-dom';
+import { Sparkles, Compass, Eye, ArrowRight, ArrowLeft, X, AlertCircle, ChevronLeft, ChevronRight, Printer } from 'lucide-react';
 import { CategoryFilter } from '../components/gallery/CategoryFilter';
 import { SearchBar } from '../components/gallery/SearchBar';
 import { TemplateCard } from '../components/gallery/TemplateCard';
@@ -158,6 +158,17 @@ export const TemplatesPage = () => {
           <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Discover professionally crafted birthday card designs for every personality and relationship. Personalize messages, add photos, choose ambient music, and share memorable birthday wishes in minutes.
           </p>
+
+          <div className="pt-1">
+            <Link
+              to="/printable-birthday-cards/"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-amber-300 bg-amber-400/10 border border-amber-400/25 hover:bg-amber-400/20 hover:border-amber-400/40 transition-all shadow-sm group"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              <span>Need a physical card? Try our Free Printable Birthday Cards (PDF)</span>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
         </div>
 
         {/* Category Filter Pills */}

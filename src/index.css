@@ -99,6 +99,106 @@
   will-change: transform;
 }
 
+/* 
+ * PRINT & PDF EXPORT SAFE OVERRIDES
+ * html2canvas and print drivers do not support -webkit-background-clip: text cleanly.
+ * When rasterizing or printing, suppress transparent text fills and overlay pseudo-elements
+ * to ensure text renders crisply with 100% readability above all background layers.
+ */
+.printable-sheet,
+.printable-card-face,
+[data-printable-card],
+#printable-card-print-target {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.printable-sheet .text-gold-foil::after,
+.printable-card-face .text-gold-foil::after,
+[data-printable-card] .text-gold-foil::after,
+#printable-card-print-target .text-gold-foil::after {
+  display: none !important;
+  content: none !important;
+  animation: none !important;
+}
+
+@media print {
+  .text-gold-foil::after {
+    display: none !important;
+    content: none !important;
+    animation: none !important;
+  }
+}
+
+.printable-sheet .text-gold-foil,
+.printable-card-face .text-gold-foil,
+[data-printable-card] .text-gold-foil,
+#printable-card-print-target .text-gold-foil {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #f59e0b !important;
+  color: #f59e0b !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  position: relative !important;
+  z-index: 20 !important;
+}
+
+.printable-sheet .text-gradient-primary,
+.printable-card-face .text-gradient-primary,
+[data-printable-card] .text-gradient-primary,
+#printable-card-print-target .text-gradient-primary {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #f0abfc !important;
+  color: #f0abfc !important;
+}
+
+.printable-sheet .text-gradient-cyan,
+.printable-card-face .text-gradient-cyan,
+[data-printable-card] .text-gradient-cyan,
+#printable-card-print-target .text-gradient-cyan {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #22d3ee !important;
+  color: #22d3ee !important;
+}
+
+.printable-sheet .text-gradient-rose,
+.printable-card-face .text-gradient-rose,
+[data-printable-card] .text-gradient-rose,
+#printable-card-print-target .text-gradient-rose {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: #fb7185 !important;
+  color: #fb7185 !important;
+}
+
+/* Print card stacking layers */
+.printable-sheet .card-bg-layer,
+.printable-card-face .card-bg-layer {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.printable-sheet .card-border-frame,
+.printable-card-face .card-border-frame {
+  position: absolute !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+.printable-sheet .card-content-safe-area,
+.printable-card-face .card-content-safe-area {
+  position: relative !important;
+  z-index: 20 !important;
+}
+
 .text-gradient-primary {
   background: linear-gradient(135deg, #fdf4ff 0%, #f0abfc 40%, #c026d3 100%);
   -webkit-background-clip: text;
@@ -155,21 +255,40 @@
 }
 
 /* 
- * Robust Urdu & Card Typography Pipeline
- * When a custom font (especially Urdu Nastaliq/Naskh) is active on [data-card-export],
- * ensure child text elements (h1, h2, p, span, div) inherit the chosen font-family
- * instead of being blocked by static utility classes like font-serif, font-display, font-outfit.
+ * Robust Typography Pipeline across Card Editor & Printable Cards
+ * When a custom font (Urdu Nastaliq/Naskh, Arabic, Hindi, Latin, etc.) is active,
+ * ensure ALL card text elements (h1, h2, h3, h4, p, span, div.font-script, .card-text)
+ * inherit the chosen font-family instead of being blocked by utility classes
+ * like font-serif, font-display, font-sans, font-mono, font-script, font-outfit.
  */
-[data-card-export] {
+[data-card-export],
+[data-printable-card] {
   /* Set CSS custom variable for dynamic card typography */
   --card-font: inherit;
 }
 
 [data-card-export] h1,
 [data-card-export] h2,
+[data-card-export] h3,
+[data-card-export] h4,
 [data-card-export] p,
-[data-card-export] .card-text {
+[data-card-export] span,
+[data-card-export] .font-script,
+[data-card-export] .card-text,
+[data-printable-card] h1,
+[data-printable-card] h2,
+[data-printable-card] h3,
+[data-printable-card] h4,
+[data-printable-card] p,
+[data-printable-card] span,
+[data-printable-card] .card-text {
   font-family: var(--card-font) !important;
+}
+
+/* Ensure icons retain font-family: inherit or standard SVG behavior */
+[data-card-export] svg,
+[data-printable-card] svg {
+  font-family: sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -190,6 +309,8 @@
 /* Base RTL container: direction + bidi isolation */
 [data-card-export][dir="rtl"],
 [dir="rtl"] [data-card-export],
+[data-printable-card][dir="rtl"],
+[dir="rtl"] [data-printable-card],
 .urdu-text {
   direction: rtl;
   unicode-bidi: isolate;
@@ -202,6 +323,11 @@
 [data-card-export][dir="rtl"] h2,
 [data-card-export][dir="rtl"] span,
 [data-card-export][dir="rtl"] div,
+[data-printable-card][dir="rtl"] p,
+[data-printable-card][dir="rtl"] h1,
+[data-printable-card][dir="rtl"] h2,
+[data-printable-card][dir="rtl"] span,
+[data-printable-card][dir="rtl"] div,
 .urdu-text p,
 .urdu-text h1,
 .urdu-text h2,
@@ -218,6 +344,8 @@
  * Small padding prevents glyph clipping at container edges. */
 [data-card-export][dir="rtl"] h1,
 [data-card-export][dir="rtl"] h2,
+[data-printable-card][dir="rtl"] h1,
+[data-printable-card][dir="rtl"] h2,
 .urdu-text h1,
 .urdu-text h2 {
   line-height: 1.5 !important;
@@ -227,16 +355,17 @@
 }
 
 /* ── BODY TEXT (p, .card-text) — RTL ────────────────────────────────
- * Body text at text-base/text-lg needs generous line-height for
- * multi-line readability. Nastaliq especially needs this because
- * descenders from one line can visually overlap the line below. */
+ * Body text at text-base/text-lg needs balanced line-height for
+ * multi-line readability without pushing containers past card borders. */
 [data-card-export][dir="rtl"] p,
+[data-printable-card][dir="rtl"] p,
 .urdu-text p,
 [data-card-export][dir="rtl"] .card-text,
+[data-printable-card][dir="rtl"] .card-text,
 .urdu-text .card-text {
-  line-height: 2.0 !important;
-  padding-top: 0.1em;
-  padding-bottom: 0.15em;
+  line-height: 1.55 !important;
+  padding-top: 0.05em;
+  padding-bottom: 0.05em;
   overflow: visible !important;
 }
 
@@ -247,6 +376,10 @@
 [data-card-export][dir="rtl"] .text-sm,
 [data-card-export][dir="rtl"] .text-\[11px\],
 [data-card-export][dir="rtl"] .text-\[10px\],
+[data-printable-card][dir="rtl"] .text-xs,
+[data-printable-card][dir="rtl"] .text-sm,
+[data-printable-card][dir="rtl"] .text-\[11px\],
+[data-printable-card][dir="rtl"] .text-\[10px\],
 .urdu-text .text-xs,
 .urdu-text .text-sm {
   line-height: 1.7 !important;
@@ -254,19 +387,23 @@
 }
 
 /* ── NASTALIQ-SPECIFIC OVERRIDES ─────────────────────────────────────
- * When data-font-category="nastaliq" is set, apply even more generous
- * vertical space. Nastaliq fonts have ~2× the vertical extent of Naskh. */
+ * When data-font-category="nastaliq" is set, apply balanced
+ * line-height and padding. For printable cards, do NOT force excessive
+ * !important line-heights or paddings that cause vertical overflow. */
 [data-card-export][data-font-category="nastaliq"] h1,
-[data-card-export][data-font-category="nastaliq"] h2 {
-  line-height: 1.65 !important;
-  padding-top: 0.2em;
-  padding-bottom: 0.3em;
+[data-card-export][data-font-category="nastaliq"] h2,
+[data-printable-card][data-font-category="nastaliq"] h1,
+[data-printable-card][data-font-category="nastaliq"] h2 {
+  line-height: 1.35 !important;
+  padding-top: 0.05em;
+  padding-bottom: 0.1em;
 }
 
-[data-card-export][data-font-category="nastaliq"] p {
-  line-height: 2.2 !important;
-  padding-top: 0.15em;
-  padding-bottom: 0.25em;
+[data-card-export][data-font-category="nastaliq"] p,
+[data-printable-card][data-font-category="nastaliq"] p {
+  line-height: 1.55 !important;
+  padding-top: 0.05em;
+  padding-bottom: 0.05em;
 }
 
 /* ── PREVENT GLYPH CLIPPING ──────────────────────────────────────────
@@ -274,7 +411,8 @@
  * Urdu/Nastaliq glyphs. We target the direct child content area only,
  * NOT the outer card container (which needs overflow:hidden for its
  * decorative corners). */
-[data-card-export][dir="rtl"] > div {
+[data-card-export][dir="rtl"] > div,
+[data-printable-card][dir="rtl"] > div {
   overflow: visible;
 }
 
@@ -282,6 +420,7 @@
  * When Urdu text contains embedded English words/names, use isolate
  * so the directional run doesn't disrupt surrounding RTL flow. */
 [data-card-export][dir="rtl"] bdi,
+[data-printable-card][dir="rtl"] bdi,
 .urdu-text bdi {
   unicode-bidi: isolate;
 }

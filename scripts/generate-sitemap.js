@@ -16,8 +16,10 @@ const STATIC_ROUTES = [
   { path: '/blog', priority: '0.9', changefreq: 'daily' },
   { path: '/birthday-wishes', priority: '0.9', changefreq: 'daily' },
   { path: '/templates', priority: '0.9', changefreq: 'daily' },
+  { path: '/christmas-cards', priority: '0.9', changefreq: 'daily' },
   { path: '/birthday-card-templates', priority: '0.9', changefreq: 'weekly' },
   { path: '/birthday-card-maker', priority: '0.9', changefreq: 'weekly' },
+  { path: '/printable-birthday-cards', priority: '0.9', changefreq: 'daily' },
   { path: '/birthday-ideas', priority: '0.9', changefreq: 'daily' },
 
   // Feature Pages
@@ -84,6 +86,7 @@ const FALLBACK_CATEGORY_SLUGS = [
   'audio-birthday-card',
   'audio-greeting-card',
   'puppy-training',
+  'ev-charger',
   'writing-guides',
   'creative-ideas',
   'surprises',
